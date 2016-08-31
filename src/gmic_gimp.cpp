@@ -2072,9 +2072,7 @@ void _gimp_preview_invalidate() {
       if (w>=h) ph = cimg::max(1,h*(pw=min_preview_size)/w);
       else pw = cimg::max(1,w*(ph=min_preview_size)/h);
       preview_image_id = gimp_image_duplicate(image_id);
-      gimp_selection_none(preview_image_id);
       if (is_selection) gimp_image_crop(preview_image_id,w,h,sel_x0,sel_y0);
-
       preview_image_factor = (double)cimg::max(pw,ph)/cimg::max(w,h);
       const GimpInterpolationType mode = gimp_context_get_interpolation();
       gimp_context_set_interpolation(GIMP_INTERPOLATION_NONE);
