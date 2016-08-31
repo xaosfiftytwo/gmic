@@ -2052,7 +2052,18 @@ void _gimp_preview_invalidate() {
   else {
     if (GTK_IS_WIDGET(gui_preview)) gtk_widget_destroy(gui_preview);
 
-    const int w = gimp_image_width(image_id), h = gimp_image_height(image_id);
+/*
+    int is_selection = 0, sel_x0 = 0, sel_y0 = 0, sel_x1 = 0, sel_y1 = 0;
+    if (!gimp_selection_bounds(image_id,&is_selection,&sel_x0,&sel_y0,&sel_x1,&sel_y1)) is_selection = 0;
+*/
+    int w = gimp_image_width(image_id), h = gimp_image_height(image_id);
+/*
+    if (is_selection) {
+      w = sel_x1 - sel_x0 + 1;
+      h = sel_y1 - sel_y0 + 1;
+    }
+*/
+
     if (preview_image_id) gimp_image_delete(preview_image_id);
     preview_image_id = 0;
     preview_image_factor = 1;
