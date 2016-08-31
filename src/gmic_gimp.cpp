@@ -2051,9 +2051,11 @@ void _gimp_preview_invalidate() {
   if (is_valid_preview_drawable) gimp_preview_invalidate(GIMP_PREVIEW(gui_preview));
   else {
     if (GTK_IS_WIDGET(gui_preview)) gtk_widget_destroy(gui_preview);
+
     const int w = gimp_image_width(image_id), h = gimp_image_height(image_id);
     if (preview_image_id) gimp_image_delete(preview_image_id);
-    preview_image_id = 0; preview_image_factor = 1;
+    preview_image_id = 0;
+    preview_image_factor = 1;
 
     // Pre-compute image thumbnail for preview if image is too small.
     const int min_preview_size = (200 + 120*get_preview_size(true))*2/3;
@@ -3193,11 +3195,6 @@ void process_preview() {
       } else {
 
         // Multiple input layers: compute a 'hand-made' set of thumbnails.
-        if (preview_image_id) {
-          wp = gimp_image_width(preview_image_id);
-          hp = gimp_image_height(preview_image_id);
-        }
-
         CImgList<unsigned char> images_uchar;
         const CImg<int> layers = get_input_layers(images_uchar);
         if (images_uchar) {
@@ -3364,6 +3361,7 @@ void process_preview() {
                               (int)cimg::round(computed_preview.height()*ratio),
                               1,-100,2);
     }
+
     if (computed_preview.width()!=wp || computed_preview.height()!=hp)
       computed_preview.resize(wp,hp,1,-100,0,0,0.5,0.5);
     calibrate_image(computed_preview,sp,true);
