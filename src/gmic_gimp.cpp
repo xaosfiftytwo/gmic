@@ -2052,27 +2052,20 @@ void _gimp_preview_invalidate() {
   else {
     if (GTK_IS_WIDGET(gui_preview)) gtk_widget_destroy(gui_preview);
 
-
     int is_selection = 0, sel_x0 = 0, sel_y0 = 0, sel_x1 = 0, sel_y1 = 0;
     if (!gimp_selection_bounds(image_id,&is_selection,&sel_x0,&sel_y0,&sel_x1,&sel_y1)) is_selection = 0;
-    int w = gimp_image_width(image_id), h = gimp_image_height(image_id);
-    if (is_selection) {
-      w = sel_x1 - sel_x0 + 1;
-      h = sel_y1 - sel_y0 + 1;
-    }
-
+    const int w = gimp_image_width(image_id), h = gimp_image_height(image_id);
     if (preview_image_id) gimp_image_delete(preview_image_id);
     preview_image_id = 0;
     preview_image_factor = 1;
 
     // Pre-compute image thumbnail for preview if image is too small.
     const int min_preview_size = (200 + 120*get_preview_size(true))*2/3;
-    if (cimg::max(w,h)<min_preview_size) {
+    if (!is_selection && cimg::max(w,h)<min_preview_size) {
       int pw = 0, ph = 0;
       if (w>=h) ph = cimg::max(1,h*(pw=min_preview_size)/w);
       else pw = cimg::max(1,w*(ph=min_preview_size)/h);
       preview_image_id = gimp_image_duplicate(image_id);
-      if (is_selection) gimp_image_crop(preview_image_id,w,h,sel_x0,sel_y0);
       preview_image_factor = (double)cimg::max(pw,ph)/cimg::max(w,h);
       const GimpInterpolationType mode = gimp_context_get_interpolation();
       gimp_context_set_interpolation(GIMP_INTERPOLATION_NONE);
