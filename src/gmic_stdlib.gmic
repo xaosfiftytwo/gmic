@@ -25492,7 +25492,9 @@ _gimp_dirty :
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/01/2016</i>.</small>")
 gimp_flip_blocs :
   -repeat $! -l[$>]
-    -ac "-_gimp_flip_blocs ${1-4}",$5
+    -if $5 -ac "-_gimp_flip_blocs ${1-4}",$5
+    -else -_gimp_flip_blocs ${1-4}
+    -endif
   -endl -done
 
 _gimp_flip_blocs :
