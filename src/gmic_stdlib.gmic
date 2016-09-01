@@ -25487,19 +25487,23 @@ _gimp_dirty :
 #@gimp : Y-size (px) = int(4,1,128)
 #@gimp : Flip = choice(3,"None","X-axis","Y-axis","XY-axes")
 #@gimp : Rotate = choice(1,"-90 deg.","0 deg.","90 deg.")
+#@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/01/2016</i>.</small>")
 gimp_flip_blocs :
   -repeat $! -l[$>]
-    -if {($3%2)" && "$1>1} -s x,-$1 -mirror x -a x -endif
-    -if {($3>1)" && "$2>1} -s y,-$2 -mirror y -a y -endif
-    -if {$4!=1" && "$1>1" && "$2>1}
-      -s y,-$2 N=$!
-      -s x,-$1 M={$!/$N}
-      -ap "-rotate {($4-1)*90}"
-      -append_tiles $M,$N
-    -endif
+    -ac "-_gimp_flip_blocs ${1-4}",$5
   -endl -done
+
+_gimp_flip_blocs :
+  -if {($3%2)" && "$1>1} -s x,-$1 -mirror x -a x -endif
+  -if {($3>1)" && "$2>1} -s y,-$2 -mirror y -a y -endif
+  -if {$4!=1" && "$1>1" && "$2>1}
+    -s y,-$2 N=$!
+    -s x,-$1 M={$!/$N}
+    -ap "-rotate {($4-1)*90}"
+    -append_tiles $M,$N
+  -endif
 
 gimp_flip_blocs_preview :
   -gimp_split_preview "-gimp_flip_blocs $*",$-1
