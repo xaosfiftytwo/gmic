@@ -25482,16 +25482,23 @@ _gimp_dirty :
     -* -idct -c 0,255
   -endl -done
 
-#@gimp Flip blocs : gimp_flip_blocs,gimp_flip_blocs_preview(0)
-#@gimp : X-size = int(4,2,128)
-#@gimp : Y-size = int(4,2,128)
+#@gimp Flip &amp; rotate blocs : gimp_flip_blocs,gimp_flip_blocs_preview(0)
+#@gimp : X-size = int(4,1,128)
+#@gimp : Y-size = int(4,1,128)
 #@gimp : Flip = choice("X-axis","Y-axis","XY-axes")
+#@gimp : Rotate = choice("0 deg.","90 deg.","180 deg.","270 deg.")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/01/2016</i>.</small>")
 gimp_flip_blocs :
   -repeat $! -l[$>]
-    -if {!($3%2)} -s x,-$1 -mirror x -a x -endif
-    -if {!($3>1)} -s y,-$2 -mirror y -a y -endif
+    -if {!($3%2)&&$1>1} -s x,-$1 -mirror x -a x -endif
+    -if {!($3>1)&&$2>1} -s y,-$2 -mirror y -a y -endif
+    -if {$4&&$1>1&&$2>1}
+      -s y,-$2 N=$!
+      -s x,-$1 M={$!/$N}
+      -ap "-rotate {$4*90}"
+      -append_tiles $M,$N
+    -endif
   -endl -done
 
 gimp_flip_blocs_preview :
@@ -31107,7 +31114,7 @@ gmicol_rotate :
 #@gmicol clone("Blur [radial]")
 #@gmicol clone("Chromatic aberrations")
 #@gmicol clone("Dirty")
-#@gmicol clone("Flip blocs")
+#@gmicol clone("Flip &amp; rotate blocs")
 #@gmicol clone("Lomo")
 #@gmicol clone("Noise [additive]")
 #@gmicol clone("Noise [spread]")
