@@ -20686,7 +20686,7 @@ _gimp_merge_layers :
   -endl
   -if {narg({'$res'})} -u $res -else -u "${2--1}" -endif
 
-# Generate a splitted preview, with arguments "command",_split_type,_timeout.
+# Generate a splitted preview, with arguments "command",_split_type,_timeout,_compute_entire_image
 # 'split_type' can be { 0=no split | 1=forw. horiz. | 2=forw. vert. | 3=back. horiz. | 4=back. vert. | 5=dupl. horiz. | 6=dupl. vert. }
 # 'timeout' can be { 0=no timeout | >0=with specified timeout (in seconds) }.
 # 'compute_entire_image' can be { 0=no | 1=yes }.
@@ -25364,7 +25364,7 @@ __gimp_dof_blur :
 #@gimp : XY-amplitude = float(3,0,20)
 #@gimp : X-amplitude = float(0,0,20)
 #@gimp : Y-amplitude = float(0,0,20)
-#@gimp : Boundary conditions = choice(1,"Black","Nearest")
+#@gimp : Boundary = choice(1,"Black","Nearest")
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : Value action = choice("None","Cut","Normalize")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
@@ -25397,7 +25397,7 @@ gimp_glow_preview :
 #@gimp : Orthogonal radius = float(0.5,0,100)
 #@gimp : Angle = float(0,0,180)
 #@gimp : Sharpness = float(0,0,500)
-#@gimp : Boundary conditions = choice(1,"Black","Nearest")
+#@gimp : Boundary = choice(1,"Black","Nearest")
 #@gimp : sep = separator(), Channel(s) = choice(7,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : Value action = choice("None","Cut","Normalize")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
@@ -25698,6 +25698,30 @@ gimp_scanlines_preview :
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
 gimp_watermark_visible :
   -watermark_visible "$1",$2,$3,$4,$6,$5
+
+#@gimp Warp by intensity : gimp_warp_by_intensity, gimp_warp_by_intensity_preview(0)
+#@gimp : X-factor = float(0.04,-2,2)
+#@gimp : Y-factor = float(0.04,-2,2)
+#@gimp : sep = separator()
+#@gimp : X-offset = float(128,0,255)
+#@gimp : Y-offset = float(128,0,255)
+#@gimp : sep = separator()
+#@gimp : Correlated channels = bool(0)
+#@gimp : Interpolation = choice(1,"Nearest neighbor","Linear")
+#@gimp : Boundary = choice(1,"Black","Nearest","Repeat")
+#@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
+#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/02/2016</i>.</small>")
+gimp_warp_by_intensity :
+  -ac "-_gimp_warp_by_intensity ${1-7}",$8
+
+_gimp_warp_by_intensity :
+  -if $5 -f "ni=norm2(R,G,B);J((ni-$3)*$1,(ni-$4)*$2,0,$6,$7)"
+  -else -f "j((i-$3)*$1,(i-$4)*$2,0,0,$6,$7)"
+  -endif
+
+gimp_warp_by_intensity_preview :
+  -gimp_split_preview "-gimp_warp_by_intensity $*",$-1,0,1
 
 #@gimp _<b>Details</b>
 #----------------------
@@ -31142,6 +31166,7 @@ gmicol_rotate :
 #@gmicol clone("Random shade stripes")
 #@gmicol clone("Scanlines")
 #@gmicol clone("Visible watermark")
+#@gmicol clone("Warp by intensity")
 
 #@gmicol _<b>Details</b>
 #-----------------------
