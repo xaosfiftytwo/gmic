@@ -27765,7 +27765,7 @@ gimp_canvas_preview :
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>07/20/2016</i>.</small>")
 gimp_cracks :
-  -ac "-cracks $1,$2,{$6/255},${3-5}",$7
+  -ac "-cracks $1,$2,{$6/255},${3-5},255",$7
 
 gimp_cracks_preview :
   -gimp_split_preview "-gimp_cracks $*",$-1
