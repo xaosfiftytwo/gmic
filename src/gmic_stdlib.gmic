@@ -25700,8 +25700,8 @@ gimp_watermark_visible :
   -watermark_visible "$1",$2,$3,$4,$6,$5
 
 #@gimp Warp by intensity : gimp_warp_by_intensity, gimp_warp_by_intensity_preview(0)
-#@gimp : X-factor = float(0.04,-2,2)
-#@gimp : Y-factor = float(0.04,-2,2)
+#@gimp : X-factor = float(0.04,-6,6)
+#@gimp : Y-factor = float(0.04,-6,6)
 #@gimp : sep = separator()
 #@gimp : X-offset = float(128,0,255)
 #@gimp : Y-offset = float(128,0,255)
