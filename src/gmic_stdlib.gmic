@@ -25590,7 +25590,7 @@ gimp_8bits_preview :
 #@gimp : note = note{"<small><b>Sorting parameters:</b></small>"}
 #@gimp : Order = choice(1,"Decreasing","Increasing")
 #@gimp : Axis = choice("X-axis","Y-axis","X-axis then Y-axis","Y-axis then X-axis")
-#@gimp : Sorting criterion = choice(1,"Minimum","Luminance","Lightness","Intensity","Maximum","Random")
+#@gimp : Sorting criterion = choice("Red","Green","Blue","Intensity","Luminance","Lightness","Hue","Saturation","Minimum","Maximum","Random")
 #@gimp : sep = separator()
 #@gimp : note = note{"<small><b>Masking parameters:</b></small>"}
 #@gimp : Mask by = choice(1,"Bottom layer","Criterion","Contours","Random")
@@ -25604,18 +25604,23 @@ gimp_8bits_preview :
 #@gimp : This filter implements one version of the algorithm described here :
 #@gimp : </small>"}
 #@gimp : link = link("http://satyarth.me/articles/pixel-sorting/")
-#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>06/06/2016</i>.</small>")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/05/2016</i>.</small>")
 gimp_pixelsort :
   -_gimp_pixelsort ${1-8},0
 
 _gimp_pixelsort :
   -repeat {$!-($4==0)} -l[$>]
-    -if {$3==0} --compose_channels min
-    -elif {$3==1} --luminance
-    -elif {$3==2} --to_rgb -rgb2hsl. -channels. 2
-    -elif {$3==3} --compose_channels +
-    -elif {$3==4} --compose_channels max
-    -else 100%,100%,1,1 -rand. 0,100
+    -if {$3==0} --to_rgb -channels. 0              # Red
+    -elif {$3==1} --to_rgb -channels. 1            # Green
+    -elif {$3==2} --to_rgb -channels. 2            # Blue
+    -elif {$3==3} --compose_channels +             # Intensity
+    -elif {$3==4} --luminance                      # Luminance
+    -elif {$3==5} --to_rgb -rgb2hsl. -channels. 2  # Lightness
+    -elif {$3==6} --to_rgb -rgb2hsl. -channels. 0  # Hue
+    -elif {$3==7} --to_rgb -rgb2hsl. -channels. 1  # Saturation
+    -elif {$3==8} --compose_channels min           # Minimum
+    -elif {$3==9} --compose_channels max           # Maximum
+    -else 100%,100%,1,1 -rand. 0,100               # Random
     -endif
     -if {$4==0} -pass. 0 -norm.
     -elif {$4==1} .
