@@ -116,10 +116,15 @@ GtkWidget *right_frame = 0;                    // The right frame containing the
 GtkWidget *right_pane = 0;                     // The right scrolled window, containing the right frame.
 GtkWidget *markup2ascii = 0;                   // Used to convert markup to ascii strings.
 GimpPDBStatusType status = GIMP_PDB_SUCCESS;   // The plug-in return status.
+#if GIMP_MINOR_VERSION>8
+GimpColorProfile* img_profile = 0;             // The color profile of the image.
+#endif
+
 const char *s_blendmode[] = { "alpha","dissolve","behind","multiply","screen","overlay","difference",
                               "add","subtract","darken","lighten","hue","saturation","color","value",
                               "divide","dodge","burn","hardlight","softlight","grainextract",
                               "grainmerge","colorerase" };
+
 
 // Set/get plug-in persistent variables, using GIMP {get,set}_data() features.
 //-----------------------------------------------------------------------------
@@ -1625,6 +1630,148 @@ void convert_image2uchar(CImg<T>& img) {
   }
 }
 
+// Apply current GIMP color profile to image to render it in GimpPreview widget.
+//------------------------------------------------------------------------------
+#define CLAMPF(a, mn, mx) ((a) < (mn) ? (mn) : ((a) > (mx) ? (mx) : (a)))
+template<typename T>
+void apply_color_profile(CImg<T>& img) {
+/*  if (!img) return;
+
+#if GIMP_MINOR_VERSION<=8
+  cimg::unused(img);
+#else
+  GimpColorConfig* color_config = gimp_get_color_configuration();
+  if(!color_config) return;
+
+  printf("convert_to_display(): img_profile=%p\n", (void*)img_profile);
+  if( img_profile == NULL ) return;
+
+  //printf("convert_to_display(): img.spectrum()=%d WxH=%dx%d\n",
+//	 (int)img.spectrum(),(int)img.width(),(int)img.height());
+  const unsigned int linsiz = img.width()*img.spectrum();
+  float* linbuf = (float*)malloc(linsiz*sizeof(float));
+  //printf("convert_to_display(): linsiz=%d, linbuf=%p\n",
+//	 (int)linsiz, (void*)linbuf);
+  const unsigned int siz = img.width()*img.height();
+  GimpColorRenderingIntent intent =
+    GIMP_COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC;
+  GimpColorTransformFlags flags = 0;
+  flags |= GIMP_COLOR_TRANSFORM_FLAGS_BLACK_POINT_COMPENSATION;
+  flags |= GIMP_COLOR_TRANSFORM_FLAGS_NOOPTIMIZE;
+  switch (img.spectrum()) {
+  case 1 : {
+  } break;
+  case 2 : {
+  } break;
+  case 3 : {
+    Babl* fmt = babl_format ("R'G'B' float");
+    GimpColorTransform* transform =
+      gimp_widget_get_color_transform(gui_preview, color_config, img_profile, fmt, fmt);
+    //  gimp_color_transform_new(img_profile, fmt,
+    //			       dpy_profile, fmt,
+    //			       intent,
+    //			       flags);
+    printf("convert_to_display(): transform=%p\n", (void*)transform);
+    if( transform ) {
+      for(unsigned int r = 0; r < img.height(); r++ ){
+	T *ptr0 = img.data(0,r,0,0);
+	T *ptr1 = img.data(0,r,0,1);
+	T *ptr2 = img.data(0,r,0,2);
+	//printf("  processing row %d (%p %p %p %p)\n",
+	//	r, (void*)ptr0, (void*)ptr1, (void*)ptr2, (void*)linbuf);
+	//printf("  processing row %d\n", r);
+ 	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
+	  //printf("    copying col %d (i=%d), linbuf=%p\n", j, i, (void*)linbuf);
+	  linbuf[i] = ptr0[j]/255;
+	  linbuf[i+1] = ptr1[j]/255;
+	  linbuf[i+2] = ptr2[j]/255;
+	  if( false && r==0 && j<4) {
+	    printf("    in ->  ptr: %f %f %f, linbuf[i]: %f %f %f\n",
+		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
+		   linbuf[i],linbuf[i+1],linbuf[i+2]);
+	  }
+	}
+	//printf("    copying finished\n");
+	//printf("    applying ICC transform...\n");
+	gimp_color_transform_process_pixels(transform,
+					    fmt, linbuf,
+					    fmt, linbuf,
+					    img.width());
+	//printf("    ... done.\n");
+	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
+	  //printf("    copying back col %d\n", j);
+	  ptr0[j] = CLAMPF(linbuf[i]*255,0,255);
+	  ptr1[j] = CLAMPF(linbuf[i+1]*255,0,255);
+	  ptr2[j] = CLAMPF(linbuf[i+2]*255,0,255);
+	  if( false && r==0 && j<4) {
+	    printf("    out -> ptr: %f %f %f, linbuf[i]: %f %f %f\n",
+		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
+		   linbuf[i],linbuf[i+1],linbuf[i+2]);
+	  }
+	}
+      }
+      g_object_unref(transform);
+    }
+  } break;
+  case 4 : {
+    Babl* fmt = babl_format ("R'G'B'A float");
+    GimpColorTransform* transform =
+      gimp_widget_get_color_transform(gui_preview, color_config, img_profile, fmt, fmt);
+      //  gimp_color_transform_new(img_profile, fmt,
+      //		       dpy_profile, fmt,
+      //		       intent,
+      //		       flags);
+    printf("convert_to_display(): transform=%p\n", (void*)transform);
+    if( transform ) {
+      for(unsigned int r = 0; r < img.height(); r++ ){
+	T *ptr0 = img.data(0,r,0,0);
+	T *ptr1 = img.data(0,r,0,1);
+	T *ptr2 = img.data(0,r,0,2);
+	T *ptr3 = img.data(0,r,0,3);
+	//printf("  processing row %d (%p %p %p %p)\n",
+	//	r, (void*)ptr0, (void*)ptr1, (void*)ptr2, (void*)linbuf);
+	//printf("  processing row %d\n", r);
+	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
+	  //printf("    copying col %d\n", j);
+	  linbuf[i] = ptr0[j]/255;
+	  linbuf[i+1] = ptr1[j]/255;
+	  linbuf[i+2] = ptr2[j]/255;
+	  linbuf[i+3] = ptr3[j]/255;
+	  if( false && r==0 && j<4) {
+	    printf("    in ->  ptr: %f %f %f, linbuf[i]: %f %f %f\n",
+		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
+		   linbuf[i],linbuf[i+1],linbuf[i+2]);
+	  }
+	}
+	//printf("    applying ICC transform...\n");
+	gimp_color_transform_process_pixels(transform,
+					    fmt, linbuf,
+					    fmt, linbuf,
+					    img.width());
+	//printf("    ... done.\n");
+	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
+	  //printf("    copying back col %d\n", j);
+	  ptr0[j] = CLAMPF(linbuf[i]*255,0,255);
+	  ptr1[j] = CLAMPF(linbuf[i+1]*255,0,255);
+	  ptr2[j] = CLAMPF(linbuf[i+2]*255,0,255);
+	  if( false && r==0 && j<4) {
+	    printf("    out -> ptr: %f %f %f, linbuf[i]: %f %f %f\n",
+		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
+		   linbuf[i],linbuf[i+1],linbuf[i+2]);
+	  }
+	}
+      }
+      g_object_unref(transform);
+    }
+  } break;
+  }
+
+//printf("convert_to_display(): freeing linbuf\n");
+  if(linbuf) free(linbuf);
+*/
+#endif
+}
+
 // Calibrate any image to fit the required number of channels (GRAY,GRAYA, RGB or RGBA).
 //---------------------------------------------------------------------------------------
 template<typename T>
@@ -3096,6 +3243,10 @@ void process_preview() {
   const CImg<char> command_line = get_command_line(true);
   if (!command_line || std::strstr(command_line," -_none_")) return;
 
+#if GIMP_MINOR_VERSION>8
+  img_profile = gimp_image_get_effective_color_profile(image_id);
+#endif
+
   bool update_parameters = false;
   int wp, hp, sp, xp, yp;
   static int _xp = -1, _yp = -1;
@@ -3366,6 +3517,8 @@ void process_preview() {
 
     if (computed_preview.width()!=wp || computed_preview.height()!=hp)
       computed_preview.resize(wp,hp,1,-100,0,0,0.5,0.5);
+
+    apply_color_profile(computed_preview);
     calibrate_image(computed_preview,sp,true);
     convert_image2uchar(computed_preview);
     computed_preview.channel(0);
@@ -4274,6 +4427,7 @@ void gmic_run(const gchar *name, gint nparams, const GimpParam *param,
 #if GIMP_MINOR_VERSION>8
   gegl_init(NULL,NULL);
   gimp_plugin_enable_precision();
+  gimp_color_config_get_type();
 #endif
   markup2ascii = gtk_label_new(0);
 
