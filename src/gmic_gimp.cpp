@@ -1632,143 +1632,35 @@ void convert_image2uchar(CImg<T>& img) {
 
 // Apply current GIMP color profile to image to render it in GimpPreview widget.
 //------------------------------------------------------------------------------
-#define CLAMPF(a, mn, mx) ((a) < (mn) ? (mn) : ((a) > (mx) ? (mx) : (a)))
 template<typename T>
 void apply_color_profile(CImg<T>& img) {
-/*  if (!img) return;
+  if (!img || img.spectrum()<3) return;
 
 #if GIMP_MINOR_VERSION<=8
   cimg::unused(img);
 #else
-  GimpColorConfig* color_config = gimp_get_color_configuration();
-  if(!color_config) return;
 
-  printf("convert_to_display(): img_profile=%p\n", (void*)img_profile);
-  if( img_profile == NULL ) return;
-
-  //printf("convert_to_display(): img.spectrum()=%d WxH=%dx%d\n",
-//	 (int)img.spectrum(),(int)img.width(),(int)img.height());
-  const unsigned int linsiz = img.width()*img.spectrum();
-  float* linbuf = (float*)malloc(linsiz*sizeof(float));
-  //printf("convert_to_display(): linsiz=%d, linbuf=%p\n",
-//	 (int)linsiz, (void*)linbuf);
-  const unsigned int siz = img.width()*img.height();
-  GimpColorRenderingIntent intent =
-    GIMP_COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC;
-  GimpColorTransformFlags flags = 0;
-  flags |= GIMP_COLOR_TRANSFORM_FLAGS_BLACK_POINT_COMPENSATION;
-  flags |= GIMP_COLOR_TRANSFORM_FLAGS_NOOPTIMIZE;
-  switch (img.spectrum()) {
-  case 1 : {
-  } break;
-  case 2 : {
-  } break;
-  case 3 : {
-    Babl* fmt = babl_format ("R'G'B' float");
-    GimpColorTransform* transform =
-      gimp_widget_get_color_transform(gui_preview, color_config, img_profile, fmt, fmt);
-    //  gimp_color_transform_new(img_profile, fmt,
-    //			       dpy_profile, fmt,
-    //			       intent,
-    //			       flags);
-    printf("convert_to_display(): transform=%p\n", (void*)transform);
-    if( transform ) {
-      for(unsigned int r = 0; r < img.height(); r++ ){
-	T *ptr0 = img.data(0,r,0,0);
-	T *ptr1 = img.data(0,r,0,1);
-	T *ptr2 = img.data(0,r,0,2);
-	//printf("  processing row %d (%p %p %p %p)\n",
-	//	r, (void*)ptr0, (void*)ptr1, (void*)ptr2, (void*)linbuf);
-	//printf("  processing row %d\n", r);
- 	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
-	  //printf("    copying col %d (i=%d), linbuf=%p\n", j, i, (void*)linbuf);
-	  linbuf[i] = ptr0[j]/255;
-	  linbuf[i+1] = ptr1[j]/255;
-	  linbuf[i+2] = ptr2[j]/255;
-	  if( false && r==0 && j<4) {
-	    printf("    in ->  ptr: %f %f %f, linbuf[i]: %f %f %f\n",
-		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
-		   linbuf[i],linbuf[i+1],linbuf[i+2]);
-	  }
-	}
-	//printf("    copying finished\n");
-	//printf("    applying ICC transform...\n");
-	gimp_color_transform_process_pixels(transform,
-					    fmt, linbuf,
-					    fmt, linbuf,
-					    img.width());
-	//printf("    ... done.\n");
-	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
-	  //printf("    copying back col %d\n", j);
-	  ptr0[j] = CLAMPF(linbuf[i]*255,0,255);
-	  ptr1[j] = CLAMPF(linbuf[i+1]*255,0,255);
-	  ptr2[j] = CLAMPF(linbuf[i+2]*255,0,255);
-	  if( false && r==0 && j<4) {
-	    printf("    out -> ptr: %f %f %f, linbuf[i]: %f %f %f\n",
-		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
-		   linbuf[i],linbuf[i+1],linbuf[i+2]);
-	  }
-	}
-      }
-      g_object_unref(transform);
+#if 0
+  GimpColorConfig *const color_config = gimp_get_color_configuration();
+  if (!color_config || !img_profile) return;
+  const GimpColorRenderingIntent intent = GIMP_COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC;
+  const GimpColorTransformFlags flags =
+    GIMP_COLOR_TRANSFORM_FLAGS_BLACK_POINT_COMPENSATION |
+    GIMP_COLOR_TRANSFORM_FLAGS_NOOPTIMIZE;
+  const Babl *const fmt = babl_format(img.spectrum()==3?"R'G'B' float":"R'G'B'A' float");
+  const GimpColorTransform *const transform = gimp_widget_get_color_transform(gui_preview,color_config,img_profile,fmt,fmt);
+  if (transform) {
+    CImg<float> row;
+    cimg_forY(img,y) {
+      img.get_row(y).permute_axes("cxyz").move_to(row)/=255;
+      gimp_color_transform_process_pixels(transform,fmt,row,fmt,row,row.height());
+      img.draw_image((row*=255).cut(0,255).permute_axes("yzcx"),0,y);
     }
-  } break;
-  case 4 : {
-    Babl* fmt = babl_format ("R'G'B'A float");
-    GimpColorTransform* transform =
-      gimp_widget_get_color_transform(gui_preview, color_config, img_profile, fmt, fmt);
-      //  gimp_color_transform_new(img_profile, fmt,
-      //		       dpy_profile, fmt,
-      //		       intent,
-      //		       flags);
-    printf("convert_to_display(): transform=%p\n", (void*)transform);
-    if( transform ) {
-      for(unsigned int r = 0; r < img.height(); r++ ){
-	T *ptr0 = img.data(0,r,0,0);
-	T *ptr1 = img.data(0,r,0,1);
-	T *ptr2 = img.data(0,r,0,2);
-	T *ptr3 = img.data(0,r,0,3);
-	//printf("  processing row %d (%p %p %p %p)\n",
-	//	r, (void*)ptr0, (void*)ptr1, (void*)ptr2, (void*)linbuf);
-	//printf("  processing row %d\n", r);
-	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
-	  //printf("    copying col %d\n", j);
-	  linbuf[i] = ptr0[j]/255;
-	  linbuf[i+1] = ptr1[j]/255;
-	  linbuf[i+2] = ptr2[j]/255;
-	  linbuf[i+3] = ptr3[j]/255;
-	  if( false && r==0 && j<4) {
-	    printf("    in ->  ptr: %f %f %f, linbuf[i]: %f %f %f\n",
-		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
-		   linbuf[i],linbuf[i+1],linbuf[i+2]);
-	  }
-	}
-	//printf("    applying ICC transform...\n");
-	gimp_color_transform_process_pixels(transform,
-					    fmt, linbuf,
-					    fmt, linbuf,
-					    img.width());
-	//printf("    ... done.\n");
-	for (unsigned int i = 0, j = 0; i<linsiz; i += img.spectrum(), j++) {
-	  //printf("    copying back col %d\n", j);
-	  ptr0[j] = CLAMPF(linbuf[i]*255,0,255);
-	  ptr1[j] = CLAMPF(linbuf[i+1]*255,0,255);
-	  ptr2[j] = CLAMPF(linbuf[i+2]*255,0,255);
-	  if( false && r==0 && j<4) {
-	    printf("    out -> ptr: %f %f %f, linbuf[i]: %f %f %f\n",
-		   (float)ptr0[j],(float)ptr1[j],(float)ptr2[j],
-		   linbuf[i],linbuf[i+1],linbuf[i+2]);
-	  }
-	}
-      }
-      g_object_unref(transform);
-    }
-  } break;
+    g_object_unref(transform);
   }
 
-//printf("convert_to_display(): freeing linbuf\n");
-  if(linbuf) free(linbuf);
-*/
+#endif // #if 0
+
 #endif
 }
 
