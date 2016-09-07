@@ -1841,48 +1841,9 @@ CImg<int> get_input_layers(CImgList<T>& images) {
     gimp_pixel_rgn_init(&region,drawable,rgn_x,rgn_y,rgn_width,rgn_height,false,false);
     guchar *const row = g_new(guchar,rgn_width*spectrum), *ptrs = 0;
     CImg<T> img(rgn_width,rgn_height,1,spectrum);
-    switch (spectrum) {
-    case 1 : {
-      T *ptr_r = img.data(0,0,0,0);
-      cimg_forY(img,y) {
-        gimp_pixel_rgn_get_row(&region,ptrs=row,rgn_x,rgn_y + y,rgn_width);
-        cimg_forX(img,x) *(ptr_r++) = (T)*(ptrs++);
-      }
-    } break;
-    case 2 : {
-      T *ptr_r = img.data(0,0,0,0), *ptr_g = img.data(0,0,0,1);
-      cimg_forY(img,y) {
-        gimp_pixel_rgn_get_row(&region,ptrs=row,rgn_x,rgn_y + y,rgn_width);
-        cimg_forX(img,x) {
-          *(ptr_r++) = (T)*(ptrs++);
-          *(ptr_g++) = (T)*(ptrs++);
-        }
-      }
-    } break;
-    case 3 : {
-      T *ptr_r = img.data(0,0,0,0), *ptr_g = img.data(0,0,0,1), *ptr_b = img.data(0,0,0,2);
-      cimg_forY(img,y) {
-        gimp_pixel_rgn_get_row(&region,ptrs=row,rgn_x,rgn_y + y,rgn_width);
-        cimg_forX(img,x) {
-          *(ptr_r++) = (T)*(ptrs++);
-          *(ptr_g++) = (T)*(ptrs++);
-          *(ptr_b++) = (T)*(ptrs++);
-        }
-      }
-    } break;
-    case 4 : {
-      T *ptr_r = img.data(0,0,0,0), *ptr_g = img.data(0,0,0,1),
-        *ptr_b = img.data(0,0,0,2), *ptr_a = img.data(0,0,0,3);
-      cimg_forY(img,y) {
-        gimp_pixel_rgn_get_row(&region,ptrs=row,rgn_x,rgn_y + y,rgn_width);
-        cimg_forX(img,x) {
-          *(ptr_r++) = (T)*(ptrs++);
-          *(ptr_g++) = (T)*(ptrs++);
-          *(ptr_b++) = (T)*(ptrs++);
-          *(ptr_a++) = (T)*(ptrs++);
-        }
-      }
-    } break;
+    cimg_forY(img,y) {
+      gimp_pixel_rgn_get_row(&region,ptrs=row,rgn_x,rgn_y + y,rgn_width);
+      img.draw_image(0,y,CImg<unsigned char>(ptrs,spectrum,rgn_width,1,1,true).get_permute_axes("yzcx"));
     }
     g_free(row);
     gimp_drawable_detach(drawable);
@@ -1894,10 +1855,6 @@ CImg<int> get_input_layers(CImgList<T>& images) {
       spectrum==3?"R'G'B' " s_gmic_pixel_type:"R'G'B'A " s_gmic_pixel_type;
     CImg<float> img(spectrum,rgn_width,rgn_height);
     gegl_buffer_get(buffer,&rect,1,babl_format(format),img.data(),0,GEGL_ABYSS_NONE);
-//    GimpColorTransform transform = gimp_color_transform_new(gimp_image_get_color_profile(image),
-//    gimp_drawable_get_format(drawable),gimp_color_profile_new_srgb(),babl_format("R'G'B'A float"),intent,flags);
-// if (transform==NULL) gegl_buffer_copy()...
-// else gimp_color_transform_process_buffer(transform, gimp_drawable_get_buffer (drawable), rect1, tmp_buffer, rect2);
     (img*=255).permute_axes("yzcx");
     g_object_unref(buffer);
 #endif
@@ -3168,49 +3125,7 @@ void process_preview() {
         // Single input layer: get the default thumbnail provided by GIMP.
         spt.images.assign(1);
         spt.images_names.assign(1);
-
-        const guchar *ptrs = ptr0;
-        spt.images.assign(1,wp,hp,1,sp);
-        const int whp = wp*hp;
-        switch (sp) {
-        case 1 : {
-          float *ptr_r = spt.images[0].data(0,0,0,0);
-          for (int xy = 0; xy<whp; ++xy) *(ptr_r++) = (float)*(ptrs++);
-        } break;
-        case 2 : {
-          float
-            *ptr_r = spt.images[0].data(0,0,0,0),
-            *ptr_g = spt.images[0].data(0,0,0,1);
-          for (int xy = 0; xy<whp; ++xy) {
-            *(ptr_r++) = (float)*(ptrs++);
-            *(ptr_g++) = (float)*(ptrs++);
-          }
-        } break;
-        case 3 : {
-          float
-            *ptr_r = spt.images[0].data(0,0,0,0),
-            *ptr_g = spt.images[0].data(0,0,0,1),
-            *ptr_b = spt.images[0].data(0,0,0,2);
-          for (int xy = 0; xy<whp; ++xy) {
-            *(ptr_r++) = (float)*(ptrs++);
-            *(ptr_g++) = (float)*(ptrs++);
-            *(ptr_b++) = (float)*(ptrs++);
-          }
-        } break;
-        case 4 : {
-          float
-            *ptr_r = spt.images[0].data(0,0,0,0),
-            *ptr_g = spt.images[0].data(0,0,0,1),
-            *ptr_b = spt.images[0].data(0,0,0,2),
-            *ptr_a = spt.images[0].data(0,0,0,3);
-          for (int xy = 0; xy<whp; ++xy) {
-            *(ptr_r++) = (float)*(ptrs++);
-            *(ptr_g++) = (float)*(ptrs++);
-            *(ptr_b++) = (float)*(ptrs++);
-            *(ptr_a++) = (float)*(ptrs++);
-          }
-        } break;
-        }
+        spt.images[0].assign(ptr0,sp,wp,hp).permute_axes("yzcx");
 
         const float opacity = gimp_layer_get_opacity(*layers);
         const GimpLayerModeEffects blendmode = gimp_layer_get_mode(*layers);
