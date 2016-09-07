@@ -1839,14 +1839,10 @@ CImg<int> get_input_layers(CImgList<T>& images) {
     GimpDrawable *drawable = gimp_drawable_get(input_layers[l]);
     GimpPixelRgn region;
     gimp_pixel_rgn_init(&region,drawable,rgn_x,rgn_y,rgn_width,rgn_height,false,false);
-    guchar *const row = g_new(guchar,rgn_width*spectrum), *ptrs = 0;
-    CImg<T> img(rgn_width,rgn_height,1,spectrum);
-    cimg_forY(img,y) {
-      gimp_pixel_rgn_get_row(&region,ptrs=row,rgn_x,rgn_y + y,rgn_width);
-      img.draw_image(0,y,CImg<unsigned char>(ptrs,spectrum,rgn_width,1,1,true).get_permute_axes("yzcx"));
-    }
-    g_free(row);
+    CImg<unsigned char> img(spectrum,rgn_width,rgn_height);
+    gimp_pixel_rgn_get_rect(&region,img,rgn_x,rgn_y,rgn_width,rgn_height);
     gimp_drawable_detach(drawable);
+    img.permute_axes("yzcx");
 #else
     GeglRectangle rect;
     gegl_rectangle_set(&rect,rgn_x,rgn_y,rgn_width,rgn_height);
