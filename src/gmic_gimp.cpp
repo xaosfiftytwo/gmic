@@ -1632,34 +1632,26 @@ void convert_image2uchar(CImg<T>& img) {
 
 // Apply current GIMP color profile to image to render it in GimpPreview widget.
 //------------------------------------------------------------------------------
+// (Much thanks to Andrea Ferrero for his contribution on this).
 template<typename T>
 void apply_color_profile(CImg<T>& img) {
-  if (!img || img.spectrum()<3) return;
-
 #if GIMP_MINOR_VERSION<=8
   cimg::unused(img);
 #else
 
-#if 0
-  GimpColorConfig *const color_config = gimp_get_color_configuration();
-  if (!color_config || !img_profile) return;
-  const GimpColorRenderingIntent intent = GIMP_COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC;
-  const GimpColorTransformFlags flags =
-    GIMP_COLOR_TRANSFORM_FLAGS_BLACK_POINT_COMPENSATION |
-    GIMP_COLOR_TRANSFORM_FLAGS_NOOPTIMIZE;
-  const Babl *const fmt = babl_format(img.spectrum()==3?"R'G'B' float":"R'G'B'A' float");
-  const GimpColorTransform *const transform = gimp_widget_get_color_transform(gui_preview,color_config,img_profile,fmt,fmt);
-  if (transform) {
-    CImg<float> row;
-    cimg_forY(img,y) {
-      img.get_row(y).permute_axes("cxyz").move_to(row)/=255;
-      gimp_color_transform_process_pixels(transform,fmt,row,fmt,row,row.height());
-      img.draw_image((row*=255).cut(0,255).permute_axes("yzcx"),0,y);
-    }
-    g_object_unref(transform);
-  }
+  if (!img || img.spectrum()<3 || img.spectrum()>4 || !img_profile) return;
 
-#endif // #if 0
+  GimpColorConfig *const color_config = gimp_get_color_configuration();
+  if (!color_config) return;
+  const Babl *const fmt = babl_format(img.spectrum()==3?"R'G'B' float":"R'G'B'A float");
+  GimpColorTransform *const transform = gimp_widget_get_color_transform(gui_preview,color_config,img_profile,fmt,fmt);
+  if (!transform) return;
+
+  CImg<float> corrected;
+  img.get_permute_axes("cxyz").move_to(corrected)/=255;
+  gimp_color_transform_process_pixels(transform,fmt,corrected,fmt,corrected,corrected.height()*corrected.depth());
+  (corrected.permute_axes("yzcx")*=255).move_to(img);
+  g_object_unref(transform);
 
 #endif
 }
@@ -4319,7 +4311,7 @@ void gmic_run(const gchar *name, gint nparams, const GimpParam *param,
 #if GIMP_MINOR_VERSION>8
   gegl_init(NULL,NULL);
   gimp_plugin_enable_precision();
-  gimp_color_config_get_type();
+//  gimp_color_config_get_type();
 #endif
   markup2ascii = gtk_label_new(0);
 
