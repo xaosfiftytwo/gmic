@@ -1004,7 +1004,8 @@ CImg<T>& inpaint(const CImg<t>& mask, const unsigned int method) {
               if (!Mpc) J[ind++] = Ipc;
               if (!Mnc) J[ind++] = Inc;
               if (!Mpn) J[ind++] = Ipn;
-              if (!Mcn) J[ind++] = Icn; if (!Mnn) J[ind++] = Inn;
+              if (!Mcn) J[ind++] = Icn;
+              if (!Mnn) J[ind++] = Inn;
               (*this)(x,y,k) = CImg<T>(J,ind,1,1,1,true).kth_smallest(ind>>1);
             }
             _nmask(x,y) = 0;
@@ -2820,7 +2821,8 @@ gmic& gmic::add_commands(const char *const data_commands,
 
     // Remove useless trailing spaces.
     char *linee = line.data() + std::strlen(line) - 1;
-    while (linee>=line && *linee==' ') --linee; *(linee + 1) = 0;
+    while (linee>=line && *linee==' ') --linee;
+    *(linee + 1) = 0;
     char *lines = line; while (*lines==' ') ++lines; // Remove useless leading spaces.
     if (!*lines) continue; // Empty line.
 
@@ -3998,7 +4000,8 @@ CImg<char> gmic::substitute_item(const char *const source,
                       "Item substitution '{%s}': Invalid selection [%d] (no image data available).",
                       cimg::strellipsize(inbraces,64,false),ind);
             }
-            while (*feature!=',') ++feature; ++feature;
+            while (*feature!=',') ++feature;
+            ++feature;
           } else if (cimg_sscanf(inbraces,"%255[a-zA-Z0-9_]%c",substr.assign(256).data(),&(sep=0))==2 && sep==',') {
             selection2cimg(substr,images.size(),images_names,"Item substitution '{name,feature}'").move_to(_ind);
             if (_ind.height()!=1)
@@ -4006,7 +4009,8 @@ CImg<char> gmic::substitute_item(const char *const source,
                     "Item substitution '{%s}': Invalid selection [%s], specifies multiple images.",
                     cimg::strellipsize(inbraces,64,false),substr.data());
             ind = (int)*_ind;
-            while (*feature!=',') ++feature; ++feature;
+            while (*feature!=',') ++feature;
+            ++feature;
           } else ind = images.width() - 1;
 
           CImg<T> &img = ind>=0?gmic_check(images[ind]):CImg<T>::empty();
@@ -7430,7 +7434,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                   else {
                     g_img_uc(0,0) = 255; g_img_uc(1,0) = g_img_uc(2,0) = 30;
                     g_img_uc(0,1) = g_img_uc(2,1) = 30; g_img_uc(1,1) = 255;
-                    if (img.spectrum()>=3) g_img_uc(0,2) = g_img_uc(1,2) = 30; g_img_uc(2,2) = 255;
+                    if (img.spectrum()>=3) { g_img_uc(0,2) = g_img_uc(1,2) = 30; g_img_uc(2,2) = 255; }
                   }
                   cimg_forC(img,k) {
                     const CImg<T> channel = img.get_shared_channel(k);
@@ -7522,7 +7526,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                   else {
                     g_img_uc(0,0) = 255; g_img_uc(1,0) = g_img_uc(2,0) = 30;
                     g_img_uc(0,1) = g_img_uc(2,1) = 30; g_img_uc(1,1) = 255;
-                    if (img.spectrum()>=3) g_img_uc(0,2) = g_img_uc(1,2) = 30; g_img_uc(2,2) = 255;
+                    if (img.spectrum()>=3) { g_img_uc(0,2) = g_img_uc(1,2) = 30; g_img_uc(2,2) = 255; }
                   }
                   cimg_forC(img,k) {
                     const CImg<T> channel = img.get_shared_channel(k);
