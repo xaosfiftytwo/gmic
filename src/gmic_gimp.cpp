@@ -1638,7 +1638,6 @@ void apply_color_profile(CImg<T>& img) {
 #if GIMP_MINOR_VERSION<=8
   cimg::unused(img);
 #else
-
   if (!img || img.spectrum()<3 || img.spectrum()>4 || !img_profile) return;
 
   GimpColorConfig *const color_config = gimp_get_color_configuration();
@@ -1652,7 +1651,6 @@ void apply_color_profile(CImg<T>& img) {
   gimp_color_transform_process_pixels(transform,fmt,corrected,fmt,corrected,corrected.height()*corrected.depth());
   (corrected.permute_axes("yzcx")*=255).move_to(img);
   g_object_unref(transform);
-
 #endif
 }
 
@@ -2060,7 +2058,7 @@ void on_dialog_reset_zoom_button_clicked(GtkCheckButton *const) {
   set_preview_factor();
 }
 
-// Secure function for invalidate preview.
+// Secure function for invalidating preview.
 void _gimp_preview_invalidate() {
   cimg::mutex(25);
   if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
@@ -4311,7 +4309,6 @@ void gmic_run(const gchar *name, gint nparams, const GimpParam *param,
 #if GIMP_MINOR_VERSION>8
   gegl_init(NULL,NULL);
   gimp_plugin_enable_precision();
-//  gimp_color_config_get_type();
 #endif
   markup2ascii = gtk_label_new(0);
 
