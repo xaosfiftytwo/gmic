@@ -1630,27 +1630,45 @@ void convert_image2uchar(CImg<T>& img) {
   }
 }
 
-// Apply current GIMP color profile to image to render it in GimpPreview widget.
-//------------------------------------------------------------------------------
+// Apply current GIMP color profile to input image.
+//-------------------------------------------------
 // (Much thanks to Andrea Ferrero for his contribution on this).
 template<typename T>
-void apply_color_profile(CImg<T>& img) {
+CImg<T>& apply_icc(CImg<T>& img) {
 #if GIMP_MINOR_VERSION<=8
   cimg::unused(img);
 #else
-  if (!img || img.spectrum()<3 || img.spectrum()>4 || !img_profile) return;
+  if (!img || img.spectrum()<3 || img.spectrum()>4 || !img_profile) return img;
 
   GimpColorConfig *const color_config = gimp_get_color_configuration();
-  if (!color_config) return;
+  if (!color_config) return img;
   const Babl *const fmt = babl_format(img.spectrum()==3?"R'G'B' float":"R'G'B'A float");
   GimpColorTransform *const transform = gimp_widget_get_color_transform(gui_preview,color_config,img_profile,fmt,fmt);
-  if (!transform) return;
+  if (!transform) return img;
 
   CImg<float> corrected;
   img.get_permute_axes("cxyz").move_to(corrected)/=255;
   gimp_color_transform_process_pixels(transform,fmt,corrected,fmt,corrected,corrected.height()*corrected.depth());
   (corrected.permute_axes("yzcx")*=255).move_to(img);
   g_object_unref(transform);
+#endif
+  return img;
+}
+
+// Color-correct preview image.
+//-----------------------------
+void preview_with_icc() {
+#if GIMP_MINOR_VERSION>8
+  img_profile = gimp_image_get_effective_color_profile(image_id);
+  GimpColorConfig *const color_config = gimp_get_color_configuration();
+  if (!img_profile || !color_config) return;
+  int wp, hp, sp;
+  guchar *const ptr0 = gimp_zoom_preview_get_source(GIMP_ZOOM_PREVIEW(gui_preview),&wp,&hp,&sp);
+  CImg<unsigned char> img(ptr0,sp,wp,hp);
+  apply_icc(img.permute_axes("yzcx")).permute_axes("cxyz");
+  std::memcpy(ptr0,img,wp*hp*sp*sizeof(unsigned char));
+  gimp_preview_draw_buffer(GIMP_PREVIEW(gui_preview),ptr0,wp*sp);
+  g_free(ptr0);
 #endif
 }
 
@@ -1777,7 +1795,7 @@ void calibrate_image(CImg<T>& img, const unsigned int spectrum, const bool is_pr
 // Get the input layers of a GIMP image as a list of CImg<T>.
 //-----------------------------------------------------------
 template<typename T>
-CImg<int> get_input_layers(CImgList<T>& images) {
+CImg<int> get_input_layers(CImgList<T>& images, const unsigned int input_mode=~0U) {
 
   // Retrieve the list of desired layers.
   int
@@ -1788,8 +1806,8 @@ CImg<int> get_input_layers(CImgList<T>& images) {
   CImg<int> input_layers;
   if (gimp_item_is_group(active_layer_id)) { images.assign(); return input_layers; }
 
-  const unsigned int input_mode = get_input_mode();
-  switch (input_mode) {
+  const unsigned int _input_mode = input_mode!=~0U?input_mode:get_input_mode();
+  switch (_input_mode) {
   case 0 : // Input none
     break;
   case 1 : // Input active layer
@@ -1797,7 +1815,7 @@ CImg<int> get_input_layers(CImgList<T>& images) {
     break;
   case 2 : case 9 : // Input all image layers
     input_layers = CImg<int>(layers,1,nb_layers);
-    if (input_mode==9) input_layers.mirror('y');
+    if (_input_mode==9) input_layers.mirror('y');
     break;
   case 3 : // Input active & below layers
     if (active_layer_id>=0) {
@@ -1816,14 +1834,14 @@ CImg<int> get_input_layers(CImgList<T>& images) {
     for (int i = 0; i<nb_layers; ++i)
       if (_gimp_item_get_visible(layers[i])) CImg<int>::vector(layers[i]).move_to(visible_layers);
     input_layers = visible_layers>'y';
-    if (input_mode==7) input_layers.mirror('y');
+    if (_input_mode==7) input_layers.mirror('y');
   } break;
   default : { // Input all invisible image layers
     CImgList<int> invisible_layers;
     for (int i = 0; i<nb_layers; ++i)
       if (!_gimp_item_get_visible(layers[i])) CImg<int>::vector(layers[i]).move_to(invisible_layers);
     input_layers = invisible_layers>'y';
-    if (input_mode==8) input_layers.mirror('y');
+    if (_input_mode==8) input_layers.mirror('y');
   } break;
   }
 
@@ -3074,7 +3092,7 @@ void process_preview() {
   if (is_block_preview) { is_block_preview = false; return; }
   if (!gimp_image_is_valid(image_id)) return;
   const unsigned int filter = get_current_filter();
-  if (!filter) return;
+  if (!filter) { preview_with_icc(); return; }
   const CImg<char> command_line = get_command_line(true);
   if (!command_line || std::strstr(command_line," -_none_")) return;
 
@@ -3311,7 +3329,7 @@ void process_preview() {
     if (computed_preview.width()!=wp || computed_preview.height()!=hp)
       computed_preview.resize(wp,hp,1,-100,0,0,0.5,0.5);
 
-    apply_color_profile(computed_preview);
+    apply_icc(computed_preview);
     calibrate_image(computed_preview,sp,true);
     convert_image2uchar(computed_preview);
     computed_preview.channel(0);

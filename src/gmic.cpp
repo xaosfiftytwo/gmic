@@ -998,9 +998,13 @@ CImg<T>& inpaint(const CImg<t>& mask, const unsigned int method) {
             cimg_forC(*this,k) {
               cimg_get3x3(*this,x,y,0,k,I,T);
               unsigned int ind = 0;
-              if (!Mpp) J[ind++] = Ipp; if (!Mcp) J[ind++] = Icp; if (!Mnp) J[ind++] = Inp;
-              if (!Mpc) J[ind++] = Ipc; if (!Mnc) J[ind++] = Inc;
-              if (!Mpn) J[ind++] = Ipn; if (!Mcn) J[ind++] = Icn; if (!Mnn) J[ind++] = Inn;
+              if (!Mpp) J[ind++] = Ipp;
+              if (!Mcp) J[ind++] = Icp;
+              if (!Mnp) J[ind++] = Inp;
+              if (!Mpc) J[ind++] = Ipc;
+              if (!Mnc) J[ind++] = Inc;
+              if (!Mpn) J[ind++] = Ipn;
+              if (!Mcn) J[ind++] = Icn; if (!Mnn) J[ind++] = Inn;
               (*this)(x,y,k) = CImg<T>(J,ind,1,1,1,true).kth_smallest(ind>>1);
             }
             _nmask(x,y) = 0;
@@ -1073,8 +1077,12 @@ CImg<T>& inpaint(const CImg<t>& mask, const unsigned int method) {
             cimg_forC(*this,k) {
               cimg_get3x3x3(*this,x,y,z,k,I,T);
               unsigned int ind = 0;
-              if (!Mccp) J[ind++] = Iccp; if (!Mcpc) J[ind++] = Icpc; if (!Mpcc) J[ind++] = Ipcc;
-              if (!Mncc) J[ind++] = Incc; if (!Mcnc) J[ind++] = Icnc; if (!Mccn) J[ind++] = Iccn;
+              if (!Mccp) J[ind++] = Iccp;
+              if (!Mcpc) J[ind++] = Icpc;
+              if (!Mpcc) J[ind++] = Ipcc;
+              if (!Mncc) J[ind++] = Incc;
+              if (!Mcnc) J[ind++] = Icnc;
+              if (!Mccn) J[ind++] = Iccn;
               (*this)(x,y,z,k) = CImg<T>(J,ind,1,1,1,true).kth_smallest(ind>>1);
             }
             _nmask(x,y,z) = 0;
@@ -1092,15 +1100,32 @@ CImg<T>& inpaint(const CImg<t>& mask, const unsigned int method) {
             cimg_forC(*this,k) {
               cimg_get3x3x3(*this,x,y,z,k,I,T);
               unsigned int ind = 0;
-              if (!Mppp) J[ind++] = Ippp; if (!Mcpp) J[ind++] = Icpp; if (!Mnpp) J[ind++] = Inpp;
-              if (!Mpcp) J[ind++] = Ipcp; if (!Mccp) J[ind++] = Iccp; if (!Mncp) J[ind++] = Incp;
-              if (!Mpnp) J[ind++] = Ipnp; if (!Mcnp) J[ind++] = Icnp; if (!Mnnp) J[ind++] = Innp;
-              if (!Mppc) J[ind++] = Ippc; if (!Mcpc) J[ind++] = Icpc; if (!Mnpc) J[ind++] = Inpc;
-              if (!Mpcc) J[ind++] = Ipcc; if (!Mncc) J[ind++] = Incc;
-              if (!Mpnc) J[ind++] = Ipnc; if (!Mcnc) J[ind++] = Icnc; if (!Mnnc) J[ind++] = Innc;
-              if (!Mppn) J[ind++] = Ippn; if (!Mcpn) J[ind++] = Icpn; if (!Mnpn) J[ind++] = Inpn;
-              if (!Mpcn) J[ind++] = Ipcn; if (!Mccn) J[ind++] = Iccn; if (!Mncn) J[ind++] = Incn;
-              if (!Mpnn) J[ind++] = Ipnn; if (!Mcnn) J[ind++] = Icnn; if (!Mnnn) J[ind++] = Innn;
+              if (!Mppp) J[ind++] = Ippp;
+              if (!Mcpp) J[ind++] = Icpp;
+              if (!Mnpp) J[ind++] = Inpp;
+              if (!Mpcp) J[ind++] = Ipcp;
+              if (!Mccp) J[ind++] = Iccp;
+              if (!Mncp) J[ind++] = Incp;
+              if (!Mpnp) J[ind++] = Ipnp;
+              if (!Mcnp) J[ind++] = Icnp;
+              if (!Mnnp) J[ind++] = Innp;
+              if (!Mppc) J[ind++] = Ippc;
+              if (!Mcpc) J[ind++] = Icpc;
+              if (!Mnpc) J[ind++] = Inpc;
+              if (!Mpcc) J[ind++] = Ipcc;
+              if (!Mncc) J[ind++] = Incc;
+              if (!Mpnc) J[ind++] = Ipnc;
+              if (!Mcnc) J[ind++] = Icnc;
+              if (!Mnnc) J[ind++] = Innc;
+              if (!Mppn) J[ind++] = Ippn;
+              if (!Mcpn) J[ind++] = Icpn;
+              if (!Mnpn) J[ind++] = Inpn;
+              if (!Mpcn) J[ind++] = Ipcn;
+              if (!Mccn) J[ind++] = Iccn;
+              if (!Mncn) J[ind++] = Incn;
+              if (!Mpnn) J[ind++] = Ipnn;
+              if (!Mcnn) J[ind++] = Icnn;
+              if (!Mnnn) J[ind++] = Innn;
               (*this)(x,y,z,k) = CImg<T>(J,ind,1,1,1,true).kth_smallest(ind>>1);
             }
             _nmask(x,y,z) = 0;
