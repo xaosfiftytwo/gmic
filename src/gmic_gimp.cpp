@@ -1372,7 +1372,8 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   for (const char *data = gmic_additional_commands; *data; ) {
     char *_line = line;
     // Read new line.
-    while (*data!='\n' && *data && _line<line.data() + line.width()) *(_line++) = *(data++); *_line = 0;
+    while (*data!='\n' && *data && _line<line.data() + line.width()) *(_line++) = *(data++);
+    *_line = 0;
     while (*data=='\n') ++data; // Skip next '\n'.
     for (_line = line; *_line; ++_line) if (*_line<' ') *_line = ' '; // Replace non-usual characters by spaces.
     if (line[0]!='#' || line[1]!='@' || line[2]!='g' || // Check for a '#@gimp' line.
@@ -3448,7 +3449,8 @@ void create_parameters_gui(const bool reset_params) {
       gtk_table_attach(GTK_TABLE(table),label,0,1,0,1,
                        (GtkAttachOptions)(GTK_EXPAND),(GtkAttachOptions)(GTK_EXPAND),0,0);
       gtk_misc_set_alignment(GTK_MISC(label),0,0.5);
-      if (event_infos) delete[] event_infos; event_infos = 0;
+      if (event_infos) delete[] event_infos;
+      event_infos = 0;
       set_filter_nbparams(filter,0);
 
     } else { // Filter requires parameters -> Create parameters table.
@@ -3461,7 +3463,8 @@ void create_parameters_gui(const bool reset_params) {
       gtk_container_set_border_width(GTK_CONTAINER(table),8);
 
       // Parse arguments list and add recognized one to the table.
-      if (event_infos) delete[] event_infos; event_infos = new void*[2*nb_arguments];
+      if (event_infos) delete[] event_infos;
+      event_infos = new void*[2*nb_arguments];
       unsigned int current_argument = 0;
       const bool is_fave = filter>=indice_faves;
       for (const char *argument = gmic_arguments[filter].data(); *argument; ) {
@@ -3849,7 +3852,8 @@ void create_parameters_gui(const bool reset_params) {
             case 2 : std::strcpy(url,label); break;
             case 1 : cimg_snprintf(url,url.width(),"%g",alignment); break;
             case 0 : if (cimg_sscanf(argument_arg,"%1023[^,],%1023s",label.data(),url.data())==1)
-                std::strcpy(url,label); break;
+                std::strcpy(url,label);
+              break;
             }
             cimg::strpare(label,' ',false,true);
             cimg::strpare(label,'\"',true,false);
