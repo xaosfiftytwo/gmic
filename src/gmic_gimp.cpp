@@ -1650,7 +1650,7 @@ CImg<T>& apply_icc(CImg<T>& img) {
   CImg<float> corrected;
   img.get_permute_axes("cxyz").move_to(corrected)/=255;
   gimp_color_transform_process_pixels(transform,fmt,corrected,fmt,corrected,corrected.height()*corrected.depth());
-  (corrected.permute_axes("yzcx")*=255).move_to(img);
+  (corrected.permute_axes("yzcx")*=255).cut(0,255).move_to(img);
   g_object_unref(transform);
 #endif
   return img;
