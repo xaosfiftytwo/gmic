@@ -3092,8 +3092,8 @@ void process_image(const char *const command_line, const bool is_apply) {
 void process_preview() {
   if (is_block_preview) { is_block_preview = false; return; }
   if (!gimp_image_is_valid(image_id)) return;
-  const unsigned int filter = get_current_filter();
   preview_with_icc();
+  const unsigned int filter = get_current_filter();
   if (!filter) return;
   const CImg<char> command_line = get_command_line(true);
   if (!command_line || std::strstr(command_line," -_none_")) return;
