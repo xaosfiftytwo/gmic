@@ -3838,6 +3838,11 @@ void create_parameters_gui(const bool reset_params) {
             cimg::strpare(argument_arg,' ',false,true);
             cimg::strpare(argument_arg,'\"',true,false);
             cimg::strunescape(argument_arg);
+
+            const char *const tag_s = "<span style=\"color:", *const tag_d = "<span color=\"      ";
+            char *ptr = std::strstr(argument_arg,tag_s);  // Search & replace to allow HTML syntax for colored text
+            while (ptr) { std::memcpy(ptr,tag_d,std::strlen(tag_d)); ptr = std::strstr(++ptr,tag_s); }
+
             GtkWidget *const label = gtk_label_new(NULL);
             gtk_label_set_markup(GTK_LABEL(label),argument_arg);
             gtk_label_set_line_wrap(GTK_LABEL(label),true);
