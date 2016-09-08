@@ -2023,7 +2023,10 @@ void on_preview_button_changed(GtkToggleButton *const toggle_button) {
   cimg::mutex(25);
   if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
   cimg::mutex(25,0);
-  if (!gtk_toggle_button_get_active(toggle_button)) gtk_widget_hide(gui_preview_warning);
+  if (!gtk_toggle_button_get_active(toggle_button)) {
+    gtk_widget_hide(gui_preview_warning);
+    preview_with_icc();
+  }
 }
 
 void on_dialog_reset_zoom_button_clicked(GtkCheckButton *const) {
