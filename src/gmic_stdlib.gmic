@@ -6326,7 +6326,7 @@ rgb2int :
 #@gmic : $ image.jpg -rgb2xyz -split c
 rgb2xyz :
   -e[^-1] "Convert image$? from RGB to XYZ color bases."
-  -v - -/ 255 -mix_rgb 0.412453,0.357580,0.180423,0.212671,0.715160,0.072169,0.019334,0.119193,0.950227 -v +
+  -v - -/ 255 -mix_rgb 2.7689,1.7517,1.1302,1,4.5907,0.0601,0,0.056508,5.5943 -v +  # According to wikipedia
 
 #@gmic rgb2xyz8
 #@gmic : Convert selected images from RGB to XYZ8 color bases.
@@ -6726,7 +6726,7 @@ _transfer_rgb : -v - -l[] -check "${1=0}>=0 && ${2=1.5}>=0 && ${3=128}>0" gamma=
 #@gmic : Convert selected images from XYZ to RGB colorbases.
 xyz2rgb :
   -e[^-1] "Convert image$? from XYZ to RGB color bases."
-  -v - -* 255 -mix_rgb 3.240479,-1.537150,-0.498535,-0.969256,1.875992,0.041556,0.055648,-0.204043,1.057311 -c 0,255 -v +
+  -v - -mix_rgb 0.41847,-0.15866,-0.082835,-0.091169,0.25243,0.015708,0.00092090,-0.0025498,0.17860 -* 255 -c 0,255 -v + # According to wikipedia
 
 #@gmic xyz82rgb
 #@gmic : Convert selected images from XYZ8 to RGB color bases.
