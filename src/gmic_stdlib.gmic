@@ -6322,11 +6322,15 @@ rgb2int :
 
 #@gmic rgb2xyz
 #@gmic : Convert selected images from RGB to XYZ colorbases.
-#@gmic : the D65 illuminant is used as the white point).
+#@gmic : the D50 illuminant is used as the white point).
 #@gmic : $ image.jpg -rgb2xyz -split c
 rgb2xyz :
   -e[^-1] "Convert image$? from RGB to XYZ color bases."
-  -v - -/ 255 -mix_rgb 2.7689,1.7517,1.1302,1,4.5907,0.0601,0,0.056508,5.5943 -v +  # According to wikipedia
+  -v - -/ 255
+  -mix_rgb 0.43603516,0.38511658,0.14305115,\
+  0.22248840,0.71690369,0.06060791,\
+  0.01391602,0.09706116,0.71392822
+  -v +
 
 #@gmic rgb2xyz8
 #@gmic : Convert selected images from RGB to XYZ8 color bases.
@@ -6726,7 +6730,11 @@ _transfer_rgb : -v - -l[] -check "${1=0}>=0 && ${2=1.5}>=0 && ${3=128}>0" gamma=
 #@gmic : Convert selected images from XYZ to RGB colorbases.
 xyz2rgb :
   -e[^-1] "Convert image$? from XYZ to RGB color bases."
-  -v - -mix_rgb 0.41847,-0.15866,-0.082835,-0.091169,0.25243,0.015708,0.00092090,-0.0025498,0.17860 -* 255 -c 0,255 -v + # According to wikipedia
+  -v -
+  -mix_rgb 3.134274799724,-1.617275708956,-0.490724283042,\
+           -0.978795575994,1.916161689117,0.033453331711,\
+           0.071976988401,-0.228984974402,1.405718224383
+  -* 255 -v +
 
 #@gmic xyz82rgb
 #@gmic : Convert selected images from XYZ8 to RGB color bases.
