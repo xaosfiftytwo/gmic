@@ -1873,10 +1873,15 @@ CImg<T>& rotate_CImg3d(const CImg<t>& rot) {
     g = (float)rot(0,2), h = (float)rot(1,2), i = (float)rot(2,2);
   T *ptrd = data() + 8;
   for (unsigned int j = 0; j<nbv; ++j) {
-    const float x = (float)*(ptrs++), y = (float)*(ptrs++), z = (float)*(ptrs++);
-    *(ptrd++) = (T)(a*x + b*y + c*z);
-    *(ptrd++) = (T)(d*x + e*y + f*z);
-    *(ptrd++) = (T)(g*x + h*y + i*z);
+    const float
+      x = (float)ptrs[0],
+      y = (float)ptrs[1],
+      z = (float)ptrs[2];
+    ptrs+=3;
+    ptrd[0] = (T)(a*x + b*y + c*z);
+    ptrd[1] = (T)(d*x + e*y + f*z);
+    ptrd[2] = (T)(g*x + h*y + i*z);
+    ptrd+=3;
   }
   return *this;
 }
@@ -1943,9 +1948,10 @@ CImgList<T> get_split_CImg3d() const {
     if (val!=-128) ptr+=2;
     else {
       const unsigned int
-        w = cimg::float2uint(*(ptr++)),
-        h = cimg::float2uint(*(ptr++)),
-        s = cimg::float2uint(*(ptr++));
+        w = cimg::float2uint(ptr[0]),
+        h = cimg::float2uint(ptr[1]),
+        s = cimg::float2uint(ptr[2]);
+      ptr+=3;
       if (w*h*s!=0) ptr+=w*h*s;
     }
   }
@@ -1955,9 +1961,10 @@ CImgList<T> get_split_CImg3d() const {
     const T val = *(ptr++);
     if (val==-128) {
       const unsigned int
-        w = cimg::float2uint(*(ptr++)),
-        h = cimg::float2uint(*(ptr++)),
-        s = cimg::float2uint(*(ptr++));
+        w = cimg::float2uint(ptr[0]),
+        h = cimg::float2uint(ptr[1]),
+        s = cimg::float2uint(ptr[2]);
+      ptr+=3;
       if (w*h*s!=0) ptr+=w*h*s;
     }
   }
