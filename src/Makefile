@@ -149,7 +149,8 @@ DEBUG_CFLAGS = -pedantic -Dcimg_verbosity=3 -g -fsanitize=address # -fsanitize=t
 
 # Flags to enable optimizations.
 ifeq ($(notdir $(CXX)),g++)
-OPT_CFLAGS = -O3 -mtune=generic # -Ofast -march=native
+# OPT_CFLAGS = -O3 -mtune=generic # -Ofast -march=native
+OPT_CFLAGS = -Ofast
 else
 ifeq ($(notdir $(CXX)),icpc)
 OPT_CFLAGS = -fast
