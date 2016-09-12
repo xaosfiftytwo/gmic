@@ -1605,26 +1605,29 @@ void convert_image2uchar(CImg<T>& img) {
   case 2 : {
     const T *ptr0 = img.data(0,0,0,0), *ptr1 = img.data(0,0,0,1);
     for (unsigned int i = 0; i<siz; ++i) {
-      *(ptrd++) = (unsigned char)*(ptr0++);
-      *(ptrd++) = (unsigned char)*(ptr1++);
+      ptrd[0] = (unsigned char)*(ptr0++);
+      ptrd[1] = (unsigned char)*(ptr1++);
+      ptrd+=2;
     }
   } break;
   case 3 : {
     const T *ptr0 = img.data(0,0,0,0), *ptr1 = img.data(0,0,0,1), *ptr2 = img.data(0,0,0,2);
     for (unsigned int i = 0; i<siz; ++i) {
-      *(ptrd++) = (unsigned char)*(ptr0++);
-      *(ptrd++) = (unsigned char)*(ptr1++);
-      *(ptrd++) = (unsigned char)*(ptr2++);
+      ptrd[0] = (unsigned char)*(ptr0++);
+      ptrd[1] = (unsigned char)*(ptr1++);
+      ptrd[2] = (unsigned char)*(ptr2++);
+      ptrd+=3;
     }
   } break;
   case 4 : {
     const T *ptr0 = img.data(0,0,0,0), *ptr1 = img.data(0,0,0,1),
       *ptr2 = img.data(0,0,0,2), *ptr3 = img.data(0,0,0,3);
     for (unsigned int i = 0; i<siz; ++i) {
-      *(ptrd++) = (unsigned char)*(ptr0++);
-      *(ptrd++) = (unsigned char)*(ptr1++);
-      *(ptrd++) = (unsigned char)*(ptr2++);
-      *(ptrd++) = (unsigned char)*(ptr3++);
+      ptrd[0] = (unsigned char)*(ptr0++);
+      ptrd[1] = (unsigned char)*(ptr1++);
+      ptrd[2] = (unsigned char)*(ptr2++);
+      ptrd[3] = (unsigned char)*(ptr3++);
+      ptrd+=4;
     }
   } break;
   default: return;
