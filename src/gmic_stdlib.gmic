@@ -6121,7 +6121,9 @@ luminance :
   -e[^-1] "Compute luminance of image$?."
   -v - -remove_opacity -srgb2rgb
   -repeat $! -l[$>]
-  -if {s==3} -sh 0 -sh[0] 1 -sh[0] 2 -*[1] 0.299 -*[2] 0.587 -*[3] 0.114 -+[1-3] -rm[1]
+  -if {s==3} -sh 0 -sh[0] 1 -sh[0] 2
+  -*[1] 0.22248840 -*[2] 0.71690369 -*[3] 0.06060791
+  -+[1-3] -rm[1]
   -elif {s!=1} -norm -n 0,255
   -endif -endl -done
   -channels 0 -rgb2srgb -v +
