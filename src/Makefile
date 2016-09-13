@@ -125,7 +125,7 @@ PRERELEASE_CFLAGS = -Dgmic_prerelease="\\\"`date +%m%d%y`\\\""
 MANDATORY_CFLAGS = -Dgmic_build -Dcimg_use_zlib `pkg-config --cflags zlib || echo -I$(USR)/$(INCLUDE)` $(PRERELEASE_CFLAGS)
 MANDATORY_LIBS = `pkg-config --libs zlib || echo -lz`
 ifndef NO_SRIPDLIB
-MANDATORY_CFLAGS += -pedantic # -std=c++11 -pedantic
+MANDATORY_CFLAGS += -std=c++11 -pedantic
 endif
 MANDATORY_LIBS += -L$(USR)/$(LIB)
 ifeq ($(notdir $(CXX)),g++)
