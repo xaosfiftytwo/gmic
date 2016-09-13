@@ -6190,8 +6190,8 @@ replace_color : -check "$1>=0 && $2>=0"
 #@gmic retinex : _value_offset>0,_colorspace={ hsi | hsv | lab | rgb | ycbcr },0<=_min_cut<=100,0<=_max_cut<=100,_sigma_low>0,_sigma_mid>0,_sigma_high>0
 #@gmic : Apply multi-scale retinex algorithm on selected image to improve color consistency.
 #@gmic : (as described in the page http://www.ipol.im/pub/art/2014/107/).
-#@gmic : Default values: 'offset=1', 'colorspace=lab', 'min_cut=1', 'max_cut=1', 'sigma_low=15','sigma_mid=80' and 'sigma_high=250'.
-retinex : -check "${1=5}>0 && ${3=1}>=0 && $3<=100 && ${4=1}>=0 && $4<=100 && ${5=15}>0 && ${6=80}>0 && ${7=250}>0" -skip "${2=lab}"
+#@gmic : Default values: 'offset=1', 'colorspace=hsv', 'min_cut=1', 'max_cut=1', 'sigma_low=15','sigma_mid=80' and 'sigma_high=250'.
+retinex : -check "${1=5}>0 && ${3=1}>=0 && $3<=100 && ${4=1}>=0 && $4<=100 && ${5=15}>0 && ${6=80}>0 && ${7=250}>0" -skip "${2=hsv}"
   -e[^-1] "Apply Retinex color consistency algorithm on image$?, with value offset $1, colorspace '$2', cuts ($3,$4) and sigmas (${5-7})."
   -v -
   -if {;'$2'=='hsi'} mode=hsi_i
