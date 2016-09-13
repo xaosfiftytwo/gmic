@@ -2068,12 +2068,12 @@ void _gimp_preview_invalidate() {
 
     // Pre-compute image thumbnail for preview if image is too small.
     const int min_preview_size = (200 + 120*get_preview_size(true))*2/3;
-    if (!is_selection && cimg::max(w,h)<min_preview_size) {
+    if (!is_selection && std::max(w,h)<min_preview_size) {
       int pw = 0, ph = 0;
-      if (w>=h) ph = cimg::max(1,h*(pw=min_preview_size)/w);
-      else pw = cimg::max(1,w*(ph=min_preview_size)/h);
+      if (w>=h) ph = std::max(1,h*(pw=min_preview_size)/w);
+      else pw = std::max(1,w*(ph=min_preview_size)/h);
       preview_image_id = gimp_image_duplicate(image_id);
-      preview_image_factor = (double)cimg::max(pw,ph)/cimg::max(w,h);
+      preview_image_factor = (double)std::max(pw,ph)/std::max(w,h);
       const GimpInterpolationType mode = gimp_context_get_interpolation();
       gimp_context_set_interpolation(GIMP_INTERPOLATION_NONE);
       gimp_image_scale(preview_image_id,pw,ph);
@@ -2629,7 +2629,7 @@ void process_image(const char *const command_line, const bool is_apply) {
   const unsigned int
     filter = get_current_filter(),
     _output_mode = get_output_mode(),
-    output_mode = get_input_mode()==0?cimg::max(1U,_output_mode):_output_mode,
+    output_mode = get_input_mode()==0?std::max(1U,_output_mode):_output_mode,
     verbosity_mode = get_verbosity_mode();
 
   if (!command_line && !filter) return;
@@ -2732,7 +2732,7 @@ void process_image(const char *const command_line, const bool is_apply) {
     unsigned int i = 0, used_memory = 0;
     cimg::unused(i,used_memory);
     while (pthread_mutex_trylock(&spt.is_running)) {
-      if (spt.progress>=0) gimp_progress_update(cimg::min(1.0,spt.progress/100.0));
+      if (spt.progress>=0) gimp_progress_update(std::min(1.0,spt.progress/100.0));
       else gimp_progress_pulse();
       cimg::wait(333);
 
@@ -2927,7 +2927,7 @@ void process_image(const char *const command_line, const bool is_apply) {
 
           for (unsigned int p = spt.images._width; p<layers._height; ++p) gimp_image_remove_layer(image_id,layers[p]);
           if (image_nb_layers==layers.height()) gimp_image_resize(image_id,max_width,max_height,0,0);
-          else gimp_image_resize(image_id,cimg::max(image_width,max_width),cimg::max(image_height,max_height),0,0);
+          else gimp_image_resize(image_id,std::max(image_width,max_width),std::max(image_height,max_height),0,0);
 
       }
       gimp_image_undo_group_end(image_id);
@@ -2989,7 +2989,7 @@ void process_image(const char *const command_line, const bool is_apply) {
 #endif
           img.assign();
         }
-        const unsigned int Mw = cimg::max(image_width,max_width), Mh = cimg::max(image_height,max_height);
+        const unsigned int Mw = std::max(image_width,max_width), Mh = std::max(image_height,max_height);
         if (Mw && Mh) gimp_image_resize(image_id,Mw,Mh,0,0);
         if (output_mode==1) gimp_image_set_active_layer(image_id,active_layer_id);
         else { // Destroy preview widget will force the preview to get the new active layer as base image.
@@ -3180,7 +3180,7 @@ void process_preview() {
             h0 = gimp_drawable_height(active_layer),
             _wp = (int)cimg::round(wp/preview_image_factor),
             _hp = (int)cimg::round(hp/preview_image_factor);
-          const double ratio = cimg::max((double)_wp/w0,(double)_hp/h0);
+          const double ratio = std::max((double)_wp/w0,(double)_hp/h0);
 
           // Retrieve resized and cropped preview layers.
           cimg_forY(layers,p) {
@@ -3327,8 +3327,8 @@ void process_preview() {
       }
     if (!computed_preview) computed_preview.assign(wp,hp,1,4,0);
     if (computed_preview.width()!=wp || computed_preview.height()!=hp) {
-      const double ratio = cimg::min((double)wp/computed_preview.width(),
-                                     (double)hp/computed_preview.height());
+      const double ratio = std::min((double)wp/computed_preview.width(),
+                                    (double)hp/computed_preview.height());
       computed_preview.resize((int)cimg::round(computed_preview.width()*ratio),
                               (int)cimg::round(computed_preview.height()*ratio),
                               1,-100,2);
@@ -3537,7 +3537,7 @@ void create_parameters_gui(const bool reset_params) {
                                            (double)(int)cimg::round(min_value,1.0f),
                                            (double)(int)cimg::round(max_value,1.0f),
                                            (double)1,
-                                           (double)cimg::max(1.0,cimg::round((max_value - min_value)/20,1,1)),
+                                           (double)std::max(1.0f,cimg::round((max_value - min_value)/20,1,1)),
                                            0,true,0,0,0,0);
             event_infos[2*current_argument] = (void*)(cimg_ulong)current_argument;
             event_infos[2*current_argument + 1] = (void*)0;
@@ -3918,7 +3918,7 @@ void create_parameters_gui(const bool reset_params) {
   // Take care of the size of the parameter table.
   GtkRequisition requisition;
   gtk_widget_size_request(table,&requisition);
-  gtk_widget_set_size_request(right_pane,cimg::max(450,requisition.width),-1);
+  gtk_widget_set_size_request(right_pane,std::max(450,requisition.width),-1);
   set_preview_factor();
 
   // Set correct icon for fave button.
@@ -4193,7 +4193,7 @@ bool create_dialog_gui() {
   flush_tree_view(tree_view);
   GtkRequisition requisition;
   gtk_widget_size_request((GtkWidget*)tree_view,&requisition);
-  gtk_widget_set_size_request((GtkWidget*)tree_view,cimg::max(210,requisition.width),-1);
+  gtk_widget_set_size_request((GtkWidget*)tree_view,std::max(210,requisition.width),-1);
   g_signal_connect(tree_view,"cursor-changed",G_CALLBACK(on_filter_selected),0);
   g_signal_connect(tree_view,"row-activated",G_CALLBACK(on_filter_doubleclicked),0);
 
