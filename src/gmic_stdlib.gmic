@@ -31112,6 +31112,7 @@ gmicol_rotate :
 #@gmicol clone("Mixer [HSV]")
 #@gmicol clone("Mixer [Lab]")
 #@gmicol clone("Mixer [CMYK]")
+#@gmicol clone("Retinex")
 #@gmicol clone("RGB tone")
 #@gmicol clone("Select-replace color")
 #@gmicol clone("Specific saturation")
