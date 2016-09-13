@@ -24268,8 +24268,8 @@ gimp_mix_ycbcr_preview :
   -gimp_split_preview "-gimp_mix_ycbcr $*",$-1
 
 #@gimp Retinex : gimp_retinex, gimp_retinex_preview(0)
-#@gimp : Strength (%) = float(100,0,100)
-#@gimp : Colorspace = choice(2,"HSI","HSV","Lab","YCbCr")
+#@gimp : Strength (%) = float(75,0,100)
+#@gimp : Colorspace = choice(1,"HSI","HSV","Lab","YCbCr")
 #@gimp : Min cut (%) = float(1,0,100)
 #@gimp : Max cut (%) = float(1,0,100)
 #@gimp : sep = separator()
