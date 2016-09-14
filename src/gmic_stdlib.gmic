@@ -24274,6 +24274,7 @@ gimp_mix_ycbcr_preview :
 #@gimp : Colorspace = choice(1,"HSI","HSV","Lab","RGB","YCbCr")
 #@gimp : Min cut (%) = float(1,0,100)
 #@gimp : Max cut (%) = float(1,0,100)
+#@gimp : Regularization = float(5,0,32)
 #@gimp : sep = separator()
 #@gimp : Low scale = float(15,1,512)
 #@gimp : Middle scale = float(80,1,512)
@@ -24284,8 +24285,10 @@ gimp_mix_ycbcr_preview :
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/13/2016</i>.</small>")
 gimp_retinex :
   -repeat $! -l[$>]
-    --retinex $2,${"-arg 1+$3,hsi,hsv,lab,rgb,ycbcr"},${4--1}
+    --retinex $2,${"-arg 1+$3,hsi,hsv,lab,rgb,ycbcr"},$4,$5,${7--1}
+    -if $6 -guided. ..,$6,$6 -endif
     -j[0] .,0,0,0,0,{$1%} -rm.
+    -c 0,255
   -endl -done
 
 gimp_retinex_preview :
