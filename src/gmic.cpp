@@ -9831,6 +9831,17 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
           is_released = false; ++position; continue;
         }
 
+        // Quit.
+        if (!std::strcmp("-quit",item)) {
+          print(images,0,"Quit G'MIC interpreter.");
+          dowhiles.assign();
+          repeatdones.assign();
+          position = commands_line.size();
+          is_released = is_quit = true;
+          *is_abort = true;
+          break;
+        }
+
         goto gmic_commands_others;
 
         //-----------------------------
