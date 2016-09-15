@@ -24280,9 +24280,9 @@ gimp_mix_ycbcr_preview :
 #@gimp : Low scale = float(15,1,512)
 #@gimp : Middle scale = float(80,1,512)
 #@gimp : High scale = float(250,1,512)
+#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
 #@gimp : sep = separator(), note = note("<small><b>Note:</b> This filter implements the <i>Multiscale Color Retinex</i> algorithm, as described in:</small>")
 #@gimp : link = link{"http://www.ipol.im/pub/art/2014/107/"}
-#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/13/2016</i>.</small>")
 gimp_retinex :
   -repeat $! -l[$>]
