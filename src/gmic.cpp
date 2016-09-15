@@ -4754,7 +4754,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
         //-----------------------------
         // Commands starting by '-a...'
         //-----------------------------
-        else if (command1=='a') {
+        if (command1=='a') {
 
           // Append.
           if (!std::strcmp("-append",command)) {
