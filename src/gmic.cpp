@@ -4751,8 +4751,8 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                 "Item '%s %s': Unknow name '%s'.",
                 initial_item,initial_argument,new_name.data());
 
-        // Dispatch parser to correct parsing code, regarding the first character of the command.
-        // We rely on the compiler to optmize this using an associative array (verified with g++).
+        // Dispatch to dedicated parsing code, regarding the first character of the command.
+        // We rely on the compiler to optimize this using an associative array (verified with g++).
         switch (command1) {
         case 'a' : goto gmic_commands_a;
         case 'b' : goto gmic_commands_b;
