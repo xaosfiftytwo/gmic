@@ -14859,17 +14859,13 @@ blend_median :
   -e[^-1] "Blend image$? using 'median' mode."
   -v -
   -if {$!<2} -v + -return -endif
-  -to_colormode 0 -r ${-max_whd},100%,0,0,0.5,0.5,0.5 whd={w},{h},{d} -r 100%,{h*d},1,100%,-1
+  -to_colormode 0 -r ${-max_whd},100%,0,0,0.5,0.5,0.5
   -if {$!==2} -+ -/ 2
-  -elif {$!%2}
-    -repeat {$!/2} -repeat {$!-1-$>} -l[$>,{$>+1}] --max -min[0,1] -endl -done -done
-    -k[{int($!/2)}]
-  -elif {!($!%2)}
-    -repeat {$!/2+1} -repeat {$!-1-$>} -l[$>,{$>+1}] --max -min[0,1] -endl -done -done
-    -k[{int($!/2-1)},{$!/2}]
-    -+ -/ 2
+  -else
+    whds={w},{h},{d},{s} -r 100%,100%,{d*s},1,-1 -a c
+    100%,100%,100%,1,"med(I(#0))" -k. -r $whds,-1
   -endif
-  -r $whd,100%,-1 -v +
+  -v +
 
 #@gmic blend_seamless : _is_mixed_mode={ 0 | 1 },_inner_fading[%]>=0,_outer_fading[%]>=0
 #@gmic : Blend selected images using a seamless blending mode (Poisson-based).
