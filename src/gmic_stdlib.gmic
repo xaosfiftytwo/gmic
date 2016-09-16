@@ -656,7 +656,8 @@ _help_usage :
   -_help_paragraph "  - "${-GMIC}" has an embedded "${g}"mathematical parser"$n". It is used to evaluate expressions inside
 \n     braces '"$g"{}"$n"', or formulas in commands that may take one as an argument (e.g. '"$c"-fill"$n"').
 \n
-\n  - When used as a command argument, a formula is evaluated "${g}"for each pixel"$n" of the selected images.
+\n  - When the context allows it, a formula is evaluated "${g}"for each pixel"$n" of the selected images
+\n     (e.g. '"$c"-fill"$n"').
 \n
 \n  - The mathematical parser understands the following set of functions, operators and variables:
 \n
@@ -665,15 +666,15 @@ _help_usage :
 \n       %"$n" (modulo), "$c"^"$n" (power), "$c"!"$n" (logical not), "$c"~"$n" (bitwise not),
 \n       "$c"++"$n", "$c"--"$n", "$c"+="$n", "$c"-="$n", "$c"*="$n", "$c"/="$n", "$c"%="$n", "$c"&="$n", "$c"|="$n", "$c"^="$n", "$c">>="$n", "$c"<<="$n" (in-place operators).
 \n
-\n    _ "${g}"Usual functions:"$n" "${c}"abs(), acos(), arg(), argmax(), argmin(), asin(), atan(), atan2(),
-\n       cbrt(), cos(), cosh(), cut(), exp(), fact(), fibo(), gauss(), hypoth(), int(), isval(), isnan(), isinf(),
-\n       isint(), isbool(), isfile(), isdir(), isin(), kth(), log(), log2(), log10(), max(), mean(),
-\n       med(), min(), narg(), prod(), rol()"$n" (left bit rotation), "${c}"ror()"$n" (right bit rotation)"${c}",
-\n       round(), sign(), sin(), sinc(), sinh(), sqrt(), std(), sum(), tan(), tanh(), variance()"$n".
+\n    _ "${g}"Usual math functions:"$n" "${c}"abs(), acos(), arg(), argmax(), argmin(), asin(), atan(), atan2(),
+\n       cbrt(), cos(), cosh(), cut(), exp(), fact(), fibo(), gauss(), hypoth(), int(), isval(),
+\n       isnan(), isinf(), isint(), isbool(), isfile(), isdir(), isin(), kth(), log(), log2(),
+\n       log10(), max(), mean(), med(), min(), narg(), prod(), rol()"$n" (left bit rotation),
+\n       "${c}"ror()"$n" (right bit rotation)"${c}", round(), sign(), sin(), sinc(), sinh(), sqrt(), std(),
+\n       sum(), tan(), tanh(), variance()"$n".
 \n
 \n       . '"${c}"atan2(x,y)"$n"' is the version of '"${c}"atan()"$n"' with two arguments '"${g}"y"$n"' and '"${g}"x"$n"' (as in C/C++).
-\n       . '"${c}"hypoth(x,y)"$n"' computes the square root of the sum of the squares of x and y.
-\n       . '"${c}"permut(k,n,with_order)"$n"' computes the number of permutations of k objects from a set of k objects.
+\n       . '"${c}"permut(k,n,with_order)"$n"' computes the number of permutations of k objects from a set of n objects.
 \n       . '"${c}"gauss(x,_sigma)"$n"' returns '"${g}"exp(-x^2/(2*s^2))/sqrt(2*pi*sigma^2)'"$n".
 \n       . '"${c}"cut(value,min,max)"$n"' returns value if it is in range "${g}"[min,max]"$n", or "${g}"min"$n" or "${g}"max"$n" otherwise.
 \n       . '"${c}"narg(a_1,...,a_N)"$n"' returns the number of specified arguments (here, "${g}"N"$n").
@@ -703,7 +704,7 @@ _help_usage :
 \n       . '"${c}"i"$n"': current processed pixel value (i.e. value located at "$g"(x,y,z,c)"$n") in the
 \n          associated image, if any ("${g}"0"$n" otherwise).
 \n       . '"${c}"iN"$n"': Nth channel value of current processed pixel (i.e. value located at "$g"(x,y,z,N)"$n") in
-\n          the associated image, if any ("${g}"0"$n" otherwise). '"${g}"N"$n"' must be an integer in range "$g"[0,7]"$n".
+\n          the associated image, if any ("${g}"0"$n" otherwise). '"${g}"N"$n"' must be an integer in range "$g"[0,9]"$n".
 \n       . '"${c}"R"$n"','"${c}"G"$n"','"${c}"B"$n"' and '"${c}"A"$n"' are equivalent to '"${c}"i0"$n"', '"${c}"i1"$n"', '"${c}"i2"$n"' and '"${c}"i3"$n"' respectively.
 \n       . '"${c}"im"$n"','"${c}"iM"$n"','"${c}"ia"$n"','"${c}"iv"$n"','"${c}"is"$n"','"${c}"ip"$n"','"${c}"ic"$n"': Respectively the minimum, maximum, average values,
 \n          variance, sum, product and median value of the associated image, if any ("${g}"0"$n" otherwise).
@@ -711,9 +712,12 @@ _help_usage :
 \n          image, if any ("${g}"0"$n" otherwise).
 \n       . '"${c}"xM"$n"','"${c}"yM"$n"','"${c}"zM"$n"','"${c}"cM"$n"': The pixel coordinates of the maximum value in the associated
 \n          image, if any ("${g}"0"$n" otherwise).
+\n       . '"${c}"I"$n"': current vector-valued processed pixel in the associated image, if any ("${g}"0"$n" otherwise).
+\n          The number of vector components is equal to the number of image channels
+\n          (e.g. "${g}"I = [ R,G,B ]"$n" for a "${g}"RGB"$n" image).
 \n       . You may add '"${c}"#ind"$n"' to any of the variable name above to retrieve the information for any
 \n          numbered image "${g}"[ind]"$n" of the list (when this makes sense). For instance '"${c}"ia#0"$n"' denotes the
-\n          average value of the first image).
+\n          average value of the first image of the list).
 \n       . '"${c}"x"$n"': current processed column of the associated image, if any ("${g}"0"$n" otherwise).
 \n       . '"${c}"y"$n"': current processed row of the associated image, if any ("${g}"0"$n" otherwise).
 \n       . '"${c}"z"$n"': current processed slice of the associated image, if any ("${g}"0"$n" otherwise).
