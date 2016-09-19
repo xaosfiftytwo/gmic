@@ -520,7 +520,12 @@ gmic_stdlib.h:
 	@echo " done!"
 CImg.h:
 	@echo -n "> Retrieve CImg Library..."
-	@if [ -f ../../CImg/CImg.h ]; then if [ ! -f ./CImg.h ]; then ln -s ../../CImg/CImg.h .; fi; else $(WGET) CImg.h https://github.com/dtschump/CImg/blob/master/CImg.h?raw=true; touch CImg.h; fi
+	@if [ -f ../../CImg/CImg.h ]; then \
+          if [ ! -f ./CImg.h ]; then ln -s ../../CImg/CImg.h .; fi; \
+        else \
+          $(WGET) CImg.h https://github.com/dtschump/CImg/blob/master/CImg.h?raw=true; \
+          touch CImg.h; \
+        fi
 	@echo " done!"
 
 # Generate gmic_stdlib.h file (requires 'gmic' to be installed first).
@@ -601,7 +606,7 @@ install:
 	cp -f gmic $(DESTDIR)$(USR)/$(BIN)/
 	mkdir -p $(DESTDIR)$(USR)/$(INCLUDE)/
 	cp -f gmic.h $(DESTDIR)$(USR)/$(INCLUDE)/
-	cp -f gmic_libc.h $(DESTDIR)$(USR)/$(INCLUDE)/
+	@if [ -f gmic_libc.h ]; then cp -f gmic_libc.h $(DESTDIR)$(USR)/$(INCLUDE)/; fi
 
 ifneq ($(OS),Darwin)
 	mkdir -p $(DESTDIR)$(USR)/share
@@ -609,10 +614,15 @@ ifneq ($(OS),Darwin)
 	cp -f libgmic.so $(DESTDIR)$(USR)/$(LIB)/libgmic.so._gmic_versio3
 	ln -fs libgmic.so._gmic_versio3 $(DESTDIR)$(USR)/$(LIB)/libgmic.so._gmic_versio1
 	ln -fs libgmic.so._gmic_versio1 $(DESTDIR)$(USR)/$(LIB)/libgmic.so
-	cp -f libcgmic.so $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio3
-	ln -fs libcgmic.so._gmic_versio3 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio1
-	ln -fs libcgmic.so._gmic_versio1 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so
-	cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/
+	@if [ -f libcgmic.so ]; then \
+	  cp -f gmic_libc.h $(DESTDIR)$(USR)/$(INCLUDE)/; \
+	  cp -f libcgmic.so $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio3; \
+          ln -fs libcgmic.so._gmic_versio3 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio1 ; \
+          ln -fs libcgmic.so._gmic_versio1 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so; \
+        fi
+	@if [ -f ../zart/zart ]; then \
+	  cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/ \
+        fi
 endif
 	mkdir -p $(DESTDIR)$(USR)/share/man/
 	mkdir -p $(DESTDIR)$(USR)/share/man/man1/
