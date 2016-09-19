@@ -6236,7 +6236,7 @@ _rgb2bayer3 : (0,0;1,0^1,0;0,1^0,1;0,0)
 #@gmic : $ image.jpg -rgb2cmy -split c
 rgb2cmy :
   -e[^-1] "Convert image$? from RGB to CMY color bases."
-  -v - -to_rgb -c 0,255 -* -1 -+ 255 -v +
+  -v - -to_rgb -* -1 -+ 255 -c 0,255 -v +
 
 #@gmic rgb2cmyk
 #@gmic : Convert selected images from RGB to CMYK colorbases.
@@ -6357,8 +6357,8 @@ rgb2xyz :
   -e[^-1] "Convert image$? from RGB to XYZ color bases."
   -v - -/ 255
   -mix_rgb 0.43603516,0.38511658,0.14305115,\
-  0.22248840,0.71690369,0.06060791,\
-  0.01391602,0.09706116,0.71392822
+           0.22248840,0.71690369,0.06060791,\
+           0.01391602,0.09706116,0.71392822
   -v +
 
 #@gmic rgb2xyz8
@@ -6377,14 +6377,18 @@ rgb2xyz8 :
 #@gmic : $ image.jpg -rgb2yiq -split c
 rgb2yiq :
   -e[^-1] "Convert image$? from RGB to YIQ color bases."
-  -v - -mix_rgb 0.299,0.587,0.114,0.595716,-0.274453,-0.321263,0.211456,-0.522591,0.311135 -v +
+  -v -
+  -mix_rgb 0.299,0.587,0.114,\
+           0.595716,-0.274453,-0.321263,\
+           0.211456,-0.522591,0.311135
+  -v +
 
 #@gmic rgb2yiq8
 #@gmic : Convert selected images from RGB to YIQ8 colorbases.
 #@gmic : $ image.jpg -rgb2yiq8 -split c
 rgb2yiq8 :
   -e[^-1] "Convert image$? from RGB to YIQ color bases."
-  -v - -mix_rgb 0.299,0.587,0.114,0.595716,-0.274453,-0.321263,0.211456,-0.522591,0.311135
+  -v - -rgb2yiq
   -repeat $!
     -sh[$>] 1 -+. 151.908 -*. 0.8393238012481239 -rm.
     -sh[$>] 2 -+. 133.261 -*. 0.9567690472081104 -rm.
@@ -6406,7 +6410,11 @@ rgb2ycbcr :
 #@gmic : $ image.jpg -rgb2yuv -split c
 rgb2yuv :
   -e[^-1] "Convert image$? from RGB to YUV color bases."
-  -v - -/ 255 -mix_rgb 0.299,0.587,0.114,-0.14713,-0.28886,0.436,0.615,-0.51498,-0.10001 -v +
+  -v - -/ 255
+  -mix_rgb 0.299,0.587,0.114,\
+           -0.14713,-0.28886,0.436,\
+           0.615,-0.51498,-0.10001
+  -v +
 
 #@gmic rgb2yuv8
 #@gmic : Convert selected images from RGB to YUV8 color bases.
@@ -6764,7 +6772,7 @@ xyz2rgb :
   -mix_rgb 3.134274799724,-1.617275708956,-0.490724283042,\
            -0.978795575994,1.916161689117,0.033453331711,\
            0.071976988401,-0.228984974402,1.405718224383
-  -* 255 -v +
+  -* 255 -c 0,255 -v +
 
 #@gmic xyz82rgb
 #@gmic : Convert selected images from XYZ8 to RGB color bases.
@@ -6781,14 +6789,21 @@ xyz82rgb :
 ycbcr2rgb :
   -e[^-1] "Convert image$? from YCbCr to RGB color bases."
   -v - -repeat $! -l[$>] -sh 0 --. 16 -rm. -sh 1,2 --. 128 -rm. -endl -done
-  -mix_rgb 298,0,409,298,-100,-208,298,516,0 -+ 128 -/ 256 -c 0,255
+  -mix_rgb 298,0,409,\
+           298,-100,-208,\
+           298,516,0
+  -+ 128 -/ 256 -c 0,255
   -v +
 
 #@gmic yiq2rgb
 #@gmic : Convert selected images from YIQ to RGB colorbases.
 yiq2rgb :
   -e[^-1] "Convert image$? from YIQ to RGB color bases."
-  -v - -mix_rgb 1,0.9563,0.6210,1,-0.2721,-0.6474,1,-1.1070,1.7046 -v +
+  -v -
+  -mix_rgb 1,0.9563,0.6210,\
+           1,-0.2721,-0.6474,\
+           1,-1.1070,1.7046
+  -c 0,255 -v +
 
 #@gmic yiq82rgb
 #@gmic : Convert selected images from YIQ8 to RGB colorbases.
@@ -6798,13 +6813,20 @@ yiq82rgb :
     -sh[$>] 1 -/. 0.8393238012481239 --. 151.908 -rm.
     -sh[$>] 2 -/. 0.9567690472081104 --. 133.261 -rm.
   -done
-  -mix_rgb 1,0.9563,0.6210,1,-0.2721,-0.6474,1,-1.1070,1.7046 -c 0,255 -v +
+  -mix_rgb 1,0.9563,0.6210,\
+           1,-0.2721,-0.6474,\
+           1,-1.1070,1.7046
+  -c 0,255 -v +
 
 #@gmic yuv2rgb
 #@gmic : Convert selected images from YUV to RGB colorbases.
 yuv2rgb :
   -e[^-1] "Convert image$? from YUV to RGB color bases."
-  -v - -mix_rgb 1,0,1.13983,1,-0.39465,-0.5806,1,2.03211,0 -* 255 -v +
+  -v -
+  -mix_rgb 1,0,1.13983,\
+           1,-0.39465,-0.5806,\
+           1,2.03211,0
+  -* 255 -c 0,255 -v +
 
 #@gmic yuv82rgb
 #@gmic : Convert selected images from YUV8 to RGB color bases.
