@@ -30583,9 +30583,9 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
 
 #@gimp Games &amp; demos : gimp_gmic_demos, gimp_gmic_demos_preview
 #@gimp : Selection = choice("2048","Blobs editor","Bouncing balls","Fire effect","Fireworks","Fish-eye effect","Fourier filtering",
-#@gimp : "Histogram","Hough transform","Jawbreaker","Virtual Landscape","The Game of Life","Light effect","Mandelbrot explorer","3d Metaballs","Minesweeper",
-#@gimp : "Minimal path","Pacman","Paint","Plasma effect","RGB Quantization","3d reflection","3d rubber object","Shadebobs","Spline editor",
-#@gimp : "Tetris","Tic-Tac-Toe","3d waves","Fractal whirl")
+#@gimp : "Histogram","Hough transform","Jawbreaker","Virtual landscape","The game of life","Light effect","Mandelbrot explorer","3d metaballs","Minesweeper",
+#@gimp : "Minimal path","Pacman","Paint","Plasma effect","RGB quantization","3d reflection","3d rubber object","Shadebobs","Spline editor",
+#@gimp : "Tetris","Tic-tac-toe","3d waves","Fractal whirl")
 #@gimp : sep = separator()
 #@gimp : note = note("<small><b>Note:</b> This filter proposes a showcase of some interactive demos, all written as G'MIC scripts.
 #@gimp : </small>")
