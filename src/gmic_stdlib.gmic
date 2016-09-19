@@ -9940,7 +9940,7 @@ arrow : -check "${5=1%}>=0 && ${6=10%}>=0 && ${7=3%}" -skip ${8=1}
       hl = "${"-is_percent $6"}"?l*$6:$6;  # head length
       ht = "${"-is_percent $7"}"?l*$7:$7;  # head thickness
       lmhl = l - hl;
-      X = mul([0,-t,lmhl,-t,lmhl,-ht,l,0,lmhl,ht,lmhl,t,0,t],rot(-atan2(dp[1],dp[0])),2);
+      X = mul([0,-t,lmhl,-t,lmhl,-ht,l,0,lmhl,ht,lmhl,t,0,t],rot(-180*atan2(dp[1],dp[0])/pi),2);
       X+=[p0,p0,p0,p0,p0,p0,p0]"},${8--1}
   -endl -done -v +
 
