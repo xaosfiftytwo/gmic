@@ -187,7 +187,7 @@ if [ "$DIST" != "Ubuntu 16.04.1 LTS" ] || [ "$BITS" != "x86_64" ] ; then
         find gmic-${VERSION}${SUFFIX} -exec touch {} ;
     cd $DIR/src &&
         sed "s/\$\(MAKE\) cli gimp lib/\$\(MAKE\) cli gimp lib libc zart/g" Makefile > /tmp/Makefile &&
-        mv /tmp/Makefile Makefile && cd ..
+        mv /tmp/Makefile Makefile && cd ../..
     cd $DIR &&
         dpkg-buildpackage -d -j3 -rfakeroot;
     mv ../gmic_${VERSION}_${ARCH}.deb ../$PAK
@@ -409,7 +409,7 @@ cp ${HOME}/work/src/deb_${TARFILE}.gz /tmp/ &&
     find gmic-${VERSION}${SUFFIX} -exec touch {} \; &&
     cd $DIR/src &&
     sed "s/\$\(MAKE\) cli gimp lib/\$\(MAKE\) cli gimp lib libc zart/g" Makefile > /tmp/Makefile &&
-    mv /tmp/Makefile Makefile && cd ..
+    mv /tmp/Makefile Makefile && cd ../..
 cd $DIR &&
     dpkg-buildpackage -d -j3 -rfakeroot;
 mv ../gmic_${VERSION}_amd64.deb ../$PAK &&
