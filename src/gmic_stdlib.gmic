@@ -3780,7 +3780,7 @@ update_server :
   -_update_server_move[] "/Testing/Garagecoder/Undo~anaglyph","/Stereoscopic~3d"
   -_update_server_move[] "/Testing/Garagecoder/Sharpen~[gradient]","/Details"
   -_update_server_move[] "/Testing/Garagecoder/Sharpen~[tones]","/Details"
-  -_update_server_move[] "/Testing/Garagecoder/Tone~enhance","/Details"
+#  -_update_server_move[] "/Testing/Garagecoder/Tone~enhance","/Details"
   -_update_server_move[] "/Testing/Garagecoder/Wiremap","/Rendering"
   -_update_server_move[] "/Testing/Naggobot/Blockism","/Artistic"
   -_update_server_move[] "/Testing/Samj/Chalk~it~up","/Artistic"

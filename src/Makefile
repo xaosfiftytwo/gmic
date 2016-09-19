@@ -621,7 +621,7 @@ ifneq ($(OS),Darwin)
           ln -fs libcgmic.so._gmic_versio1 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so; \
         fi
 	@if [ -f ../zart/zart ]; then \
-	  cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/ \
+	  cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/; \
         fi
 endif
 	mkdir -p $(DESTDIR)$(USR)/share/man/
