@@ -812,21 +812,15 @@ CImg<T> _get_gmic_shift(const float delta_x, const float delta_y=0, const float 
   if (delta_c!=0) // 4D shift.
     switch (boundary_conditions) {
     case 0: // Dirichlet.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forXYZC(res,x,y,z,c) res(x,y,z,c) = linear_atXYZC(x - delta_x,y - delta_y,z - delta_z,c - delta_c,(T)0);
       break;
     case 1: // Neumann.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forXYZC(res,x,y,z,c) res(x,y,z,c) = linear_atXYZC(x - delta_x,y - delta_y,z - delta_z,c - delta_c);
       break;
     default: // Periodic.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forXYZC(res,x,y,z,c) res(x,y,z,c) = linear_atXYZC(cimg::mod(x - delta_x,(float)_width),
                                                              cimg::mod(y - delta_y,(float)_height),
                                                              cimg::mod(z - delta_z,(float)_depth),
@@ -835,21 +829,15 @@ CImg<T> _get_gmic_shift(const float delta_x, const float delta_y=0, const float 
   else if (delta_z!=0) // 3D shift.
     switch (boundary_conditions) {
     case 0: // Dirichlet.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forC(res,c) cimg_forXYZ(res,x,y,z) res(x,y,z,c) = linear_atXYZ(x - delta_x,y - delta_y,z - delta_z,c,(T)0);
       break;
     case 1: // Neumann.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forC(res,c) cimg_forXYZ(res,x,y,z) res(x,y,z,c) = linear_atXYZ(x - delta_x,y - delta_y,z - delta_z,c);
       break;
     default: // Periodic.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forC(res,c) cimg_forXYZ(res,x,y,z) res(x,y,z,c) = linear_atXYZ(cimg::mod(x - delta_x,(float)_width),
                                                                           cimg::mod(y - delta_y,(float)_height),
                                                                           cimg::mod(z - delta_z,(float)_depth),c);
@@ -857,42 +845,30 @@ CImg<T> _get_gmic_shift(const float delta_x, const float delta_y=0, const float 
   else if (delta_y!=0) // 2D shift.
     switch (boundary_conditions) {
     case 0: // Dirichlet.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forZC(res,z,c) cimg_forXY(res,x,y) res(x,y,z,c) = linear_atXY(x - delta_x,y - delta_y,z,c,(T)0);
       break;
     case 1: // Neumann.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forZC(res,z,c) cimg_forXY(res,x,y) res(x,y,z,c) = linear_atXY(x - delta_x,y - delta_y,z,c);
       break;
     default: // Periodic.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forZC(res,z,c) cimg_forXY(res,x,y) res(x,y,z,c) = linear_atXY(cimg::mod(x - delta_x,(float)_width),
                                                                          cimg::mod(y - delta_y,(float)_height),z,c);
     }
   else // 1D shift.
     switch (boundary_conditions) {
     case 0: // Dirichlet.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forYZC(res,y,z,c) cimg_forX(res,x) res(x,y,z,c) = linear_atX(x - delta_x,y,z,c,(T)0);
       break;
     case 1: // Neumann.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forYZC(res,y,z,c) cimg_forX(res,x) res(x,y,z,c) = linear_atX(x - delta_x,y,z,c);
       break;
     default: // Periodic.
-#ifdef cimg_use_openmp
-#pragma omp parallel for collapse(3) if (res.size()>=4096)
-#endif
+      cimg_pragma_openmp(parallel for collapse(3) if (res.size()>=4096))
       cimg_forYZC(res,y,z,c) cimg_forX(res,x) res(x,y,z,c) = linear_atX(cimg::mod(x - delta_x,(float)_width),y,z,c);
     }
   return res;
@@ -1617,9 +1593,8 @@ CImg<T>& operator_diveq(const char *const expression, CImgList<T> &images) {
 
 template<typename t>
 CImg<T>& operator_eq(const t val) {
-#ifdef cimg_use_openmp
-#pragma omp parallel for cimg_openmp_if(size()>=131072)
-#endif
+  if (is_empty()) return *this;
+  cimg_pragma_openmp(parallel for cimg_openmp_if(size()>=131072))
   cimg_rof(*this,ptrd,T) *ptrd = (T)(*ptrd == (T)val);
   return *this;
 }
@@ -1645,9 +1620,8 @@ CImg<T>& operator_eq(const CImg<t>& img) {
 
 template<typename t>
 CImg<T>& operator_ge(const t val) {
-#ifdef cimg_use_openmp
-#pragma omp parallel for cimg_openmp_if(size()>=131072)
-#endif
+  if (is_empty()) return *this;
+  cimg_pragma_openmp(parallel for cimg_openmp_if(size()>=131072))
   cimg_rof(*this,ptrd,T) *ptrd = (T)(*ptrd >= (T)val);
   return *this;
 }
@@ -1673,9 +1647,8 @@ CImg<T>& operator_ge(const CImg<t>& img) {
 
 template<typename t>
 CImg<T>& operator_gt(const t val) {
-#ifdef cimg_use_openmp
-#pragma omp parallel for cimg_openmp_if(size()>=131072)
-#endif
+  if (is_empty()) return *this;
+  cimg_pragma_openmp(parallel for cimg_openmp_if(size()>=131072))
   cimg_rof(*this,ptrd,T) *ptrd = (T)(*ptrd > (T)val);
   return *this;
 }
@@ -1701,9 +1674,8 @@ CImg<T>& operator_gt(const CImg<t>& img) {
 
 template<typename t>
 CImg<T>& operator_le(const t val) {
-#ifdef cimg_use_openmp
-#pragma omp parallel for cimg_openmp_if(size()>=131072)
-#endif
+  if (is_empty()) return *this;
+  cimg_pragma_openmp(parallel for cimg_openmp_if(size()>=131072))
   cimg_rof(*this,ptrd,T) *ptrd = (T)(*ptrd <= (T)val);
   return *this;
 }
@@ -1729,9 +1701,8 @@ CImg<T>& operator_le(const CImg<t>& img) {
 
 template<typename t>
 CImg<T>& operator_lt(const t val) {
-#ifdef cimg_use_openmp
-#pragma omp parallel for cimg_openmp_if(size()>=131072)
-#endif
+  if (is_empty()) return *this;
+  cimg_pragma_openmp(parallel for cimg_openmp_if(size()>=131072))
   cimg_rof(*this,ptrd,T) *ptrd = (T)(*ptrd < (T)val);
   return *this;
 }
@@ -1769,9 +1740,8 @@ CImg<T>& operator_muleq(const char *const expression, CImgList<T> &images) {
 
 template<typename t>
 CImg<T>& operator_neq(const t val) {
-#ifdef cimg_use_openmp
-#pragma omp parallel for cimg_openmp_if(size()>=131072)
-#endif
+  if (is_empty()) return *this;
+  cimg_pragma_openmp(parallel for cimg_openmp_if(size()>=131072))
   cimg_rof(*this,ptrd,T) *ptrd = (T)(*ptrd != (T)val);
   return *this;
 }
