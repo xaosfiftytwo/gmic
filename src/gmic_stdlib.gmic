@@ -659,7 +659,7 @@ _help_usage :
 \n  - When the context allows it, a formula is evaluated "${g}"for each pixel"$n" of the selected images
 \n     (e.g. '"$c"-fill"$n"').
 \n
-\n  - A math expression may return a "${g}"scalar"$n" or "${g}"vector"$n"-valued result (with a known number of components).
+\n  - A math expression may return a "${g}"scalar"$n" or "${g}"vector"$n"-valued result (with a fixed number of components).
 \n
 \n  - The mathematical parser understands the following set of functions, operators and variables:
 \n
