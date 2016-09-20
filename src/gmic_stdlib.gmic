@@ -9100,15 +9100,15 @@ remove_pixels : -check "$1>=0"
 #@gmic : Apply the rolling guidance filter on selected image.
 #@gmic : Rolling guidance filter is a fast image abstraction filter, described in:
 #@gmic : "Rolling Guidance Filter", Qi Zhang Xiaoyong, Shen Li, Xu Jiaya Jia, ECCV'2014.
-#@gmic : Default values: 'std_variation_s=4' and 'precision=1'.
+#@gmic : Default values: 'std_variation_s=6', 'std_variation_r=10' and 'precision=0.5'.
 #@gmic : $ image.jpg --rolling_guidance , ---
-rolling_guidance : -check "${1=4}>=0 && ${2=10}>=0 && ${3=1}>=0"
+rolling_guidance : -check "${1=6}>=0 && ${2=10}>=0 && ${3=0.5}>=0"
   -e[^-1] "Apply rolling guidance filter on image$?, with standard deviations ($1,$2) and precision $3."
   -v - precision={2^-$3}
   -repeat $! -l[$>]
-    --b $1 ---  -rm.
+    --f 0
     -repeat 100
-      --bilateral[0] [1],$1,$2
+      --bilateral[0] [1],$1,$2 -d
       --.. . std={-2,sqrt(iv)} -rm..
       -if {$std<$precision} -break -endif
     -done
