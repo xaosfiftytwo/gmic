@@ -9106,9 +9106,9 @@ rolling_guidance : -check "${1=6}>=0 && ${2=10}>=0 && ${3=0.5}>=0"
   -e[^-1] "Apply rolling guidance filter on image$?, with standard deviations ($1,$2) and precision $3."
   -v - precision={2^-$3}
   -repeat $! -l[$>]
-    --f 0
+    --b $1
     -repeat 100
-      --bilateral[0] [1],$1,$2 -d
+      --bilateral[0] [1],$1,$2
       --.. . std={-2,sqrt(iv)} -rm..
       -if {$std<$precision} -break -endif
     -done
