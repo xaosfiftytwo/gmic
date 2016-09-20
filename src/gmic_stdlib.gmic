@@ -4059,7 +4059,7 @@ update_server :
     -o raw:${_path_rc}update$_version.gmic,uchar
     -o cimgz:/tmp/update$_version.gmic,uchar
 
-    (175,176)
+    (175,176,177)
     -repeat {w}
       v={i[$>]}
       -_update_server_upload[] ${_path_rc}update$_version.gmic,plain_update$v.gmic
