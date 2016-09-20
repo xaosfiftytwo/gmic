@@ -25970,23 +25970,6 @@ gimp_mighty_details :
 gimp_mighty_details_preview :
   -gimp_split_preview "-gimp_mighty_details $*",$-1
 
-#@gimp Sharpen [texture] : gimp_sharpen_texture, gimp_sharpen_texture_preview(0)
-#@gimp : Strength = float(1,0,4)
-#@gimp : Radius = float(4,0,32)
-#@gimp : sep = separator(), Channel(s) = choice(16,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
-#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
-#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/20/2016</i>.</small>")
-gimp_sharpen_texture :
-  -ac "-_gimp_sharpen_texture ${1-2}",$3,1
-
-_gimp_sharpen_texture :
-  -repeat $! -l[$>]
-    --rolling_guidance $2,5,0.5 --. [0] -*. $1 -- -c 0,255
-  -endl -done
-
-gimp_sharpen_texture_preview :
-  -gimp_split_preview "-gimp_sharpen_texture $*",$-1
-
 #@gimp Sharpen [deblur] : gimp_deblur, gimp_deblur_preview(0)
 #@gimp : Radius = float(2,0,20)
 #@gimp : Iterations = int(10,0,100)
@@ -26080,6 +26063,23 @@ gimp_sharpen_shock :
 
 gimp_sharpen_shock_preview :
   -gimp_split_preview "-gimp_sharpen_shock $*",$-1
+
+#@gimp Sharpen [texture] : gimp_sharpen_texture, gimp_sharpen_texture_preview(0)
+#@gimp : Strength = float(1,0,4)
+#@gimp : Radius = float(4,0,32)
+#@gimp : sep = separator(), Channel(s) = choice(16,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
+#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/20/2016</i>.</small>")
+gimp_sharpen_texture :
+  -ac "-_gimp_sharpen_texture ${1-2}",$3,1
+
+_gimp_sharpen_texture :
+  -repeat $! -l[$>]
+    --rolling_guidance $2,5,0.5 --. [0] -*. $1 -- -c 0,255
+  -endl -done
+
+gimp_sharpen_texture_preview :
+  -gimp_split_preview "-gimp_sharpen_texture $*",$-1
 
 #@gimp Sharpen [unsharp mask] : gimp_unsharp, gimp_unsharp_preview(0)
 #@gimp : Sharpening type = choice(0,"Gaussian","Bilateral")
@@ -31326,6 +31326,7 @@ gmicol_rotate :
 #@gmicol clone("Sharpen [octave sharpening]")
 #@gmicol clone("Sharpen [richardson-lucy]")
 #@gmicol clone("Sharpen [shock filters]")
+#@gmicol clone("Sharpen [texture]")
 #@gmicol clone("Sharpen [tones]")
 #@gmicol clone("Sharpen [unsharp mask]")
 #@gmicol clone("Simple local contrast")
