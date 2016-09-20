@@ -7741,7 +7741,7 @@ bandpass : -skip ${1=0},${2=20%}
     -fft.. -*... . -*[-2,-1] -ifft -rm.
   -endl -done -v +
 
-#@gmic bilateral : [guide],std_variation_s>0[%],std_variation_r[%]>0,_sampling_s>=0,_sampling_r>=0 : std_variation_s>0[%],std_variation_r[%]>0,_sampling_s>=0,_sampling_r>=0 : (+)
+#@gmic bilateral : [guide],std_variation_s[%]>=0,std_variation_r[%]>=0,_sampling_s>=0,_sampling_r>=0 : std_variation_s[%]>=0,std_variation_r[%]>=0,_sampling_s>=0,_sampling_r>=0 : (+)
 #@gmic : Blur selected images by anisotropic (eventually joint/cross) bilateral filtering.
 #@gmic : If a guide image is provided, it is used for drive the smoothing filter.
 #@gmic : A guide image must be of the same xyz-size as the selected images.
@@ -8360,7 +8360,7 @@ gradient_orientation : -check "${1=3}==1 || $1==2 || $1==3"
     -endif
   -endl -done -v +
 
-#@gmic guided : [guide],radius[%]>0,regularization[%]>0 : radius[%]>0,regularization[%]>0 : (+)
+#@gmic guided : [guide],radius[%]>=0,regularization[%]>=0 : radius[%]>=0,regularization[%]>=0 : (+)
 #@gmic : Blur selected images by guided image filtering.
 #@gmic : If a guide image is provided, it is used to drive the smoothing process.
 #@gmic : A guide image must be of the same xyz-size as the selected images.
@@ -9094,6 +9094,25 @@ remove_pixels : -check "$1>=0"
 
       -r 100%,{h/$d},$d,100%,-1  # Resize to original dimension (eventually 3d).
     -endif
+  -endl -done -v +
+
+#@gmic rolling_guidance : std_variation_s[%]>=0,std_variation_r[%]>=0,_precision>=0
+#@gmic : Apply the rolling guidance filter on selected image.
+#@gmic : Rolling guidance filter is a fast image abstraction filter, described in:
+#@gmic : "Rolling Guidance Filter", Qi Zhang Xiaoyong, Shen Li, Xu Jiaya Jia, ECCV'2014.
+#@gmic : Default values: 'std_variation_s=4' and 'precision=1'.
+#@gmic : $ image.jpg --rolling_guidance , ---
+rolling_guidance : -check "${1=4}>=0 && ${2=10}>=0 && ${3=1}>=0"
+  -e[^-1] "Apply rolling guidance filter on image$?, with standard deviations ($1,$2) and precision $3."
+  -v - precision={2^-$3}
+  -repeat $! -l[$>]
+    --b $1 ---  -rm.
+    -repeat 100
+      --bilateral[0] [1],$1,$2
+      --.. . std={-2,sqrt(iv)} -rm..
+      -if {$std<$precision} -break -endif
+    -done
+    -k.
   -endl -done -v +
 
 #@gmic sharpen : amplitude>=0 : amplitude>=0,edge>=0,_alpha,_sigma : (+)
@@ -22835,6 +22854,19 @@ _gimp_shapeism6 : # Star
 _gimp_shapeism7 : # Custom
   -star3d $1,$2 -*3d. {0,min(w,h)/2} -r3d. 0,0,1,$3 -j3d[0] .,50%,50%,0,1,2,0 -k[0]
 
+#@gimp Sharp abstraction : gimp_sharp_abstract, gimp_sharp_abstract_preview(0)
+#@gimp : Spatial scale = float(6,0,128)
+#@gimp : Value scale = float(10,0,16)
+#@gimp : Precision = float(0.5,0,2)
+#@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
+#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>09/20/2016</i>.</small>")
+gimp_sharp_abstract :
+  -ac "-rolling_guidance ${1-3}",$4
+
+gimp_sharp_abstract_preview :
+  -gimp_split_preview "-gimp_sharp_abstract $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+
 #@gimp Smooth abstract : gimp_smooth_abstract, gimp_smooth_abstract_preview(0)
 #@gimp : Smoothness (%) = float(75,0,100)
 #@gimp : Regularization = choice(0,"Isotropic","Delaunay-oriented","Edge-oriented")
@@ -30972,6 +31004,7 @@ gmicol_brushify_preview :
 #@gmicol clone("Polygonize [energy]")
 #@gmicol clone("Poster edges")
 #@gmicol clone("Rodilius")
+#@gmicol clone("Sharp abstract")
 #@gmicol clone("Smooth abstract")
 #@gmicol clone("Vector painting")
 #@gmicol clone("Warhol")
