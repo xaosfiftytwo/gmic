@@ -85,16 +85,17 @@
                     alternative: <a href="http://www.partha.com/">Partha version (64 bits)</a><br/><br/></td>
                 </tr>
                 <tr>
-                  <td><a href="http://gmic.eu/files/source/gmic_source.tar.gz"><img alt="" src="img/download_source.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td>
-                  <td><a href="http://gmic.eu/files/source/gmic_source.tar.gz"><font size="3">G'MIC source</font></a><br/>
-                    tar.gz file<br/>
-                    alternative: <a href="https://github.com/dtschump/gmic">git repository</a><br/><br/></td>
+                  <td><a href="http://gmic.eu/files/prerelease/gmic_source.tar.gz"><img alt="" src="img/download_source.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td>
+                  <td><a href="http://gmic.eu/files/prerelease/gmic_source.tar.gz"><font size="3">G'MIC source</font></a><br/>
+                    tar.gz file (current <i>development version</i>)<br/>
+                    alternative1: <a href="https://github.com/dtschump/gmic">git repository</a><br/>
+                    alternative2: <a href="http://gmic.eu/files/source/gmic_source.tar.gz">Latest stable (.tar.gz)</a><br/><br/></td>
                 </tr>
-                <tr>
-                  <td><a href="http://gmic.eu/files/prerelease"><img alt="" src="img/download_prerelease.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td>
-                  <td><a href="http://gmic.eu/files/prerelease"><font size="3">G'MIC pre-release for testing</font></a><br/>
-                    source and Windows/Linux installers/binaries<br/><br/></td>
-                </tr>
+                <!-- <tr> -->
+                <!--   <td><a href="http://gmic.eu/files/prerelease"><img alt="" src="img/download_prerelease.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td> -->
+                <!--   <td><a href="http://gmic.eu/files/prerelease"><font size="3">G'MIC pre-release for testing</font></a><br/> -->
+                <!--     source and Windows/Linux installers/binaries<br/><br/></td> -->
+                <!-- </tr> -->
                 <tr>
                   <td><a href="http://gmic.eu/files/"><img alt="" src="img/download_browse.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td>
                   <td><a href="http://gmic.eu/files"><font size="3">Browse all files</font></a><br/></td>

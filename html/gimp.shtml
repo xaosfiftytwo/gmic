@@ -59,11 +59,11 @@
                   <td><a href="http://karo03.bplaced.de/gmic/release/"><font size="3">G'MIC plug-in for Mac Intel</font></a><br/>
                     dmg file<br/><br/></td>
                 </tr>
-                <tr>
-                  <td><a href="http://gmic.eu/files/prerelease"><img alt="" src="img/download_prerelease.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td>
-                  <td><a href="http://gmic.eu/files/prerelease"><font size="3">G'MIC plug-in pre-release for testing</font></a><br/>
-                    source and Windows/Linux installers/binaries<br/><br/></td>
-                </tr>
+                <!-- <tr> -->
+                <!--   <td><a href="http://gmic.eu/files/prerelease"><img alt="" src="img/download_prerelease.png" border="0"></img></a></td><td>&nbsp;&nbsp;</td> -->
+                <!--   <td><a href="http://gmic.eu/files/prerelease"><font size="3">G'MIC plug-in pre-release for testing</font></a><br/> -->
+                <!--     source and Windows/Linux installers/binaries<br/><br/></td> -->
+                <!-- </tr> -->
               </table>
             </font>
             <hr noshade="noshade" size="1" width="90%"></hr>
