@@ -9108,7 +9108,9 @@ rolling_guidance : -check "${1=4}>=0 && ${2=10}>=0 && ${3=0.5}>=0"
   -repeat $! -l[$>]
     --b $1
     -repeat 100
-      --norm. --bilateral... .,$1,$2 -rm..
+      -if {c>1} --norm. --bilateral... .,$1,$2 -rm..
+      -else --bilateral.. .,$1,$2
+      -endif
       --.. . std={-2,sqrt(iv)} -rm..
       -if {$std<$precision} -break -endif
     -done
