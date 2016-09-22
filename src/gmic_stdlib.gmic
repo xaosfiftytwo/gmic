@@ -8876,7 +8876,7 @@ meancurvature_flow : -skip ${1=10},${2=30},${3=0}
 #@gmic : Apply (opt. thresholded) median filter on selected images with structuring element size x size.
 #@gmic : $ image.jpg --median 5
 
-#@gmic nlmeans : _patch_radius>0,_spatial_bandwidth>0,_tonal_bandwidth>0,_patch_measure_command
+#@gmic nlmeans : [guide],_patch_radius>0,_spatial_bandwidth>0,_tonal_bandwidth>0,_patch_measure_command : _patch_radius>0,_spatial_bandwidth>0,_tonal_bandwidth>0,_patch_measure_command
 #@gmic : Apply non local means denoising of Buades et al, 2005. on selected images.
 #@gmic : The patch is a gaussian function of 'std _patch_radius'.
 #@gmic : The spatial kernel is a rectangle of radius 'spatial_bandwidth'.
@@ -8884,18 +8884,32 @@ meancurvature_flow : -skip ${1=10},${2=30},${3=0}
 #@gmic : with d the euclidiean distance between image patches.
 #@gmic : Default values: 'patch_radius=4', 'spatial_bandwidth=4', 'tonal_bandwidth=10' and 'patch_measure_command=-norm'.
 #@gmic : $ image.jpg --noise 10 -nlmeans[-1] 4,4,{0.6*${-std_noise}}
-nlmeans: -check "${1=4}>0 && ${2=4}>0 && ${3=10}>0" -skip "${4=-norm}"
-  -e[^-1] "Apply non-local means denoising with patch size $1, spatial bandwidth $2, tonal bandwidth $3 and patch measure command '$4'."
-  -v - -repeat $! -l[$>]
-    # [1] preprocessed image used to compute weights.
-    --l $4 -k[0] -endl
+nlmeans:
+  -v -
+  -if ${"-is_image_arg $1"}
 
-    # [2] compute a scaling.
-    100%,100%,100%,100%,{-1.0/($3*$3)}
-    # Apply the NLM denoising with image 1 and 2 as parameter.
-    -nlmeans_core[0] [1],[2],$1,$2
-    -rm[-1,-2] # Clean up.
-  -endl -done -v +
+    # Guided-filtering
+    -check "${2=4}>0 && ${3=4}>0 && ${4=10}>0" -skip "${5=-norm}"
+    -e[^-1] "Apply non-local means denoising on image$?, with guide $1, patch size $2, spatial bandwidth $3, tonal bandwidth $4 and patch measure command '$5'."
+    -pass$1 0 -l. $5 -k[0] -endl # [1] preprocessed image used to compute weights.
+    -repeat {$!-1} -l[$>,-1]
+      100%,100%,100%,100%,{-1.0/($4*$4)} # [2] compute a scaling.
+      -nlmeans_core[0] [1],[2],$2,$3 -rm. # Apply the NLM denoising with image 1 and 2 as parameter.
+    -endl -done
+    -rm.
+
+  -else
+
+    # Non-guided filtering
+    -check "${1=4}>0 && ${2=4}>0 && ${3=10}>0" -skip "${4=-norm}"
+    -e[^-1] "Apply non-local means denoising on image$?, with patch size $1, spatial bandwidth $2, tonal bandwidth $3 and patch measure command '$4'."
+    -repeat $! -l[$>]
+      --l $4 -k[0] -endl # [1] preprocessed image used to compute weights.
+      100%,100%,100%,100%,{-1.0/($3*$3)} # [2] compute a scaling.
+      -nlmeans_core[0] [1],[2],$1,$2 -k[0] # Apply the NLM denoising with image 1 and 2 as parameter.
+    -endl -done
+
+  -endif -v +
 
 #@gmic nlmeans_core: _reference_image,_scaling_map,_patch_radius>0,_spatial_bandwidth>0
 #@gmic : Apply non local means denoising using a image for weigth and a map for scaling
