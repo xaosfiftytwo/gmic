@@ -28674,11 +28674,10 @@ gimp_anisotropic_smoothing_preview :
 #@gimp : Value variance = float(7,0,100)
 #@gimp : Iterations = int(2,1,10)
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
-#@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate horizontal","Duplicate vertical")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
 gimp_bilateral : -skip ${5=0},${6=0}
-  -ac "-gimp_parallel_overlap \"-repeat $3 -bilateral $1,$2 -done\",$5,$6",$4
+  -ac "-repeat $3 -bilateral $1,$2 -done",$4
 
 gimp_bilateral_preview :
   -gimp_split_preview "-gimp_bilateral $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
