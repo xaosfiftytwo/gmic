@@ -859,15 +859,15 @@ _help_usage :
 \n          starting from a source value '"${c}"src"$n"' to a specified destination '"${c}"dest"$n"', with increments
 \n          defined by '"${c}"inc_d"$n"' and '"${c}"inc_s"$n"' respectively for the destination and source pointers.
 \n
-\n    - "${g}"User-defined functions:"$n"
+\n    - "${g}"User-defined macro functions:"$n"
 \n
 \n       . Custom macro functions can be defined in a math expression, using the assignment operator '"${c}"="$n"', e.g.
-\n         '"${c}"foo(x,y) = cos(x + y); result = foo(1,2) + foo(2,3)"$n"'.
-\n       . Overriding a built-in function has no effect.
-\n       . Overriding an already defined macro function replaces its old definition.
+\n         '"${c}"foo(x,y) = cos((x) + (y)); result = foo(1,2) + foo(2,3)"$n"'.
+\n       . Trying to override a built-in function (e.g. '"${c}"abs()"$n"') has no effect.
+\n       . Overriding an already defined macro function discard its previous definition.
 \n       . Macro functions are indeed processed as "${g}"macros"$n" by the mathematical evaluator. You should avoid invoking
 \n          them with arguments that are themselves results of assignments or self-operations. For instance,
-\n          '"${c}"foo(x) = x + x; z = 0; result = foo(++z)"$n"' will set '"${c}"result = 4"$n"' rather than expected value '"${c}"2"$n"'.
+\n          '"${c}"foo(x) = (x) + (x); z = 0; result = foo(++z)"$n"' will set '"${c}"result = 4"$n"' rather than expected value '"${c}"2"$n"'.
 \n
 \n    - "${g}"Multi-threaded"$n" and "${g}"in-place"$n" evaluation:
 \n
