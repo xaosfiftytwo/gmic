@@ -868,8 +868,8 @@ _help_usage :
 \n       . Macro functions are indeed processed as "${g}"macros"$n" by the mathematical evaluator. You should avoid invoking
 \n          them with arguments that are themselves results of assignments or self-operations. For instance,
 \n          '"${c}"foo(x) = (x) + (x); z = 0; result = foo(++z)"$n"' will set '"${c}"result = 4"$n"' rather than expected value '"${c}"2"$n"'.
-\n       . When necessary, you can force the substitution of a macro argument by inserting a '"${c}"#"$n"' just before,
-\n          e.g. '"${c}"vec(N) = vector#N();"$n"'.
+\n       . Number signs appearing in a macro function counts for '"${c}"empty"$n"' characters. They may be used to force
+\n          the substitution of macro arguments in unusual places, e.g. as in '"${c}"vec(N) = vector#N();"$n"'.
 \n
 \n    - "${g}"Multi-threaded"$n" and "${g}"in-place"$n" evaluation:
 \n
