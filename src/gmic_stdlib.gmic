@@ -20196,6 +20196,8 @@ x_shadebobs :
   -e[] "\n
 ------ "${g}"Shade bobs"$n" -------------------------------\n
 ----\n
+---- Keys '"${c}"CTRL+D"$n"' to increase window size.\n
+---- Keys '"${c}"CTRL+C"$n"' to reset window size.\n
 ---- Keys '"${c}"ESC"$n"' or '"${c}"Q"$n"' to exit.\n
 ----\n
 -------------------------------------------------"
