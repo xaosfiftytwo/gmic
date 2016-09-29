@@ -2305,7 +2305,7 @@ unsigned int gmic::strescape(const char *const str, char *const res) {
     } else *(ptrd++) = c;
   }
   *ptrd = 0;
-  return ptrd - res;
+  return (unsigned int)(ptrd - res);
 }
 
 // Constructors / destructors.
@@ -2883,7 +2883,7 @@ gmic& gmic::add_commands(std::FILE *const file,
     const cimg_long siz = std::ftell(file);
     std::rewind(file);
     if (siz>0) {
-      CImg<char> buffer(siz + 1);
+      CImg<char> buffer((unsigned int)siz + 1);
       if (std::fread(buffer.data(),sizeof(char),siz,file)) {
         buffer[siz] = 0;
         add_commands(buffer.data(),filename);
@@ -4093,7 +4093,7 @@ CImg<char> gmic::substitute_item(const char *const source,
                 try {
                   const CImg<unsigned int> inds = selection2cimg(subset,img.size(),CImgList<char>::empty(),"",false);
                   values.assign(1,inds.height());
-                  cimg_foroff(inds,p) values[p] = img[inds(p)];
+                  cimg_foroff(inds,p) values[p] = img[inds[p]];
                 } catch (gmic_exception &e) {
                   const char *const e_ptr = std::strstr(e.what(),": ");
                   error(images,0,0,
@@ -4249,7 +4249,7 @@ CImg<char> gmic::substitute_item(const char *const source,
           }
         if (is_name_found) {
           if (__variables[ind].size()>1)
-            CImg<char>(__variables[ind].data(),__variables[ind].size() - 1).
+            CImg<char>((unsigned int)(__variables[ind].data(),__variables[ind].size() - 1)).
               append_string_to(substituted_items,ptr_sub);
         } else {
           for (int l = images.width() - 1; l>=0; --l)
@@ -4296,7 +4296,7 @@ CImg<char> gmic::substitute_item(const char *const source,
       } else CImg<char>::append_string_to(*(nsource++),substituted_items,ptr_sub);
     }
   *ptr_sub = 0;
-  return CImg<char>(substituted_items.data(),ptr_sub - substituted_items.data() + 1);
+  return CImg<char>(substituted_items.data(),(unsigned int)(ptr_sub - substituted_items.data() + 1));
 }
 
 // Main parsing procedures.
@@ -10604,7 +10604,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
               if (!img) {
                 if (!is_double_hyphen) { images.remove(uind); images_names.remove(uind); off-=1; }
               } else {
-                g_list = CImg<T>(img.data(),1,img.size(),1,1,true).get_split('y',0);
+                g_list = CImg<T>(img.data(),1,(unsigned int)img.size(),1,1,true).get_split('y',0);
                 name = images_names[uind];
                 if (is_double_hyphen) {
                   images_names.insert(g_list.size(),name.copymark());
