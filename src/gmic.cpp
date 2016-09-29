@@ -4249,7 +4249,7 @@ CImg<char> gmic::substitute_item(const char *const source,
           }
         if (is_name_found) {
           if (__variables[ind].size()>1)
-            CImg<char>((unsigned int)(__variables[ind].data(),__variables[ind].size() - 1)).
+            CImg<char>(__variables[ind].data(),(unsigned int)(__variables[ind].size() - 1)).
               append_string_to(substituted_items,ptr_sub);
         } else {
           for (int l = images.width() - 1; l>=0; --l)
