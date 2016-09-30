@@ -16748,8 +16748,7 @@ tic :
 #@gmic : This command returns the elapsed time in the status value.
 #@gmic : Use it in conjunction with '-tic'.
 toc :
-  -v - _ticpos={$_ticpos-1} -v +
-  -u {_$|-${_tic$_ticpos}}
+  -v - _ticpos={$_ticpos-1} -u {_$|-${_tic$_ticpos}} -v +
   -e[^-1] "Elapsed time: "${}" s".
 
 #@gmic std_noise
