@@ -16454,6 +16454,35 @@ is_videofilename : -skip "${1=}"
 is_windows :
   -v - -u {narg($OS)==1" && "narg($WINDIR)==1} -v +
 
+#@gmic math_lib
+#@gmic : Return string that defines a set of several useful macros for the embedded math evaluator.
+#@gmic : $ image.jpg -skip {${-math_lib}" for (i=0, i<1000, ++i, draw_line(#0,0.5*[w,h],u([w,h]),0.5,u([255,255,255])));"}
+math_lib :
+  -v -
+  -u "
+  map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
+    unref(x#,_k);
+    for (_k = 0, _k<size(V#), ++_k, x# = V#[_k]; V#[_k] = fnx#);
+    V#;
+  );
+
+  draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
+    unref(_P0,_P0P1,_color,_opacity,_t,_tmax,_P);
+    _P0 = P0;
+    (_P0P1 = P1)-=_P0;
+    _opacity = opacity;
+    _color = color*_opacity;
+    _omopacity = 1 - _opacity;
+    _tmax = max(abs(_P0P1));
+    for (_t = 0, _t<_tmax, ++_t,
+      _P = round(_P0 + _t*_P0P1/_tmax);
+      I(#ind,_P) = _color + _omopacity*I(#ind,_P);
+    )
+  );
+
+"
+  -v +
+
 #@gmic mad
 #@gmic : Return the MAD (Maximum Absolute Deviation) of the last selected image.
 #@gmic : The MAD is defined as MAD = med_i|x_i-med_j(x_j)|
