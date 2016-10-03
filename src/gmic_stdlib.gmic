@@ -30689,6 +30689,7 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
     -gimp_print_preview "Syntax error:",,$error_msg,15,40
   -endl
   -if $4 # Display debug infos on preview
+    -if {!$3} -% 255 -endif
     -if {$_preview_mode>=4} -gimp_preview -endif
     siz0=13 siz1=17 siz2=19 siz3=22
     -if {['$_status_out']==0} _status_out=(empty) -endif
