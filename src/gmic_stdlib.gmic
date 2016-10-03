@@ -30691,7 +30691,6 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
   -if $4 # Display debug infos on preview
     -if {$_preview_mode>=4} -gimp_preview -endif
     siz0=13 siz1=17 siz2=19 siz3=22
-    -repeat $! -l[$>] -split_opacity -/[0] 2 -a c -endl -done
     -if {['$_status_out']==0} _status_out=(empty) -endif
     info="Input images: "#$_nb_in"\n"\
          $_dim_in"\n\n"\
@@ -30699,8 +30698,9 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
          $_dim_out"\n\n"\
          "Output status: "$_status_out
     0 -t. {``$info},0,0,${siz$5},1,255 -expand_xy. 5,0 --dilate. 3 -a[-2,-1] c
-    -to_a -r ${-max_wh},1,100%,0
-    -blend[^-1] .,alpha -rm.
+    -rr2d[^-1] ${-max_wh},2,2
+    -r. ..,..,1,100%,0 -drgba[^-1]
+    -/[^-1] 2 -blend[^-1] .,alpha -rm.
   -endif
 
 #@gimp Games &amp; demos : gimp_gmic_demos, gimp_gmic_demos_preview
