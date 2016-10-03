@@ -30661,7 +30661,7 @@ gimp_custom_code : -skip "${1=-skip ,}"
   -m "_gimp_custom_code_start : $1"
   -if $4
     _nb_in=$!
-    sep="" -repeat $! -l[$>] _dim_in=$_dim_in$sep"["$>"] = "{w}x{h}x{d}x{s}", in ["{_round([im,iM])}"]" sep="\n" -endl -done
+    _dim_in="" sep="" -repeat $! -l[$>] _dim_in=$_dim_in$sep"["$>"] = "{w}x{h}x{d}x{s}", in ["{_round([im,iM])}"]" sep="\n" -endl -done
   -endif
   -if $2
     -apply_channels "-_gimp_custom_code_start _status_out=${}",{$2-1},$3
@@ -30671,7 +30671,7 @@ gimp_custom_code : -skip "${1=-skip ,}"
   -endif
   -if $4
     _nb_out=$!
-    sep="" -repeat $! -l[$>]
+    _dim_out="" sep="" -repeat $! -l[$>]
       _dim_out=$_dim_out$sep"["$>"] = "{w}x{h}x{d}x{s}", in ["{_round([im,iM])}"]" sep="\n" -endl -done
   -endif
   -uncommand _gimp_custom_code_start
