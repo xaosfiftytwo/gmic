@@ -1971,9 +1971,18 @@ struct st_process_thread {
   pthread_t thread;
   void set_env() { // Must be called from main thread to avoid crash when doing 'gimp_get_data()'.
     env.assign(256);
+    int pw = 0, ph = 0;
+    gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&pw,&ph);
     cimg_snprintf(env,env.width(),
-                  "-v - _input_layers=%u _output_mode=%u _output_messages=%u _preview_mode=%u _preview_size=%u",
-                  get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size());
+                  "-v - "
+                  "_input_layers=%u "
+                  "_output_mode=%u "
+                  "_output_messages=%u "
+                  "_preview_mode=%u "
+                  "_preview_size=%u "
+                  "_preview_width=%d "
+                  "_preview_height=%d",
+                  get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size(),pw,ph);
   }
 };
 
