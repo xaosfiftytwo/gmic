@@ -30689,6 +30689,7 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
     -gimp_print_preview "Syntax error:",,$error_msg,15,40
   -endl
   -if $4 # Display debug infos on preview
+    -if {$_preview_mode>=4} -gimp_preview -endif
     siz0=13 siz1=17 siz2=19 siz3=22
     -repeat $! -l[$>] -split_opacity -/[0] 2 -a c -endl -done
     -if {['$_status_out']==0} _status_out=(empty) -endif
@@ -30697,11 +30698,9 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
          "Output images: "#$_nb_out"\n"\
          $_dim_out"\n\n"\
          "Output status: "$_status_out
-    0 -t. {``$info},0,0,${siz$5},1,1 -expand_xy. 1,0 --dilate. 3 -*.. 255
-    -if {$!>=3}
-      -r.. 100%,100%,1,${-max_s[0--3]}
-      -j[0--3] ..,3,3,0,0,1,. -rm[-2,-1]
-    -endif
+    0 -t. {``$info},0,0,${siz$5},1,255 -expand_xy. 5,0 --dilate. 3 -a[-2,-1] c
+    -to_a -r ${-max_wh},1,100%,0
+    -blend[^-1] .,alpha -rm.
   -endif
 
 #@gimp Games &amp; demos : gimp_gmic_demos, gimp_gmic_demos_preview
