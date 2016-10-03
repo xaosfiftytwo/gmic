@@ -30690,7 +30690,7 @@ gimp_custom_code_preview : -skip "${1=-skip ,}"
   -endl
   -if $4 # Display debug infos on preview
     siz0=13 siz1=17 siz2=19 siz3=22
-    -/ 2
+    -repeat $! -l[$>] -split_opacity -/[0] 2 -a c -endl -done
     -if {['$_status_out']==0} _status_out=(empty) -endif
     info="Input images: "#$_nb_in"\n"\
          $_dim_in"\n\n"\
