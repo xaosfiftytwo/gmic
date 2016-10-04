@@ -16461,7 +16461,7 @@ is_windows :
 math_lib :
   -v -
   -u "
-  draw_circle(ind,P0,radius,opacity,color) = (
+  draw_circle(ind,P0,radius,opacity,color) = ( # Draw a circle centered at P0 on image #ind
     unref(_dc_P0,_dc_radius,_dc_opacity,_dc_color,_dc_omopacity,_dc_Pmin,_dc_Pmax,_dc_radius,_dc_x,_dc_y,_dc_P);
     _dc_P0 = round(P0);
     _dc_radius = radius;
@@ -16499,7 +16499,7 @@ math_lib :
     nan;
   );
 
-  draw_rectangle(ind,P0,P1,opacity,color) = (
+  draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
     unref(_dr_P0,_dr_P1,_dr_opacity,_dr_omopacity,_dr_color,_dr_xs,_dr_ys,
           _dr_xmin,_dr_xmax,_dr_ymin,_dr_ymax,_dr_dx,_dr_x,_dr_y,_dr_c);
     _dr_P0 = round(P0);
@@ -16532,7 +16532,7 @@ math_lib :
     nan;
   );
 
-  draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw a spline P0-P1 with tangents T0,T1 in image #ind
+  draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw spline P0-P1 with tangents T0,T1 on image #ind
     unref(_ds_C,_ds_P0,_ds_P,_ds_t,_ds_dt,_ds_opacity,_ds_color);
     _ds_P0 = P0;
     _ds_P1 = P1;
@@ -16548,7 +16548,7 @@ math_lib :
     nan;
   );
 
-  draw_triangle(ind,P0,P1,P2,opacity,color) = (
+  draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
     unref(_dt_A,_dt_B,_dt_C,_dt_opacity,_dt_omopacity,_dt_color,_dt_xs,_dt_ys,
           _dt_xmin,_dt_xmax,_dt_ymin,_dt_ymax,_dt_v0,_dt_v1,_dt_v2,
           _dt_dot00,_dt_dot01,_dt_dot11,_dt_dot02,_dt_dot12,_dt_u,_dt_v);
