@@ -16479,8 +16479,7 @@ math_lib :
       I(#ind,_P) = _color + _omopacity*I(#ind,_P);
     )
   );
-
-"
+  "
   -v +
 
 #@gmic mad
