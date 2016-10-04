@@ -16461,12 +16461,6 @@ is_windows :
 math_lib :
   -v -
   -u "
-  map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
-    unref(x#,_k);
-    for (_m_k = 0, _m_k<size(V#), ++_m_k, x# = V#[_m_k]; V#[_m_k] = fnx#);
-    V#;
-  );
-
   draw_circle(ind,P0,radius,opacity,color) = (
     unref(_dc_P0,_dc_radius,_dc_opacity,_dc_color,_dc_omopacity,_dc_Pmin,_dc_Pmax,_dc_radius,_dc_x,_dc_y,_dc_P);
     _dc_P0 = round(P0);
@@ -16589,6 +16583,12 @@ math_lib :
       );
     );
     nan;
+  );
+
+  map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
+    unref(x#,_k);
+    for (_m_k = 0, _m_k<size(V#), ++_m_k, x# = V#[_m_k]; V#[_m_k] = fnx#);
+    V#;
   );
   "
   -v +
