@@ -16469,13 +16469,17 @@ math_lib :
 
   draw_circle(ind,P0,radius,opacity,color) = (
     unref(_dc_P0,_dc_radius,_dc_opacity,_dc_color,_dc_omopacity,_dc_Pmin,_dc_Pmax,_dc_radius,_dc_x,_dc_y,_dc_P);
-    _dc_P0 = P0;
+    _dc_P0 = round(P0);
     _dc_radius = radius;
     _dc_opacity = opacity;
     _dc_color = color*_dc_opacity;
     _dc_omopacity = 1 - _dc_opacity;
     _dc_Pmin = _dc_P0 - _dc_radius;
     _dc_Pmax = _dc_P0 + _dc_radius;
+    _dc_Pmin[0] = max(0,_dc_Pmin[0]);
+    _dc_Pmax[0] = min(w#ind - 1,_dc_Pmax[0]);
+    _dc_Pmin[1] = max(0,_dc_Pmin[1]);
+    _dc_Pmax[1] = min(h#ind - 1,_dc_Pmax[1]);
     _dc_radius+=0.5;
     for (_dc_y = _dc_Pmin[1], _dc_y<=_dc_Pmax[1], ++_dc_y,
       for (_dc_x = _dc_Pmin[0], _dc_x<=_dc_Pmax[0], ++_dc_x,
@@ -16515,6 +16519,43 @@ math_lib :
       _ds_P0 = _ds_P;
     );
     nan
+  );
+
+  draw_triangle(ind,P0,P1,P2,opacity,color) = (
+    unref(_dt_A,_dt_B,_dt_C,_dt_opacity,_dt_omopacity,_dt_color,_dt_xs,_dt_ys,
+          _dt_xmin,_dt_xmax,_dt_ymin,_dt_ymax,_dt_v0,_dt_v1,_dt_v2,
+          _dt_dot00,_dt_dot01,_dt_dot11,_dt_dot02,_dt_dot12,_dt_u,_dt_v);
+    _dt_A = round(P0);
+    _dt_B = round(P1);
+    _dt_C = round(P2);
+    _dt_opacity = opacity;
+    _dt_omopacity = 1 - _dt_opacity;
+    _dt_color = color*_dt_opacity;
+    _dt_xs = [ _dt_A[0],_dt_B[0],_dt_C[0] ];
+    _dt_ys = [ _dt_A[1],_dt_B[1],_dt_C[1] ];
+    _dt_xmin = max(0,min(_dt_xs));
+    _dt_xmax = min(w#ind - 1,max(_dt_xs));
+    _dt_ymin = max(0,min(_dt_ys));
+    _dt_ymax = min(h#ind - 1,max(_dt_ys));
+    _dt_v0 = _dt_C - _dt_A;
+    _dt_v1 = _dt_B - _dt_A;
+    _dt_dot00 = dot(_dt_v0,_dt_v0);
+    _dt_dot01 = dot(_dt_v0,_dt_v1);
+    _dt_dot11 = dot(_dt_v1,_dt_v1);
+    _dt_denom = _dt_dot00*_dt_dot11 - _dt_dot01^2;
+    for (_dt_y = _dt_ymin, _dt_y<=_dt_ymax, ++_dt_y,
+      for (_dt_x = _dt_xmin, _dt_x<=_dt_xmax, ++_dt_x,
+        _dt_v2 = [ _dt_x,_dt_y ] - _dt_A;
+        _dt_dot02 = dot(_dt_v0,_dt_v2);
+        _dt_dot12 = dot(_dt_v1,_dt_v2);
+        _dt_u = _dt_dot11*_dt_dot02 - _dt_dot01*_dt_dot12;
+        _dt_v = _dt_dot00*_dt_dot12 - _dt_dot01*_dt_dot02;
+        if (_dt_u>=0 && _dt_v>=0 && _dt_u + _dt_v<_dt_denom,
+          I(#ind,_dt_x,_dt_y) = _dt_color + _dt_omopacity*I(#ind,_dt_x,_dt_y);
+        );
+      );
+    );
+    nan;
   );
   "
   -v +
