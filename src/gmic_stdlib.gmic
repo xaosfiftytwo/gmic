@@ -865,7 +865,8 @@ _help_usage :
 \n       . Custom macro functions can be defined in a math expression, using the assignment operator '"${c}"="$n"', e.g.
 \n         '"${c}"foo(x,y) = cos(x + y); result = foo(1,2) + foo(2,3)"$n"'.
 \n       . Trying to override a built-in function (e.g. '"${c}"abs()"$n"') has no effect.
-\n       . Overriding an already defined macro function discard its previous definition.
+\n       . Overloading macros with different number of arguments is possible. Defining an already-defined macro
+\n          discard its previous definition.
 \n       . Macro functions are indeed processed as "${g}"macros"$n" by the mathematical evaluator.
 \n          You should avoid invoking them with arguments that are themselves results of assignments
 \n          or self-operations. For instance, '"${c}"foo(x) = x + x; z = 0; foo(++z)"$n"' returns '"${g}"4"$n"'
