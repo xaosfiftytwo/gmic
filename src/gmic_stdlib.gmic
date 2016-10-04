@@ -16481,7 +16481,7 @@ math_lib :
     )
   );
 
-  draw_spline(ind,P0,T0,P1,T1,opacity,color) = (
+  draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw a spline P0-P1 with tangents T0,T1 in image #ind
     unref(_ds_C,_ds_P0,_ds_P,_ds_t,_ds_dt,_ds_opacity,_ds_color);
     _ds_P0 = P0;
     _ds_P1 = P1;
