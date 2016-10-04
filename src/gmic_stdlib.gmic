@@ -16472,8 +16472,8 @@ math_lib :
     _dc_P0 = round(P0);
     _dc_radius = radius;
     _dc_opacity = opacity;
-    _dc_color = color*_dc_opacity;
-    _dc_omopacity = 1 - _dc_opacity;
+    _dc_color = color*abs(_dc_opacity);
+    _dc_omopacity = 1 - max(_dc_opacity,0);
     _dc_Pmin = _dc_P0 - _dc_radius;
     _dc_Pmax = _dc_P0 + _dc_radius;
     _dc_Pmin[0] = max(0,_dc_Pmin[0]);
@@ -16487,7 +16487,7 @@ math_lib :
          if (norm2(_dc_P - _dc_P0)<_dc_radius,I(#ind,_dc_P) = _dc_color + _dc_omopacity*I(#ind,_dc_P));
       )
     );
-    nan
+    nan;
   );
 
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
@@ -16495,14 +16495,47 @@ math_lib :
     _dl_P0 = P0;
     (_dl_P0P1 = P1)-=_dl_P0;
     _dl_opacity = opacity;
-    _dl_color = color*_dl_opacity;
-    _dl_omopacity = 1 - _dl_opacity;
+    _dl_color = color*abs(_dl_opacity);
+    _dl_omopacity = 1 - max(_dl_opacity,0);
     _dl_tmax = max(abs(_dl_P0P1));
     for (_dl_t = 0, _dl_t<_dl_tmax, ++_dl_t,
       _dl_P = round(_dl_P0 + _dl_t*_dl_P0P1/_dl_tmax);
       I(#ind,_dl_P) = _dl_color + _dl_omopacity*I(#ind,_dl_P);
     );
-    nan
+    nan;
+  );
+
+  draw_rectangle(ind,P0,P1,opacity,color) = (
+    unref(_dr_P0,_dr_P1,_dr_opacity,_dr_omopacity,_dr_color,_dr_xs,_dr_ys,
+          _dr_xmin,_dr_xmax,_dr_ymin,_dr_ymax,_dr_dx,_dr_x,_dr_y,_dr_c);
+    _dr_P0 = round(P0);
+    _dr_P1 = round(P1);
+    _dr_opacity = opacity;
+    _dr_color = color*abs(_dr_opacity);
+    _dr_omopacity = 1 - max(_dr_opacity,0);
+    _dr_xs = [ _dr_P0[0],_dr_P1[0] ];
+    _dr_ys = [ _dr_P0[1],_dr_P1[1] ];
+    _dr_xmin = max(0,min(_dr_xs));
+    _dr_xmax = min(w#ind - 1,max(_dr_xs));
+    _dr_ymin = max(0,min(_dr_ys));
+    _dr_ymax = min(h#ind - 1,max(_dr_ys));
+
+    if (_dr_opacity>=1, # Optimized version for opaque drawing
+      _dr_dx = _dr_xmax - _dr_xmin + 1;
+      for (_dr_x = _dr_xmin, _dr_x<=_dr_xmax, ++_dr_x, I(_dr_x,_dr_ymin) = _dr_color);
+      for (_dr_c = 0, _dr_c<s#ind, ++_dr_c,
+        for (_dr_y = _dr_ymin + 1, _dr_y<=_dr_ymax, ++_dr_y,
+          copy(i(_dr_xmin,_dr_y,0,_dr_c),i(_dr_xmin,_dr_ymin,0,_dr_c),_dr_dx);
+        );
+      ); 0,
+      # Version for transparent drawing
+      for (_dr_y = _dr_ymin, _dr_y<=_dr_ymax, ++_dr_y,
+        for (_dr_x = _dr_xmin, _dr_x<=_dr_xmax, ++_dr_x,
+          I(_dr_x,_dr_y) = _dr_color + _dr_omopacity*I(#ind,_dr_x,_dr_y);
+        );
+      ); 0
+    );
+    nan;
   );
 
   draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw a spline P0-P1 with tangents T0,T1 in image #ind
@@ -16518,7 +16551,7 @@ math_lib :
       draw_line(#ind,_ds_P0,_ds_P,_ds_opacity,_ds_color);
       _ds_P0 = _ds_P;
     );
-    nan
+    nan;
   );
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = (
@@ -16529,8 +16562,8 @@ math_lib :
     _dt_B = round(P1);
     _dt_C = round(P2);
     _dt_opacity = opacity;
-    _dt_omopacity = 1 - _dt_opacity;
-    _dt_color = color*_dt_opacity;
+    _dt_omopacity = 1 - abs(_dt_opacity);
+    _dt_color = color*max(_dt_opacity,0);
     _dt_xs = [ _dt_A[0],_dt_B[0],_dt_C[0] ];
     _dt_ys = [ _dt_A[1],_dt_B[1],_dt_C[1] ];
     _dt_xmin = max(0,min(_dt_xs));
