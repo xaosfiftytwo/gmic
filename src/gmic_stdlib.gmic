@@ -16463,22 +16463,37 @@ math_lib :
   -u "
   map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
     unref(x#,_k);
-    for (_k = 0, _k<size(V#), ++_k, x# = V#[_k]; V#[_k] = fnx#);
+    for (_m_k = 0, _m_k<size(V#), ++_m_k, x# = V#[_m_k]; V#[_m_k] = fnx#);
     V#;
   );
 
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
-    unref(_P0,_P0P1,_color,_opacity,_t,_tmax,_P);
-    _P0 = P0;
-    (_P0P1 = P1)-=_P0;
-    _opacity = opacity;
-    _color = color*_opacity;
-    _omopacity = 1 - _opacity;
-    _tmax = max(abs(_P0P1));
-    for (_t = 0, _t<_tmax, ++_t,
-      _P = round(_P0 + _t*_P0P1/_tmax);
-      I(#ind,_P) = _color + _omopacity*I(#ind,_P);
+    unref(_dl_P0,_dl_P0P1,_dl_color,_dl_opacity,_dl_omopacity,_dl_t,_dl_tmax,_dl_P);
+    _dl_P0 = P0;
+    (_dl_P0P1 = P1)-=_dl_P0;
+    _dl_opacity = opacity;
+    _dl_color = color*_dl_opacity;
+    _dl_omopacity = 1 - _dl_opacity;
+    _dl_tmax = max(abs(_dl_P0P1));
+    for (_dl_t = 0, _dl_t<_dl_tmax, ++_dl_t,
+      _dl_P = round(_dl_P0 + _dl_t*_dl_P0P1/_dl_tmax);
+      I(#ind,_dl_P) = _dl_color + _dl_omopacity*I(#ind,_dl_P);
     )
+  );
+
+  draw_spline(ind,P0,T0,P1,T1,opacity,color) = (
+    unref(_ds_C,_ds_P0,_ds_P,_ds_t,_ds_dt,_ds_opacity,_ds_color);
+    _ds_P0 = P0;
+    _ds_P1 = P1;
+    _ds_opacity = opacity;
+    _ds_color = color;
+    _ds_C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ _ds_P0,P1,T0,T1 ],2);
+    _ds_dt = 10/max(abs(_ds_P1 - _ds_P0));
+    for (_ds_t = 0, _ds_t<1, _ds_t+=_ds_dt,
+      _ds_P = mul([_ds_t^3,_ds_t^2,_ds_t,1],_ds_C,2);
+      draw_line(#ind,_ds_P0,_ds_P,_ds_opacity,_ds_color);
+      _ds_P0 = _ds_P;
+    );
   );
   "
   -v +
