@@ -16544,13 +16544,13 @@ math_lib :
     if (_dt_B[1]>_dt_C[1],swap(_dt_B,_dt_C));
     _dt_ymin = max(0,_dt_A[1]);
     _dt_ymax = min(h#ind - 1,_dt_C[1]);
-    _dt_A[1]+=0.5;
-    _dt_C[1]+=0.5;
+    _dt_A[1]+=0.25;
+    _dt_C[1]+=0.25;
     _dt_AB = _dt_B - _dt_A;
     _dt_AC = _dt_C - _dt_A;
     _dt_BC = _dt_C - _dt_B;
-    _dt_AB[1] = max(_dt_AB[1],1);
-    _dt_BC[1] = max(_dt_BC[1],1);
+    _dt_AB[1] = max(_dt_AB[1],0.5);
+    _dt_BC[1] = max(_dt_BC[1],0.5);
     _dt_opacity = opacity;
     _dt_color = resize(color,s#ind);
     for (_dt_y = _dt_ymin, _dt_y<=_dt_ymax, ++_dt_y,
@@ -16560,8 +16560,8 @@ math_lib :
         _dt_x1 = _dt_C[0] + (_dt_y - _dt_C[1])*_dt_BC[0]/_dt_BC[1]  # Lower part
       );
       if (_dt_x0>_dt_x1,swap(_dt_x0,_dt_x1));
-      _dt_x0 = round(max(0,_dt_x0));
-      _dt_x1 = round(min(w#ind - 1,_dt_x1));
+      _dt_x0 = round(max(0,_dt_x0 - 0.25));
+      _dt_x1 = round(min(w#ind - 1,_dt_x1 + 0.25));
       (_dt_x1-=_dt_x0)+=1;
       for (_dt_c = 0, _dt_c<s#ind, ++_dt_c, copy(i(#ind,_dt_x0,_dt_y,0,_dt_c),_dt_color[_dt_c],_dt_x1,1,0,_dt_opacity));
     );
