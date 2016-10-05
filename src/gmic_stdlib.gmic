@@ -16501,7 +16501,7 @@ math_lib :
 
   draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
     unref(_dr_P0,_dr_P1,_dr_opacity,_dr_omopacity,_dr_color,_dr_xs,_dr_ys,
-          _dr_xmin,_dr_xmax,_dr_ymin,_dr_ymax,_dr_dx,_dr_x,_dr_y,_dr_c);
+          _dr_xmin,_dr_xmax,_dr_ymin,_dr_ymax,_dr_dx,_dr_x,_dr_y,_dr_c,_dr_scanline);
     _dr_P0 = round(P0);
     _dr_P1 = round(P1);
     _dr_opacity = opacity;
@@ -16513,10 +16513,9 @@ math_lib :
     _dr_xmax = min(w#ind - 1,max(_dr_xs));
     _dr_ymin = max(0,min(_dr_ys));
     _dr_ymax = min(h#ind - 1,max(_dr_ys));
-
+    _dr_dx = _dr_xmax - _dr_xmin + 1;
     if (_dr_opacity>=1, # Optimized version for opaque drawing
       _dr_color*=abs(_dr_opacity);
-      _dr_dx = _dr_xmax - _dr_xmin + 1;
       for (_dr_x = _dr_xmin, _dr_x<=_dr_xmax, ++_dr_x, I(_dr_x,_dr_ymin) = _dr_color);
       for (_dr_c = 0, _dr_c<s#ind, ++_dr_c,
         for (_dr_y = _dr_ymin + 1, _dr_y<=_dr_ymax, ++_dr_y,
@@ -16524,7 +16523,6 @@ math_lib :
         );
       ); 0,
       # Version for transparent drawing
-      _dr_dx = _dr_xmax - _dr_xmin + 1;
       for (_dr_c = 0, _dr_c<s#ind, ++_dr_c,
         _dr_scanline = resize(([_dr_color])[_dr_c],w#ind,1);
         for (_dr_y = _dr_ymin, _dr_y<=_dr_ymax, ++_dr_y,
