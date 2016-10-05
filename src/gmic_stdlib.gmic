@@ -16462,24 +16462,23 @@ math_lib :
   -v -
   -u "
   draw_circle(ind,P0,radius,opacity,color) = ( # Draw a circle centered at P0 on image #ind
-    unref(_dc_P0,_dc_radius,_dc_opacity,_dc_color,_dc_omopacity,_dc_Pmin,_dc_Pmax,_dc_radius,_dc_x,_dc_y,_dc_P);
+    unref(_dc_P0,_dc_radius,_dc_opacity,_dc_color,_dc_ymin,_dc_ymax,_dc_y,_dc_dx,_dc_xmin,_dc_xmax,_dc_c);
     _dc_P0 = round(P0);
-    _dc_radius = radius;
+    _dc_radius = round(radius);
     _dc_opacity = opacity;
-    _dc_color = color*abs(_dc_opacity);
-    _dc_omopacity = 1 - max(_dc_opacity,0);
-    _dc_Pmin = _dc_P0 - _dc_radius;
-    _dc_Pmax = _dc_P0 + _dc_radius;
-    _dc_Pmin[0] = max(0,_dc_Pmin[0]);
-    _dc_Pmax[0] = min(w#ind - 1,_dc_Pmax[0]);
-    _dc_Pmin[1] = max(0,_dc_Pmin[1]);
-    _dc_Pmax[1] = min(h#ind - 1,_dc_Pmax[1]);
-    _dc_radius+=0.5;
-    for (_dc_y = _dc_Pmin[1], _dc_y<=_dc_Pmax[1], ++_dc_y,
-      for (_dc_x = _dc_Pmin[0], _dc_x<=_dc_Pmax[0], ++_dc_x,
-         _dc_P = [_dc_x,_dc_y];
-         if (norm2(_dc_P - _dc_P0)<_dc_radius,I(#ind,_dc_P) = _dc_color + _dc_omopacity*I(#ind,_dc_P));
-      )
+    _dc_color = [ color ];
+    _dc_ymin = round(max(0,_dc_P0[1] - _dc_radius));
+    _dc_ymax = round(min(h#ind - 1,_dc_P0[1] + _dc_radius));
+    _dc_radius = (_dc_radius - 0.75)^2;
+    for (_dc_y = _dc_ymin, _dc_y<=_dc_ymax, ++_dc_y,
+      _dc_dx = _dc_radius - (_dc_y - _dc_P0[1])^2;
+      if (_dc_dx>=0,
+        _dc_dx^=0.5;
+        _dc_xmin = round(max(0,_dc_P0[0] - _dc_dx));
+        _dc_xmax = round(min(w#ind - 1,_dc_P0[0] + _dc_dx));
+        _dc_dx = _dc_xmax - _dc_xmin + 1;
+        for (_dc_c = 0, _dc_c<s#ind, ++_dc_c, copy(i(#ind,_dc_xmin,_dc_y,0,_dc_c),_dc_color[_dc_c],_dc_dx,1,0,_dc_opacity));
+      );
     );
     nan;
   );
@@ -16513,10 +16512,8 @@ math_lib :
     _dr_ymin = max(0,min(_dr_ys));
     _dr_ymax = min(h#ind - 1,max(_dr_ys));
     _dr_dx = _dr_xmax - _dr_xmin + 1;
-    for (_dr_c = 0, _dr_c<s#ind, ++_dr_c,
-      for (_dr_y = _dr_ymin, _dr_y<=_dr_ymax, ++_dr_y,
-        copy(i(_dr_xmin,_dr_y,0,_dr_c),_dr_color[_dr_c],_dr_dx,1,0,_dr_opacity);
-      );
+    for (_dr_y = _dr_ymin, _dr_y<=_dr_ymax, ++_dr_y,
+      for (_dr_c = 0, _dr_c<s#ind, ++_dr_c, copy(i(#ind,_dr_xmin,_dr_y,0,_dr_c),_dr_color[_dr_c],_dr_dx,1,0,_dr_opacity));
     );
     nan;
   );
