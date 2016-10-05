@@ -16466,7 +16466,7 @@ math_lib :
     _dc_P0 = round(P0);
     _dc_radius = round(radius);
     _dc_opacity = opacity;
-    _dc_color = [ color ];
+    _dc_color = resize(color,s#ind);
     _dc_ymin = round(max(0,_dc_P0[1] - _dc_radius));
     _dc_ymax = round(min(h#ind - 1,_dc_P0[1] + _dc_radius));
     _dc_radius = (_dc_radius - 0.75)^2;
@@ -16504,7 +16504,7 @@ math_lib :
     _dr_P0 = round(P0);
     _dr_P1 = round(P1);
     _dr_opacity = opacity;
-    _dr_color = [ color ];
+    _dr_color = resize(color,s#ind);
     _dr_xs = [ _dr_P0[0],_dr_P1[0] ];
     _dr_ys = [ _dr_P0[1],_dr_P1[1] ];
     _dr_xmin = max(0,min(_dr_xs));
@@ -16535,38 +16535,35 @@ math_lib :
   );
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
-    unref(_dt_A,_dt_B,_dt_C,_dt_opacity,_dt_omopacity,_dt_color,_dt_xs,_dt_ys,
-          _dt_xmin,_dt_xmax,_dt_ymin,_dt_ymax,_dt_v0,_dt_v1,_dt_v2,
-          _dt_dot00,_dt_dot01,_dt_dot11,_dt_dot02,_dt_dot12,_dt_u,_dt_v);
+    unref(_dt_A,_dt_B,_dt_C,_dt_AB,_dt_AC,_dt_BC,_dt_opacity,_dt_color,_dt_ymin,_dt_ymax,_dt_y,_dt_x0,_dt_x1,_dt_c);
     _dt_A = round(P0);
     _dt_B = round(P1);
     _dt_C = round(P2);
+    if (_dt_A[1]>_dt_B[1],swap(_dt_A,_dt_B));
+    if (_dt_A[1]>_dt_C[1],swap(_dt_A,_dt_C));
+    if (_dt_B[1]>_dt_C[1],swap(_dt_B,_dt_C));
+    _dt_ymin = max(0,_dt_A[1]);
+    _dt_ymax = min(h#ind - 1,_dt_C[1]);
+    _dt_A[1]+=0.5;
+    _dt_C[1]+=0.5;
+    _dt_AB = _dt_B - _dt_A;
+    _dt_AC = _dt_C - _dt_A;
+    _dt_BC = _dt_C - _dt_B;
+    _dt_AB[1] = max(_dt_AB[1],1);
+    _dt_BC[1] = max(_dt_BC[1],1);
     _dt_opacity = opacity;
-    _dt_omopacity = 1 - abs(_dt_opacity);
-    _dt_color = color*max(_dt_opacity,0);
-    _dt_xs = [ _dt_A[0],_dt_B[0],_dt_C[0] ];
-    _dt_ys = [ _dt_A[1],_dt_B[1],_dt_C[1] ];
-    _dt_xmin = max(0,min(_dt_xs));
-    _dt_xmax = min(w#ind - 1,max(_dt_xs));
-    _dt_ymin = max(0,min(_dt_ys));
-    _dt_ymax = min(h#ind - 1,max(_dt_ys));
-    _dt_v0 = _dt_C - _dt_A;
-    _dt_v1 = _dt_B - _dt_A;
-    _dt_dot00 = dot(_dt_v0,_dt_v0);
-    _dt_dot01 = dot(_dt_v0,_dt_v1);
-    _dt_dot11 = dot(_dt_v1,_dt_v1);
-    _dt_denom = _dt_dot00*_dt_dot11 - _dt_dot01^2;
+    _dt_color = resize(color,s#ind);
     for (_dt_y = _dt_ymin, _dt_y<=_dt_ymax, ++_dt_y,
-      for (_dt_x = _dt_xmin, _dt_x<=_dt_xmax, ++_dt_x,
-        _dt_v2 = [ _dt_x,_dt_y ] - _dt_A;
-        _dt_dot02 = dot(_dt_v0,_dt_v2);
-        _dt_dot12 = dot(_dt_v1,_dt_v2);
-        _dt_u = _dt_dot11*_dt_dot02 - _dt_dot01*_dt_dot12;
-        _dt_v = _dt_dot00*_dt_dot12 - _dt_dot01*_dt_dot02;
-        if (_dt_u>=0 && _dt_v>=0 && _dt_u + _dt_v<_dt_denom,
-          I(#ind,_dt_x,_dt_y) = _dt_color + _dt_omopacity*I(#ind,_dt_x,_dt_y);
-        );
+      _dt_x0 = _dt_A[0] + (_dt_y - _dt_A[1])*_dt_AC[0]/_dt_AC[1];
+      if (_dt_y<=_dt_B[1],
+        _dt_x1 = _dt_B[0] + (_dt_y - _dt_B[1])*_dt_AB[0]/_dt_AB[1], # Upper part
+        _dt_x1 = _dt_C[0] + (_dt_y - _dt_C[1])*_dt_BC[0]/_dt_BC[1]  # Lower part
       );
+      if (_dt_x0>_dt_x1,swap(_dt_x0,_dt_x1));
+      _dt_x0 = round(max(0,_dt_x0));
+      _dt_x1 = round(min(w#ind - 1,_dt_x1));
+      (_dt_x1-=_dt_x0)+=1;
+      for (_dt_c = 0, _dt_c<s#ind, ++_dt_c, copy(i(#ind,_dt_x0,_dt_y,0,_dt_c),_dt_color[_dt_c],_dt_x1,1,0,_dt_opacity));
     );
     nan;
   );
@@ -16575,6 +16572,10 @@ math_lib :
     unref(x#,_k);
     for (_m_k = 0, _m_k<size(V#), ++_m_k, x# = V#[_m_k]; V#[_m_k] = fnx#);
     V#;
+  );
+
+  swap(x,y) = ( # Swap content of variables x and y
+    unref(_s_tmp); _s_tmp = x#; x# = y#; y# = _s_tmp;
   );
   "
   -v +
