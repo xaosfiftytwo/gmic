@@ -5672,7 +5672,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
             }
             if (!file)
               error(images,0,0,
-                    "Command '-command': Unable to load valid custom command file '%s' "
+                    "Command '-command': Unable to load custom command file '%s' "
                     "from network.",
                     gmic_argument_text() + offset_argument_text);
             std::remove(argx);
@@ -13663,7 +13663,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
           if (is_command_error) {
             if (is_network_file)
               error(images,0,0,
-                    "Command '-input': Unable to load valid custom command file '%s' from network.",
+                    "Command '-input': Unable to load custom command file '%s' from network.",
                     _filename0);
             else
               error(images,0,0,
@@ -13701,7 +13701,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
             } catch (CImgIOException&) {
               if (is_network_file)
                 error(images,0,0,
-                      "Command '-input': Unable to load valid image file '%s' from network.",
+                      "Command '-input': Unable to load image file '%s' from network.",
                       _filename0);
               else throw;
             }
