@@ -2976,12 +2976,12 @@ roddy :
   -endif
   -nm. [roddy] -v +
 
-#@gmic sample : _name={ ? | apples | bottles | cat | cliff | duck | eagle | inside | flower | fruits | greece | gummy | leaf | lion | monkey | pencils | rooster | rose | square | teddy | waterfall }
+#@gmic sample : _name={ ? | apples | bottles | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | inside | leaf | lion | monkey | pencils | rooster | rose | square | teddy | waterfall }
 #@gmic : Input a new sample RGB image.
 #@gmic : $ -repeat 6 -sample ? -done
 sample : -skip ${1="?"}
   -v -
-  N=${"-arg2var _name,"apples,bottles,cat,cliff,duck,eagle,inside,flower,fruits,greece,gummy,leaf,lion,monkey,pencils,rooster,rose,square,teddy,waterfall}
+  N=${"-arg2var _name,"apples,bottles,cat,cliff,duck,eagle,earth,inside,flower,fruits,greece,gummy,leaf,lion,monkey,pencils,rooster,rose,square,teddy,waterfall}
   -if {['"$1"']=='?'} is_random=1 sample={round(u(1,$N))}
   -else
     is_random=0 sample=-1
