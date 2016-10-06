@@ -139,21 +139,23 @@ cli_noarg :
   -parallel -_cli_noarg1,-_cli_noarg2
 
 _cli_noarg1 :
+  -wait 300
   g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_
   file_update=${_path_rc}update$_version.gmic
   need_update={"Y = date(0); M = date(1); D = date(2); date_current = Y*365 + M*31 + D;
                 Y = date(0,"$file_update"); M = date(1,"$file_update"); D = date(2,"$file_update"); date_file = Y*365 + M*31 + D;
                 date_current - date_file>=7"}
   -if $need_update
-    -v + -e[] "[gmic] Attempting to get command updates..." -v -
+    -v + -e[] "[gmic] Update commands..." -v -
     -l[] -update
-      -v + -e[] "[gmic] Update commands: "${g}"Succeeded!"$n -v -
+      -v + -e[] "\r[gmic] Update commands: "${g}"Succeeded!"$n -v -
     -onfail
-      -v + -e[] "[gmic] Update commands: "${r}"Failed!"$n -v -
+      -v + -e[] "\r[gmic] Update commands: "${r}"Failed!"$n -v -
     -endl
   -endif
 
 _cli_noarg2 :
+  g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_
   -if {{*,u}>0}
     -v + -e[] "[gmic] "${c}"Running in demo mode."$n -v - -demo , -e[] ""
   -else
