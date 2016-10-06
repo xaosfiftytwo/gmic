@@ -2978,12 +2978,13 @@ roddy :
 
 #@gmic sample : _name={ ? | inside | rooster | square | waterfall }
 #@gmic : Input a new sample RGB image.
-#@gmic : $ -sample random -sample random
+#@gmic : $ -repeat 3 -sample ? -done
 sample : -skip ${1="random"}
   -v -
   N=0
   name$N=cliff N+=1
   name$N=inside N+=1
+  name$N=flowers N+=1
   name$N=rooster N+=1
   name$N=square N+=1
   name$N=waterfall N+=1
