@@ -2976,7 +2976,7 @@ roddy :
   -endif
   -nm. [roddy] -v +
 
-#@gmic sample : _name={ ? | inside | rooster | square | waterfall }
+#@gmic sample : _name={ ? | cliff | inside | flowers | rooster | square | waterfall }
 #@gmic : Input a new sample RGB image.
 #@gmic : $ -repeat 3 -sample ? -done
 sample : -skip ${1="random"}
@@ -2989,9 +2989,9 @@ sample : -skip ${1="random"}
   name$N=square N+=1
   name$N=waterfall N+=1
 
-  -if {['"$1"']=='?'} sample={round(u($N-1))}
+  -if {['"$1"']=='?'} sample={round(u($N-1))} is_random=0
   -else
-    sample=-1
+    is_random=0 sample=-1
     -repeat inf
       name=${name$>}
       -if {'$name'!=0}
@@ -2999,16 +2999,18 @@ sample : -skip ${1="random"}
       -else -break
       -endif
     -done
-    -if {$sample<0}
-      -error "toto"
-    -endif
+    -if {$sample<0} -v + -error[0--4] "Command '-sample': Invalid sample name '$1'." -endif
   -endif
   sample=${name$sample}
 
   -v + -e[^-1] "Input sample image '"$sample"'." -v -
   filename=${_path_rc}$sample.png
   -if $filename $filename
-  -else http://gmic.eu/img/$sample.png -o. $filename -+. 0
+  -else
+    -if $is_random -l[] http://gmic.eu/img/$sample.png -o. $filename -onfail -testimage2d 400 -endl
+    -else http://gmic.eu/img/$sample.png -o. $filename
+    -endif
+    -+. 0
   -endif
   -nm. [$sample] -v +
 
