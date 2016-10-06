@@ -2976,43 +2976,25 @@ roddy :
   -endif
   -nm. [roddy] -v +
 
-#@gmic sample : _name={ ? | apples | bottles | cat | cliff | inside | flower | fruits | greece | gummy | leaf | lion | monkey | pencils | rooster | square | teddy | waterfall }
+#@gmic sample : _name={ ? | apples | bottles | cat | cliff | duck | eagle | inside | flower | fruits | greece | gummy | leaf | lion | monkey | pencils | rooster | rose | square | teddy | waterfall }
 #@gmic : Input a new sample RGB image.
 #@gmic : $ -repeat 6 -sample ? -done
 sample : -skip ${1="?"}
   -v -
-  N=0
-  name$N=apples N+=1
-  name$N=bottles N+=1
-  name$N=cat N+=1
-  name$N=cliff N+=1
-  name$N=inside N+=1
-  name$N=flower N+=1
-  name$N=fruits N+=1
-  name$N=greece N+=1
-  name$N=gummy N+=1
-  name$N=leaf N+=1
-  name$N=lion N+=1
-  name$N=monkey N+=1
-  name$N=pencils N+=1
-  name$N=rooster N+=1
-  name$N=square N+=1
-  name$N=teddy N+=1
-  name$N=waterfall N+=1
-
-  -if {['"$1"']=='?'} is_random=1 sample={round(u($N-1))}
+  N=${"-arg2var _name,"apples,bottles,cat,cliff,duck,eagle,inside,flower,fruits,greece,gummy,leaf,lion,monkey,pencils,rooster,rose,square,teddy,waterfall}
+  -if {['"$1"']=='?'} is_random=1 sample={round(u(1,$N))}
   -else
     is_random=0 sample=-1
     -repeat inf
-      name=${name$>}
+      name=${_name{1+$>}}
       -if {'$name'!=0}
-        -if {'$name'==['"$1"']} sample=$> -break -endif
+        -if {'$name'==['"$1"']} sample={$>+1} -break -endif
       -else -break
       -endif
     -done
     -if {$sample<0} -v + -error[0--4] "Command '-sample': Invalid sample name '$1'." -endif
   -endif
-  sample=${name$sample}
+  sample=${_name$sample}
 
   -v + -e[^-1] "Input sample image '"$sample"'." -v -
   filename=${_path_rc}$sample.png
