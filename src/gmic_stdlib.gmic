@@ -2754,7 +2754,7 @@ is : -skip ${1="?"},${2=0},${3=0}
 #@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) }
 #@gmic : Input a new sample RGB image (opt. with specified size).
 #@gmic : Argument 'name' can be replaced by an integer in [0,31] that serves as an index to a sample number.
-#@gmic : $ -repeat 6 -sample ? -done
+#@gmic : $ -repeat 6 -input_sample ? -done
 input_sample :
   -_input_sample[] $"*"
 
