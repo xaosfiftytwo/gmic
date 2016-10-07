@@ -2748,15 +2748,15 @@ input_gpl :
   -endl -v +
 
 #@gmic is : eq. to '-input_sample'.
-is : -skip ${1="?"},${2=0},${3=0}
-  -_input_sample[] $"*"
+is : -skip ${1="?"},${2=0}
+  -_input_sample[] "$1",${2--1}
 
 #@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) }
 #@gmic : Input a new sample RGB image (opt. with specified size).
 #@gmic : Argument 'name' can be replaced by an integer in [0,31] that serves as an index to a sample number.
 #@gmic : $ -repeat 6 -input_sample ? -done
-input_sample :
-  -_input_sample[] $"*"
+input_sample : -skip ${1="?"},${2=0}
+  -_input_sample[] "$1",${2--1}
 
 _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) && $3>=0"
   -v -
@@ -10809,7 +10809,7 @@ to : -skip ${2=2}
 text_outline : -skip ${2=2}
   -_text_outline "$1",${2--1}
 
-_text_outline : -skip ${2=2},${3=2},${4=24},${5=2},${6=1},${7=255}
+_text_outline : -skip ${3=2},${4=24},${5=2},${6=1},${7=255}
   -e[0--3] "Draw outlined text '$1' at position ($2,$3) on image$?, with font height $4, outline $5, opacity $6 and color ${7--1}."
   -v - -if $5
     0 -t. "$1",0,0,$4,1,${7--1},1 -expand_xy. {1+$5},0
