@@ -2790,11 +2790,11 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
     -+. 0
   -endif
 
-  -if {$2>0" && "$3==0} -r2dx. $2
-  -elif {$2==0" && "$3>0} -r2dy. $3
+  -if {$2>0" && "$3==0} -r2dx. $2 -round.
+  -elif {$2==0" && "$3>0} -r2dy. $3 -round.
   -elif {$2>0" && "$3>0}
     -if {w/$2>h/$3} -r2dy. $3 -else -r2dx. $2 -endif
-    -r. $2,$3,1,100%,0,0,0.5,0.5
+    -r. $2,$3,1,100%,0,0,0.5,0.5 -round.
   -endif
 
   -v + -e[0--3] "Input sample image '"$sample"' (1 image "{w}x{h}x{d}x{s}")." -v -
