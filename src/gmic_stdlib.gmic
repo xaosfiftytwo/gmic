@@ -2777,7 +2777,7 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
       -else -break
       -endif
     -done
-    -if {$sample<0} -v + -error[0--5] "Command '-sample': Invalid sample name '$1'." -endif
+    -if {$sample<0} -v + -error[0--5] "Command '-input_sample': Invalid sample name '$1'." -endif
   -endif
   sample=${_name$sample}
 
