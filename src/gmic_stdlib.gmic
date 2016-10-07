@@ -2748,17 +2748,19 @@ input_gpl :
   -endl -v +
 
 #@gmic is : eq. to '-input_sample'.
-is : -skip ${1="?"},${2=0}
+is : -skip "${1=?}",${2=0}
   -_input_sample[] "$1",${2--1}
+  -if {!${}} -noarg -endif
 
-#@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | landscape | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) }
+#@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | landscape | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) } : (no arg)
 #@gmic : Input a new sample RGB image (opt. with specified size).
-#@gmic : Argument 'name' can be replaced by an integer in [0,31] that serves as an index to a sample number.
-#@gmic : $ -repeat 6 -input_sample ? -done
-input_sample : -skip ${1="?"},${2=0}
+#@gmic : Argument 'name' can be replaced by an integer which serves as a sample index.
+#@gmic : $ -repeat 6 -input_sample -done
+input_sample : -skip "${1=?}",${2=0}
   -_input_sample[] "$1",${2--1}
+  -if {!${}} -noarg -endif
 
-_input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) && $3>=0"
+_input_sample : -skip "${1=?}" -check "isint(${2=0}) && $2>=0 && isint(${3=0}) && $3>=0"
   -v -
   N=${"-arg2var _name,"\
       apples,barbara,boats,bottles,butterfly,cat,cameraman,cliff,\
@@ -2766,10 +2768,11 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
       house,landscape,leaf,lena,lion,mandrill,monkey,parrots,pencils,\
       peppers,rooster,rose,square,teddy,wall,waterfall,zelda}
 
-  -if {['"$1"']=='?'} is_random=1 sample={round(u(1,$N))}
-  -elif {isval("$1")} is_random=0 sample={(round($1)%$N)+1}
+  is_random=0 is_arg=1
+  -if {['"$1"']=='?'} is_random=1
+  -elif {isval("$1")} sample={(round($1)%$N)+1}
   -else
-    is_random=0 sample=-1
+    sample=-1
     -repeat inf
       name=${_name{1+$>}}
       -if {'$name'!=0}
@@ -2777,8 +2780,9 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
       -else -break
       -endif
     -done
-    -if {$sample<0} -v + -error[0--5] "Command '-input_sample': Invalid sample name '$1'." -endif
+    -if {$sample<0} is_arg=0 is_random=1 -endif   # -v + -error[0--5] "Command '-input_sample': Invalid sample name '$1'." -endif
   -endif
+  -if $is_random sample={round(u(1,$N))} -endif
   sample=${_name$sample}
 
   filename=${_path_rc}sample_$sample.png
@@ -2798,7 +2802,7 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
   -endif
 
   -v + -e[0--3] "Input sample image '"$sample"' (1 image "{w}x{h}x{d}x{s}")." -v -
-  -nm. $sample -v +
+  -nm. $sample -u $is_arg -v +
 
 #@gmic input_string : "string"
 #@gmic : Insert new image containing the ascii codes of specified string.
@@ -5343,7 +5347,7 @@ decompress_rle :
     -a x -r $whds,-1 -+ $im
   -endl -done -v +
 
-#@gmic discard : _value1,_value2,... : { x | y | z | c}...{ x | y | z | c},_value1,_value2,... : (no args) : (+)
+#@gmic discard : _value1,_value2,... : { x | y | z | c}...{ x | y | z | c},_value1,_value2,... : (no arg) : (+)
 #@gmic : Discard specified values in selected images or discard neighboring duplicate values,
 #@gmic : optionally only for the values along the first of a specified axis.
 #@gmic : If no values are specified, neighboring duplicate values are discarded.
@@ -7725,7 +7729,7 @@ shrink_z : -check "$1>=0"
 
 #@gmic s : eq. to '-split'. : (+)
 
-#@gmic split : { x | y | z | c }...{ x | y | z | c },_split_mode : keep_splitting_values={ + | - },_{ x | y | z | c }...{ x | y | z | c },value1,_value2,... : (no args) : (+)
+#@gmic split : { x | y | z | c }...{ x | y | z | c },_split_mode : keep_splitting_values={ + | - },_{ x | y | z | c }...{ x | y | z | c },value1,_value2,... : (no arg) : (+)
 #@gmic : Split selected images along specified axes, or regarding to a sequence of scalar values (optionally along specified axes too).
 #@gmic : (eq. to '-s').
 #@gmic : 'split_mode' can be { 0=split according to constant values | >0=split in N parts | <0=split in parts of size -N }.
