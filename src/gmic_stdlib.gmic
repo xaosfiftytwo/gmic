@@ -2747,19 +2747,65 @@ input_gpl :
     -rm ($colors) -rows 1,100% -nm "$1" -permute yzcx
   -endl -v +
 
-#@gmic is : eq. to '-input_string'.
-is :
-  -_input_string[] "$*"
+#@gmic is : eq. to '-input_sample'.
+is : -skip ${1="?"},${2=0},${3=0}
+  -_input_sample[] $"*"
+
+#@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) }
+#@gmic : Input a new sample RGB image (opt. with specified size).
+#@gmic : Argument 'name' can be replaced by an integer in [0,31] that serves as an index to a sample number.
+#@gmic : $ -repeat 6 -sample ? -done
+input_sample :
+  -_input_sample[] $"*"
+
+_input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) && $3>=0"
+  -v -
+  N=${"-arg2var _name,"\
+      apples,barbara,boats,bottles,butterfly,cat,cameraman,cliff,\
+      duck,eagle,earth,inside,flower,fruits,greece,gummy,\
+      house,leaf,lena,lion,mandrill,monkey,parrots,pencils,\
+      peppers,rooster,rose,square,teddy,wall,waterfall,zelda}
+
+  -if {['"$1"']=='?'} is_random=1 sample={round(u(1,$N))}
+  -elif {isval("$1")} is_random=0 sample={(round($1)%$N)+1}
+  -else
+    is_random=0 sample=-1
+    -repeat inf
+      name=${_name{1+$>}}
+      -if {'$name'!=0}
+        -if {'$name'==['"$1"']} sample={$>+1} -break -endif
+      -else -break
+      -endif
+    -done
+    -if {$sample<0} -v + -error[0--5] "Command '-sample': Invalid sample name '$1'." -endif
+  -endif
+  sample=${_name$sample}
+
+  filename=${_path_rc}$sample.png
+  -if $filename $filename
+  -else
+    -if $is_random -l[] http://gmic.eu/img/$sample.png -o. $filename -onfail -testimage2d 400 -endl
+    -else http://gmic.eu/img/$sample.png -o. $filename
+    -endif
+    -+. 0
+  -endif
+
+  -if {$2>0" && "$3==0} -r2dx. $2
+  -elif {$2==0" && "$3>0} -r2dy. $3
+  -elif {$2>0" && "$3>0}
+    -if {w/$2>h/$3} -r2dy. $3 -else -r2dx. $2 -endif
+    -r. $2,$3,1,100%,0,0,0.5,0.5
+  -endif
+
+  -v + -e[0--3] "Input sample image '"$sample"' (1 image "{w}x{h}x{d}x{s}")." -v -
+  -nm. $sample -v +
 
 #@gmic input_string : "string"
 #@gmic : Insert new image containing the ascii codes of specified string.
 #@gmic : (eq. to '-is').
 #@gmic : $ -input_string "foo bar"
 input_string :
-  -_input_string[] "$*"
-
-_input_string :
-  -e[0--3] "Input new image from string '$1'."
+  -e[^-1] "Input new image from string '$1'."
   -v - ({'"$1"'}) -nm. "$1" -v +
 
 #@gmic o : eq. to '-output'. : (+)
@@ -2975,37 +3021,6 @@ roddy :
   -else http://gmic.eu/img/roddy_large.cimgz -o. $filename -+. 0
   -endif
   -nm. [roddy] -v +
-
-#@gmic sample : _name={ ? | apples | bottles | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | inside | leaf | lion | monkey | pencils | rooster | rose | square | teddy | wall | waterfall }
-#@gmic : Input a new sample RGB image.
-#@gmic : $ -repeat 6 -sample ? -done
-sample : -skip ${1="?"}
-  -v -
-  N=${"-arg2var _name,"apples,bottles,cat,cliff,duck,eagle,earth,inside,flower,fruits,greece,gummy,leaf,lion,monkey,pencils,rooster,rose,square,teddy,wall,waterfall}
-  -if {['"$1"']=='?'} is_random=1 sample={round(u(1,$N))}
-  -else
-    is_random=0 sample=-1
-    -repeat inf
-      name=${_name{1+$>}}
-      -if {'$name'!=0}
-        -if {'$name'==['"$1"']} sample={$>+1} -break -endif
-      -else -break
-      -endif
-    -done
-    -if {$sample<0} -v + -error[0--4] "Command '-sample': Invalid sample name '$1'." -endif
-  -endif
-  sample=${_name$sample}
-
-  filename=${_path_rc}$sample.png
-  -if $filename $filename
-  -else
-    -if $is_random -l[] http://gmic.eu/img/$sample.png -o. $filename -onfail -testimage2d 400 -endl
-    -else http://gmic.eu/img/$sample.png -o. $filename
-    -endif
-    -+. 0
-  -endif
-  -v + -e[^-1] "Input sample image '"$sample"' (1 image "{w}x{h}x{d}x{s}")." -v -
-  -nm. $sample -v +
 
 #@gmic select : feature_type,_X,_Y,_Z,_exit_on_anykey={ 0 | 1 } : (+)
 #@gmic : Interactively select a feature from selected images (use the instant display window [0] if opened).
@@ -3320,7 +3335,7 @@ update_film_emulation_html :
                        0
 
   -m "_thumb : -frame 3%,3%,255 -to_rgba -drop_shadow 2,2,3 -repeat $! -l[$>] -i[0] 100%,100%,1,3,245 -blend alpha -endl -done"
-  -m "_title : -is \"$""*\" -replace. {'_'},32 -f. if((x==0||j(-1)==32)&&i>=_'a'&&i<=_'z',i+_'A'-_'a',i) -u {t} -rm."
+  -m "_title : -input_string \"$""*\" -replace. {'_'},32 -f. if((x==0||j(-1)==32)&&i>=_'a'&&i<=_'z',i+_'A'-_'a',i) -u {t} -rm."
 
   nb_presets=0
   -repeat {narg($categories)}
@@ -3421,7 +3436,7 @@ update_film_emulation_html :
       basename={$>,b}
       -v + -e[] "    - "$category_name" / "$basename -v -
 
-      -is "
+      -input_string "
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n
                       \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n\n
 <!--#include file=\"header.html\" -->\n
@@ -3469,23 +3484,23 @@ with or endorsed by the companies that own the trademarks.</i></font></p>\n\n
         -endif
 
         -if {['$_category']==['$category']}
-          -is "<li><font color=\"#CC7700\"><b>"$_category_name"</b> "$_category_author"</font></li>\n"
+          -input_string "<li><font color=\"#CC7700\"><b>"$_category_name"</b> "$_category_author"</font></li>\n"
         -else
-          -is "<li><a href=\""${_category}_$basename.shtml"#browse\">"$_category_name"</a> "$_category_author"</li>\n"
+          -input_string "<li><a href=\""${_category}_$basename.shtml"#browse\">"$_category_name"</a> "$_category_author"</li>\n"
         -endif
       -done
 
-      -is "</ul>\n</td>\n<td valign=\"top\">Select sample image:<br/><br/>\n"
+      -input_string "</ul>\n</td>\n<td valign=\"top\">Select sample image:<br/><br/>\n"
       -repeat {$nb_samples}
         _basename=${basename$>}
         -if {['$_basename']==['$basename']}
-          -is "<a href=\""${category}_$_basename.shtml"#browse\"><img alt=\"\" style=\"border-color:#CC7700;\" border=\"3\" src=\""original/minithumb_$_basename.jpg"\"/></a>\n"
+          -input_string "<a href=\""${category}_$_basename.shtml"#browse\"><img alt=\"\" style=\"border-color:#CC7700;\" border=\"3\" src=\""original/minithumb_$_basename.jpg"\"/></a>\n"
         -else
-          -is "<a href=\""${category}_$_basename.shtml"#browse\"><img alt=\"\" border=\"0\" src=\""original/minithumb_$_basename.jpg"\"/></a>\n"
+          -input_string "<a href=\""${category}_$_basename.shtml"#browse\"><img alt=\"\" border=\"0\" src=\""original/minithumb_$_basename.jpg"\"/></a>\n"
         -endif
       -done
-      -is "</td>\n</tr></table>\n</div></div><div id=\"footer\"><img alt=\"\" src=\"images/footer.jpg\" /></div></div>\n"
-      -is "\n
+      -input_string "</td>\n</tr></table>\n</div></div><div id=\"footer\"><img alt=\"\" src=\"images/footer.jpg\" /></div></div>\n"
+      -input_string "\n
 <div id=\"bloc_option\"><div id=\"top_bleu\"><div id=\"text_top\">Presets ("{narg({/$presets})}")</div></div>\n
 <div id=\"center\"><div id=\"text_centre_intro\">\n
 <center><table>\n
@@ -3493,17 +3508,16 @@ with or endorsed by the companies that own the trademarks.</i></font></p>\n\n
 <div><a href=\"original/"$basename".jpg\" class=\"highslide\" onclick=\"return hs.expand(this)\"><img alt=\"\" border=\"0\" src=\"original/thumb_"$basename".jpg\" /></a>\n
 <div class=\"highslide-caption\"><b>Reference Image</b></div></div>\n
 </td></tr>\n
-<tr><td align=\"center\"><b>Refence Image</b></td></tr>\n\n
-"
+<tr><td align=\"center\"><b>Refence Image</b></td></tr>\n\n"
       -repeat {narg({/$presets})}
         preset=${-arg\ {1+$>},$presets}
 
         ({'$preset'}) -replace_seq. 39,"92,92,39" preset_esc={t} -rm.
 
         title=${-_title\ $preset}
-        -if {$>%4==0} -if $> -is "</tr>\n" -endif -is "<tr>" -endif
+        -if {$>%4==0} -if $> -input_string "</tr>\n" -endif -input_string "<tr>" -endif
 
-        -is "
+        -input_string "
 <td><table>\n
 <tr><td>\n
 <div><a href=\"#\" onclick=\"return hs.htmlExpand(this, { width: "$width", height: "$height" })\">\n
@@ -3517,16 +3531,12 @@ with or endorsed by the companies that own the trademarks.</i></font></p>\n\n
 <tr><td align=\"center\"><font size=\"-1\">"$title"</font></td></tr>\n
 </table></td>\n\n"
       -done
-      -is "
+      -input_string "
 </tr></table></center>\n
-</div></div><div id=\"footer\"><img alt=\"\" src=\"images/footer.jpg\" /></div></div>\n
-"
-
-      -is "<!--#include file=\"copyright.html\" -->\n
-<!--#include file=\"footer.html\" -->\n
-"
+</div></div><div id=\"footer\"><img alt=\"\" src=\"images/footer.jpg\" /></div></div>\n"
+      -input_string "<!--#include file=\"copyright.html\" -->\n
+<!--#include file=\"footer.html\" -->\n"
       -a[$nb_samples--1] x -o. raw:${category}_$basename.shtml,char -rm.
-
     -done
   -done
 
@@ -3705,7 +3715,7 @@ update_gallery_html :
   _nb_coms+=1
 
   # Generate gallery HTML header.
-  -is "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\
+  -input_string "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\
       \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n\
 <!--#include file=\"header.html\" -->\n
 <div id=\"bloc_option\"><div id=\"top_bleu\"><div id=\"text_top\">Image Gallery</div></div>\n
@@ -3727,7 +3737,7 @@ update_gallery_html :
   <b>Copyrights : </b> All pictures have been shot by <a href=\"http://tschumperle.users.greyc.fr/\">David Tschumperl&eacute;</a>.<br/><br/>\n"
 
   # Generate main gallery table.
-  -is "<center><table cellpadding=\"1\" border=\"0\" cellspacing=\"2\">\n"
+  -input_string "<center><table cellpadding=\"1\" border=\"0\" cellspacing=\"2\">\n"
   row=0
   -repeat $_nb_coms
 
@@ -3736,7 +3746,7 @@ update_gallery_html :
     out_thumb=${"-filename "img/gallery_thumb.png,$>}
 
     # Start new row.
-    -if {!$ind} -is "<tr>\n" -endif
+    -if {!$ind} -input_string "<tr>\n" -endif
 
     com=${_com$>}
 
@@ -3754,28 +3764,30 @@ update_gallery_html :
     -l. -frame 3%,3%,255 -to_rgba -drop_shadow 2,2,3 -endl
     -o. $out_thumb -rm.
 
-    -is "<td width=\""${width$>}"\"><center><div>\
-         <a href=\""$out_img"\" class=\"highslide\" onclick=\"return hs.expand(this)\">\
-	 <img alt=\"\" border=\"0\" src=\""$out_thumb"\"/></a>\
-         <div class=\"highslide-caption\">gmic "{$ind,b}.{$ind,x}" "${displayed_com$ind}"</div>\
-         </div></center></td>\n"
+    -input_string "
+<td width=\""${width$>}"\"><center><div>\
+<a href=\""$out_img"\" class=\"highslide\" onclick=\"return hs.expand(this)\">\
+<img alt=\"\" border=\"0\" src=\""$out_thumb"\"/></a>\
+<div class=\"highslide-caption\">gmic "{$ind,b}.{$ind,x}" "${displayed_com$ind}"</div>\
+</div></center></td>\n"
 
     -if {$ind==$nb_imgs-1" || "$>==$_nb_coms-1} # End row.
-      -is "</tr>\n<tr bgcolor=\""$bgcolor"\">\n"
+      -input_string "</tr>\n<tr bgcolor=\""$bgcolor"\">\n"
       -repeat {$ind+1}
-        -is "<td width=\""${width$>}"\"><center><font size=\"1\">gmic "{$>,b}.{$>,x}" "${displayed_com$>}"</font></center></td>\n"
+        -input_string "<td width=\""${width$>}"\"><center><font size=\"1\">gmic "{$>,b}.{$>,x}" "${displayed_com$>}"</font></center></td>\n"
       -done
-      -is "</tr>\n"
+      -input_string "</tr>\n"
       row+=1
     -endif
 
   -done
-  -is "</table></center>\n"
+  -input_string "</table></center>\n"
 
   # Generate gallery footer.
-  -is "</div></div><div id=\"footer\"><img alt=\"\" src=\"images/footer.jpg\" /></div></div>\n\
-       <!--#include file=\"copyright.html\" -->\n\
-       <!--#include file=\"footer.html\" -->\n"
+  -input_string "
+</div></div><div id=\"footer\"><img alt=\"\" src=\"images/footer.jpg\" /></div></div>\n\
+<!--#include file=\"copyright.html\" -->\n\
+<!--#include file=\"footer.html\" -->\n"
 
   # Save html page and exit properly.
   -rm[0-{$nb_imgs-1}] -a x
