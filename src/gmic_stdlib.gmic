@@ -14545,14 +14545,14 @@ warp_perspective : -skip ${1=1.5},${2=0},${3=1},${4=50},${5=50},${6=2}
     -a[-2,-1] c -warp.. .,0,1,$6 -rm.
   -endl -done -v +
 
-#@gmic water : _amplitude>=0,_smoothness>=0
+#@gmic water : _amplitude,_smoothness>=0,_angle
 #@gmic : Apply water deformation on selected images.
-#@gmic : Default values: 'amplitude=30' and 'smoothness=1.5'.
+#@gmic : Default values: 'amplitude=30', 'smoothness=1.5' and 'angle=45'.
 #@gmic : $ image.jpg --water ,
-water : -skip ${1=30},${2=1.5}
-  -e[^-1] "Apply water deformation on image$?, with amplitude $1 and smoothness $2."
+water : -check ${2=1.5}>=0 -skip ${1=30},${3=1},${4=45}
+  -e[^-1] "Apply water deformation on image$?, with amplitude $1, smoothness $2 and angle $3."
   -v - -repeat $! -l[$>]
-    25%,25%,25%,1 -noise. $1 -g. xyz -+[-1,-2,-3] -b. $2 -*. 2 -r. ..,..,1,2,3 -warp.. .,1 -rm.
+    25%,25%,25%,1 -noise. $1 -g. xy -*.. {-sin($3*pi/180)} -*. {cos($3*pi/180)} -+[-2,-1] -b. $2 -*. 2 -r. ..,..,1,2,3 -warp.. .,1 -rm.
   -endl -done -v +
 
 #@gmic wave : _amplitude>=0,_frequency>=0,_center_x,_center_y
@@ -25545,7 +25545,8 @@ gimp_twirl :
 #@gimp Water : water, water(0)
 #@gimp : Amplitude = float(30,0,300)
 #@gimp : Smoothness = float(1.5,0,4)
-#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
+#@gimp : Angle = float(45,0,180)
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>10/07/2016</i>.</small>")
 
 #@gimp Wave : wave, wave(1)
 #@gimp : Amplitude = float(10,0,30)
