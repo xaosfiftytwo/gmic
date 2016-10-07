@@ -2751,7 +2751,7 @@ input_gpl :
 is : -skip ${1="?"},${2=0}
   -_input_sample[] "$1",${2--1}
 
-#@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) }
+#@gmic input_sample : _name={ ? | apples | barbara | boats | bottles | butterfly | cameraman | cat | cliff | duck | eagle | earth | flower | fruits | greece | gummy | house | inside | landscape | leaf | lena | lion | mandrill | monkey | parrots | pencils | peppers | rooster | rose | square | teddy | wall | waterfall | zelda },_width={ >=0 | 0 (auto) },_height = { >=0 | 0 (auto) }
 #@gmic : Input a new sample RGB image (opt. with specified size).
 #@gmic : Argument 'name' can be replaced by an integer in [0,31] that serves as an index to a sample number.
 #@gmic : $ -repeat 6 -input_sample ? -done
@@ -2763,7 +2763,7 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
   N=${"-arg2var _name,"\
       apples,barbara,boats,bottles,butterfly,cat,cameraman,cliff,\
       duck,eagle,earth,inside,flower,fruits,greece,gummy,\
-      house,leaf,lena,lion,mandrill,monkey,parrots,pencils,\
+      house,landscape,leaf,lena,lion,mandrill,monkey,parrots,pencils,\
       peppers,rooster,rose,square,teddy,wall,waterfall,zelda}
 
   -if {['"$1"']=='?'} is_random=1 sample={round(u(1,$N))}
@@ -2781,11 +2781,11 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
   -endif
   sample=${_name$sample}
 
-  filename=${_path_rc}$sample.png
+  filename=${_path_rc}sample_$sample.png
   -if $filename $filename
   -else
-    -if $is_random -l[] http://gmic.eu/img/$sample.png -o. $filename -onfail -testimage2d 400 -endl
-    -else http://gmic.eu/img/$sample.png -o. $filename
+    -if $is_random -l[] http://gmic.eu/img/sample_$sample.png -o. $filename -onfail -testimage2d 400 -endl
+    -else http://gmic.eu/img/sample_$sample.png -o. $filename
     -endif
     -+. 0
   -endif
