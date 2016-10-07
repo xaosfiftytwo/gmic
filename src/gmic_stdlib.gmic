@@ -2806,7 +2806,6 @@ _input_sample : -skip "${1=?}" -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
 
 #@gmic input_string : "string"
 #@gmic : Insert new image containing the ascii codes of specified string.
-#@gmic : (eq. to '-is').
 #@gmic : $ -input_string "foo bar"
 input_string :
   -e[^-1] "Input new image from string '$1'."
