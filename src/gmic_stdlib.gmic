@@ -140,7 +140,7 @@ cli_noarg :
 
 _cli_noarg1 :
   -wait 300
-  g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_
+  g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_r
   file_update=${_path_rc}update$_version.gmic
   need_update={"Y = date(0); M = date(1); D = date(2); date_current = Y*365 + M*31 + D;
                 Y = date(0,"$file_update"); M = date(1,"$file_update"); D = date(2,"$file_update"); date_file = Y*365 + M*31 + D;
@@ -2784,7 +2784,7 @@ _input_sample : -skip ${1="?"} -check "isint(${2=0}) && $2>=0 && isint(${3=0}) &
   filename=${_path_rc}sample_$sample.png
   -if $filename $filename
   -else
-    -if $is_random -l[] http://gmic.eu/img/sample_$sample.png -o. $filename -onfail -testimage2d 400 -endl
+    -if $is_random -l[] http://gmic.eu/img/sample_$sample.png -o. $filename -onfail -testimage2d {m=max($2,$3);m>0?m:400} -endl
     -else http://gmic.eu/img/sample_$sample.png -o. $filename
     -endif
     -+. 0
