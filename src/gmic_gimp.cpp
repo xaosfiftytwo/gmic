@@ -2646,6 +2646,10 @@ void process_image(const char *const command_line, const bool is_apply) {
   const CImg<char> _command_line = command_line?CImg<char>::string(command_line):get_command_line(false);
   if (!_command_line || std::strstr(_command_line," -_none_")) return;
 
+  // Reset values for button parameters.
+  cimglist_for(gmic_button_parameters,l) set_filter_parameter(filter,gmic_button_parameters(l,0),"0");
+
+  // Retrieve G'MIC command to apply.
   CImg<char> new_label(256), progress_label;
   *new_label = 0;
   if (run_mode!=GIMP_RUN_NONINTERACTIVE) {
@@ -2666,7 +2670,16 @@ void process_image(const char *const command_line, const bool is_apply) {
     cimg::strellipsize(new_label,240,false);
   }
 
-  // Get input layers for the chosen filter.
+  int image_nb_layers = 0, is_selection = 0, sel_x0 = 0, sel_y0 = 0, sel_x1 = 0, sel_y1 = 0;
+  unsigned int image_width = 0, image_height = 0;  gimp_image_get_layers(image_id,&image_nb_layers);
+  if (image_nb_layers) {
+    image_width = gimp_image_width(image_id);
+    image_height = gimp_image_height(image_id);
+  }
+  if (!gimp_selection_bounds(image_id,&is_selection,&sel_x0,&sel_y0,&sel_x1,&sel_y1)) is_selection = 0;
+  else if (output_mode<1 || output_mode>2) sel_x0 = sel_y0 = 0;
+
+  // Init structure used to pass processing arguments.
   st_process_thread spt;
   spt.is_preview = false;
   spt.command_line = _command_line;
@@ -2675,18 +2688,16 @@ void process_image(const char *const command_line, const bool is_apply) {
   spt.progress = -1;
   spt.set_env();
 
+  // Get input layers for the chosen filter.
   const CImg<int> layers = get_input_layers(spt.images);
   CImg<int> layer_dimensions(spt.images.size(),4);
   CImg<char> layer_name(256);
-
-  int is_selection = 0, sel_x0 = 0, sel_y0 = 0, sel_x1 = 0, sel_y1 = 0;
-  if (!gimp_selection_bounds(image_id,&is_selection,&sel_x0,&sel_y0,&sel_x1,&sel_y1)) is_selection = 0;
-  else if (output_mode<1 || output_mode>2) sel_x0 = sel_y0 = 0;
-
   cimglist_for(spt.images,p) {
     const CImg<gmic_pixel_type>& img = spt.images[p];
-    layer_dimensions(p,0) = img.width(); layer_dimensions(p,1) = img.height();
-    layer_dimensions(p,2) = img.depth(); layer_dimensions(p,3) = img.spectrum();
+    layer_dimensions(p,0) = img.width();
+    layer_dimensions(p,1) = img.height();
+    layer_dimensions(p,2) = img.depth();
+    layer_dimensions(p,3) = img.spectrum();
     const GimpLayerModeEffects blendmode = gimp_layer_get_mode(layers[p]);
     const float opacity = gimp_layer_get_opacity(layers[p]);
     int posx = 0, posy = 0;
@@ -2700,18 +2711,6 @@ void process_image(const char *const command_line, const bool is_apply) {
                   _layer_name.data());
     CImg<char>::string(layer_name).move_to(spt.images_names);
   }
-
-  // Get original image dimensions and number of layers.
-  int image_nb_layers = 0;
-  gimp_image_get_layers(image_id,&image_nb_layers);
-  unsigned int image_width = 0, image_height = 0;
-  if (layers.height()) {
-    image_width = gimp_image_width(image_id);
-    image_height = gimp_image_height(image_id);
-  }
-
-  // Reset values for button parameters.
-  cimglist_for(gmic_button_parameters,l) set_filter_parameter(filter,gmic_button_parameters(l,0),"0");
 
   // Create processing thread and wait for its completion.
   bool is_abort = spt.is_abort = false;
