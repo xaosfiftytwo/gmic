@@ -90,6 +90,8 @@ bool is_block_preview = false;                 // Flag to block preview, when do
 void **event_infos;                            // Infos that are passed to the GUI callback functions.
 int image_id = 0;                              // The image concerned by the plug-in execution.
 int preview_image_id = 0;                      // The alternate preview image used if image is too small.
+int preview_width = 0;                         // The width of the last preview widget created.
+int preview_height = 0;                        // The height of the last preview widget created.
 double preview_image_factor = 0;               // If alternative preview image used, tell about the size factor (>1).
 unsigned int indice_faves = 0;                 // The starting index of favorite filters.
 unsigned int nb_available_filters = 0;         // The number of available filters (non-testing).
@@ -1971,29 +1973,17 @@ struct st_process_thread {
   pthread_t thread;
   void set_env() { // Must be called from main thread to avoid crash when doing 'gimp_get_data()'.
     env.assign(256);
-    int pw = 0, ph = 0;
-    if (gui_preview && GIMP_IS_PREVIEW(gui_preview))
-      gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&pw,&ph);
-    if (pw>0 && ph>0)
-      cimg_snprintf(env,env.width(),
-                    "-v - "
-                    "_input_layers=%u "
-                    "_output_mode=%u "
-                    "_output_messages=%u "
-                    "_preview_mode=%u "
-                    "_preview_size=%u "
-                    "_preview_width=%d "
-                    "_preview_height=%d",
-                    get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size(),pw,ph);
-    else
-      cimg_snprintf(env,env.width(),
-                    "-v - "
-                    "_input_layers=%u "
-                    "_output_mode=%u "
-                    "_output_messages=%u "
-                    "_preview_mode=%u "
-                    "_preview_size=%u ",
-                    get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size());
+    cimg_snprintf(env,env.width(),
+                  "-v - "
+                  "_input_layers=%u "
+                  "_output_mode=%u "
+                  "_output_messages=%u "
+                  "_preview_mode=%u "
+                  "_preview_size=%u "
+                  "_preview_width=%d "
+                  "_preview_height=%d",
+                  get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size(),
+                  preview_width,preview_height);
   }
 };
 
@@ -2109,6 +2099,7 @@ void _gimp_preview_invalidate() {
     gui_preview = gimp_zoom_preview_new_from_drawable_id(preview_drawable_id);
 #endif
 
+    gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&preview_width,&preview_height);
     GtkWidget *const controls = gimp_preview_get_controls(GIMP_PREVIEW(gui_preview));
     GList *const children1 = ((GtkBox*)controls)->children;
     GtkBoxChild *const child1 = (GtkBoxChild*)children1->data;
