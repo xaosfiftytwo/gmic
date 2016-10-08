@@ -90,8 +90,8 @@ bool is_block_preview = false;                 // Flag to block preview, when do
 void **event_infos;                            // Infos that are passed to the GUI callback functions.
 int image_id = 0;                              // The image concerned by the plug-in execution.
 int preview_image_id = 0;                      // The alternate preview image used if image is too small.
-int preview_width = 0;                         // The width of the last preview widget created.
-int preview_height = 0;                        // The height of the last preview widget created.
+int gimp_preview_width = 0;                    // The width of the last preview widget created.
+int gimp_preview_height = 0;                   // The height of the last preview widget created.
 double preview_image_factor = 0;               // If alternative preview image used, tell about the size factor (>1).
 unsigned int indice_faves = 0;                 // The starting index of favorite filters.
 unsigned int nb_available_filters = 0;         // The number of available filters (non-testing).
@@ -1932,19 +1932,16 @@ void set_preview_factor() {
     double factor = gmic_preview_factors(filter,0);
     if (factor>=0) {
       if (!factor) { // Compute factor so that 1:1 preview of the image is displayed.
-        int _pw = 0, _ph = 0;
-        gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&_pw,&_ph);
+        const float
+          pw = (float)gimp_preview_width,
+          ph = (float)gimp_preview_height;
 #if GIMP_MINOR_VERSION<=8
         const float
-          pw = (float)_pw,
-          ph = (float)_ph,
           dw = (float)gimp_zoom_preview_get_drawable(GIMP_ZOOM_PREVIEW(gui_preview))->width,
           dh = (float)gimp_zoom_preview_get_drawable(GIMP_ZOOM_PREVIEW(gui_preview))->height;
 #else
         const int preview_drawable_id = gimp_zoom_preview_get_drawable_id(GIMP_ZOOM_PREVIEW(gui_preview));
         const float
-          pw = (float)_pw,
-          ph = (float)_ph,
           dw = (float)gimp_drawable_width(preview_drawable_id),
           dh = (float)gimp_drawable_height(preview_drawable_id);
 #endif
@@ -1983,7 +1980,7 @@ struct st_process_thread {
                   "_preview_width=%d "
                   "_preview_height=%d",
                   get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size(),
-                  preview_width,preview_height);
+                  gimp_preview_width,gimp_preview_height);
   }
 };
 
@@ -2099,7 +2096,6 @@ void _gimp_preview_invalidate() {
     gui_preview = gimp_zoom_preview_new_from_drawable_id(preview_drawable_id);
 #endif
 
-    gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&preview_width,&preview_height);
     GtkWidget *const controls = gimp_preview_get_controls(GIMP_PREVIEW(gui_preview));
     GList *const children1 = ((GtkBox*)controls)->children;
     GtkBoxChild *const child1 = (GtkBoxChild*)children1->data;
@@ -2126,6 +2122,7 @@ void _gimp_preview_invalidate() {
     gtk_widget_set_size_request(gui_preview_align,
                                 -1,requisition.height<min_preview_size?min_preview_size:-1);
     g_signal_connect(gui_preview,"invalidated",G_CALLBACK(process_preview),0);
+    gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&gimp_preview_width,&gimp_preview_height);
   }
 }
 
@@ -2156,14 +2153,17 @@ void reset_button_parameters() {
 // Handle preview resize event.
 void on_dialog_resized() {
   reset_button_parameters();
-  static int opw = 0, oph = 0;
-  int pw = 0, ph = 0;
+  static int old_pw = 0, old_ph = 0;
   if (GIMP_IS_PREVIEW(gui_preview)) {
-    gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&pw,&ph);
-    if (!opw || !oph) { opw = pw; oph = ph; computed_preview.assign(); } else {
-      if (pw!=opw || ph!=oph) { set_preview_factor(); opw = pw; oph = ph; computed_preview.assign(); }
+    if (!old_pw || !old_ph) computed_preview.assign();
+    else if (gimp_preview_width!=old_pw || gimp_preview_height!=old_ph) {
+      set_preview_factor();
+      computed_preview.assign();
     }
   }
+  old_pw = gimp_preview_width;
+  old_ph = gimp_preview_height;
+  computed_preview.assign();
 }
 
 // Handle widgets events related to parameter changes.
@@ -3371,20 +3371,16 @@ void process_preview() {
   // Display warning message about preview inaccuracy, if needed.
   double default_factor = gmic_preview_factors(filter,0);
   if (!default_factor) {
-    int _pw = 0, _ph = 0;
-    gimp_preview_get_size(GIMP_PREVIEW(gui_preview),&_pw,&_ph);
-
+    const float
+      pw = (float)gimp_preview_width,
+      ph = (float)gimp_preview_height;
 #if GIMP_MINOR_VERSION<=8
     const float
-      pw = (float)_pw,
-      ph = (float)_ph,
       dw = (float)gimp_zoom_preview_get_drawable(GIMP_ZOOM_PREVIEW(gui_preview))->width,
       dh = (float)gimp_zoom_preview_get_drawable(GIMP_ZOOM_PREVIEW(gui_preview))->height;
 #else
     const int preview_drawable_id = gimp_zoom_preview_get_drawable_id(GIMP_ZOOM_PREVIEW(gui_preview));
     const float
-      pw = (float)_pw,
-      ph = (float)_ph,
       dw = (float)gimp_drawable_width(preview_drawable_id),
       dh = (float)gimp_drawable_height(preview_drawable_id);
 #endif
