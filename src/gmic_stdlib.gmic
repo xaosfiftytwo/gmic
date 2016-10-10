@@ -783,14 +783,15 @@ _help_usage :
 \n
 \n    _ "${g}"Special operators"$n" can be used:
 \n
-\n       . '"$c";"$n"': expression separator. The returned value is always the last encountered
-\n          expression. For instance expression '"${c}"1;2;pi"$n"' is evaluated as '"${c}"pi"$n"'.
-\n       . '"$c"="$n"': variable assignment. Variables in mathematical parser can only refer to
-\n          numerical values. Variable names are case-sensitive. Use this operator in
-\n          conjunction with '"$c";"$n"' to define more complex evaluable expressions, such as
-\n           '"${c}"t=cos(x);3*t^2+2*t+1"$n"'.
-\n          These variables remain "${g}"local"$n" to the mathematical parser and cannot be accessed
-\n          outside the evaluated expression.
+\n       . '"$c";"$n"': expression separator. The returned value is always the last encountered expression.
+\n          For instance expression '"${c}"1;2;pi"$n"' is evaluated as '"${c}"pi"$n"'.
+\n       . '"$c"="$n"': variable assignment. Variables in mathematical parser can only refer to numerical values.
+\n          Variable names are case-sensitive. Use this operator in conjunction with '"$c";"$n"' to define more complex evaluable
+\n          expressions, such as '"${c}"t=cos(x);3*t^2+2*t+1"$n"'.
+\n          These variables remain "${g}"local"$n" to the mathematical parser and cannot be accessed outside the evaluated expression.
+\n       . Variables defined in math parser may have a "${g}"constant"$n" property, by specifying keyword "${c}"const"$n" before the
+\n          variable name (e.g. "${c}"const foo = pi/4;"$n"). The value set to such a variable must be indeed a "${c}"constant scalar"$n".
+\n          Constant variables allows certain types of optimizations in the math parser.
 \n
 \n    _ The following "${g}"specific functions"$n" are also defined:
 \n
