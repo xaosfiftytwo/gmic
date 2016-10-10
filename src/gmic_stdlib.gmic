@@ -16558,49 +16558,49 @@ math_lib :
           _dp_n,_dp_ind,_dp_nind__dp_aind,_dp_P0,_dp_P01P1,_dp_P1P2,_dp_tmax,_dp_tend,_tp_t,_dp_dy,
           _dp_t,_dp_x,_dp_Xsy,_dp_x0,_dp_x1,_dp_c);
 
-    const _dp_wp1 = w#ind + 1;
     const _dp_wm1 = w#ind - 1;
     _dp_pts = pts;
     const _dp_N = size(_dp_pts)/2;
     _dp_opacity = opacity;
-   _dp_color = resize(color,s#ind);
-   _dp_Ys = resize([_dp_pts[1,size(_dp_pts)-1],0],_dp_N,1);
-   _dp_ymin = max(0,min(_dp_Ys));
-   _dp_ymax = min(h - 1,max(_dp_Ys));
-   (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _dp_wp1;
+    _dp_color = resize(color,s#ind);
+    _dp_none = max(resize(_dp_pts,_dp_N,1));
+    _dp_Ys = resize([_dp_pts[1,size(_dp_pts)-1],0],_dp_N,1);
+    _dp_ymin = max(0,min(_dp_Ys));
+    _dp_ymax = min(h - 1,max(_dp_Ys));
+    (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _dp_none;
 
-   for (_dp_n = 0, _dp_n<_dp_N, ++_dp_n,
-     _dp_ind = 2*_dp_n;
-     _dp_nind = (_dp_ind + 2)%size(_dp_pts);
-     _dp_aind = (_dp_nind + 2)%size(_dp_pts);
-     _dp_P0 = [ _dp_pts[_dp_ind],_dp_pts[_dp_ind + 1] ];
-     _dp_P0P1 = [ _dp_pts[_dp_nind],_dp_pts[_dp_nind + 1] ];  # P1
-     _dp_P1P2 = [ _dp_pts[_dp_aind],_dp_pts[_dp_aind + 1] ];  # P2
-     _dp_P1P2-=_dp_P0P1;
-     _dp_P0P1-=_dp_P0;
-     _dp_tmax = max(1,abs(_dp_P0P1[1]));
-     _dp_tend = _dp_tmax - (sign(_dp_P0P1[1])==sign(_dp_P1P2[1]));
-     _dp_y = _dp_P0[1];
-     _dp_dy = sign(_dp_P0P1[1]);
-     for (_dp_t = 0, _dp_t<=_dp_tend, ++_dp_t,
+    for (_dp_n = 0, _dp_n<_dp_N, ++_dp_n,
+      _dp_ind = 2*_dp_n;
+      _dp_nind = (_dp_ind + 2)%size(_dp_pts);
+      _dp_aind = (_dp_nind + 2)%size(_dp_pts);
+      _dp_P0 = [ _dp_pts[_dp_ind],_dp_pts[_dp_ind + 1] ];
+      _dp_P0P1 = [ _dp_pts[_dp_nind],_dp_pts[_dp_nind + 1] ];  # P1
+      _dp_P1P2 = [ _dp_pts[_dp_aind],_dp_pts[_dp_aind + 1] ];  # P2
+      _dp_P1P2-=_dp_P0P1;
+      _dp_P0P1-=_dp_P0;
+      _dp_tmax = max(1,abs(_dp_P0P1[1]));
+      _dp_tend = _dp_tmax - (sign(_dp_P0P1[1])==sign(_dp_P1P2[1]));
+      _dp_y = _dp_P0[1];
+      _dp_dy = sign(_dp_P0P1[1]);
+      for (_dp_t = 0, _dp_t<=_dp_tend, ++_dp_t,
         _dp_x = round(_dp_P0[0] + _dp_t*_dp_P0P1[0]/(_dp_tmax));
-       _dp_Xs[_dp_n + _dp_N*_dp_y] = max(0,min(_dp_wm1,_dp_x));
-       _dp_y+=_dp_dy;
-     );
-   );
+        _dp_Xs[_dp_n + _dp_N*_dp_y] = max(0,min(_dp_wm1,_dp_x));
+        _dp_y+=_dp_dy;
+      );
+    );
 
-   for (_dp_y = _dp_ymin, _dp_y<=_dp_ymax, ++_dp_y,
-     _dp_Xsy = sort(_dp_Xs[_dp_y*_dp_N,_dp_N]);
-     for (_dp_n = 0, _dp_n<_dp_N,
-       dowhile (_dp_x0 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x0==_dp_wp1);
-       if (_dp_n<_dp_N,
-         dowhile (_dp_x1 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x1==_dp_wp1);
-         if (_dp_x1!=_dp_wp1,
-           _dp_x0 = max(0,_dp_x0);
-           _dp_x1 = min(_dp_wm1,_dp_x1);
-           _dp_x1-=_dp_x0 - 1;
-           for (_dp_c = 0, _dp_c<s#ind, ++_dp_c, copy(i(_dp_x0,_dp_y,0,_dp_c),_dp_color[_dp_c],_dp_x1,1,0,_dp_opacity));
-         );
+    for (_dp_y = _dp_ymin, _dp_y<=_dp_ymax, ++_dp_y,
+      _dp_Xsy = sort(_dp_Xs[_dp_y*_dp_N,_dp_N]);
+      for (_dp_n = 0, _dp_n<_dp_N,
+        dowhile (_dp_x0 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x0==_dp_none);
+        if (_dp_x0!=_dp_none,
+          dowhile (_dp_x1 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x1==_dp_none);
+          if (_dp_x1!=_dp_none,
+            _dp_x0 = max(0,_dp_x0);
+            _dp_x1 = min(_dp_wm1,_dp_x1);
+            _dp_x1-=_dp_x0 - 1;
+            for (_dp_c = 0, _dp_c<s#ind, ++_dp_c, copy(i(_dp_x0,_dp_y,0,_dp_c),_dp_color[_dp_c],_dp_x1,1,0,_dp_opacity));
+          );
         );
       );
     );
