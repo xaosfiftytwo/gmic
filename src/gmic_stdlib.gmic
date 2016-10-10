@@ -785,7 +785,7 @@ _help_usage :
 \n
 \n       . '"$c";"$n"': expression separator. The returned value is always the last encountered expression.
 \n          For instance expression '"${c}"1;2;pi"$n"' is evaluated as '"${c}"pi"$n"'.
-\n       . '"$c"="$n"': variable assignment. Variables in mathematical parser can only refer to numerical values.
+\n       . '"$c"="$n"': variable assignment. Variables in mathematical parser can only refer to numerical values (vectors or scalars).
 \n          Variable names are case-sensitive. Use this operator in conjunction with '"$c";"$n"' to define more complex evaluable
 \n          expressions, such as '"${c}"t=cos(x);3*t^2+2*t+1"$n"'.
 \n          These variables remain "${g}"local"$n" to the mathematical parser and cannot be accessed outside the evaluated expression.
