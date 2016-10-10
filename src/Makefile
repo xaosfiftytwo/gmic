@@ -145,7 +145,7 @@ MANDATORY_LIBS += -Wl,--stack,16777216
 endif
 
 # Flags to enable software debugging (slow down the code!).
-DEBUG_CFLAGS = -pedantic -Dcimg_verbosity=3 -g -fsanitize=address # -fsanitize=thread # -fsanitize=undefined # Removed '-ansi' as it (silently) disables c++11.
+DEBUG_CFLAGS = -pedantic -Dcimg_verbosity=3 -Dcimg_strict_warnings -g -fsanitize=address # -fsanitize=thread # -fsanitize=undefined # Removed '-ansi' as it (silently) disables c++11.
 
 # Flags to enable optimizations.
 ifeq ($(notdir $(CXX)),g++)

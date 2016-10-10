@@ -8177,11 +8177,11 @@ denoise_patchpca : -check "${1=1.8} && $1>=0 && isint(${2=7}) && $2>0 && isint($
       );
       M/="$M2";
       eig = eig(M);
-      lambda = sqrt(abs(eig[0,"$N2"-1]));
+      lambda = sqrt(abs(eig[0,"$N2"]));
 
       # Determine number of lambdas to keep and project neighboring patchs.
       for (k = 0, k<size(lambda) && lambda[k]>=$1*"$stdnoise", ++k);
-      Qt = eig["$N2",size(eig) - 1];
+      Qt = eig["$N2","{$N2*$N2}"];
       Q = transp(Qt,"$N2");
       for (q = -m1, q<=m2, ++q,
         for (p = -m1, p<=m2, ++p,
