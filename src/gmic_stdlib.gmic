@@ -16553,7 +16553,7 @@ math_lib :
     nan;
   );
 
-  draw_polygon(ind,pts,opacity,color) = (
+  draw_polygon(ind,pts,opacity,color) = ( # Draw a polygon on image #ind
     unref(_dp_wp1,_dp_wm1,_dp_pts,_dp_N,_dp_opacity,_dp_color,_dp_Ys,_dp_ymin,_dp_ymax,_dp_Xs,
           _dp_n,_dp_ind,_dp_nind__dp_aind,_dp_P0,_dp_P01P1,_dp_P1P2,_dp_tmax,_dp_tend,_tp_t,_dp_dy,
           _dp_t,_dp_x,_dp_Xsy,_dp_x0,_dp_x1,_dp_c);
