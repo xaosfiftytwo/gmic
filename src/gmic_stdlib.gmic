@@ -136,11 +136,11 @@
 cli_noarg :
   -use_vt100 g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_r -version
   -v + -e[] "\n[gmic] No commands, options or data provided (type "$c"'gmic -h'"$n" to get help)." -v -
-  -parallel -_cli_noarg1,-_cli_noarg2
-
-_cli_noarg1 :
-  -wait 300
-  g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_r
+  -if {{*,u}>0}
+    -v + -e[] "[gmic] "${c}"Running in demo mode."$n -v - -parallel 0,"-demo ," -e[] ""
+  -else
+    -v + -e[] "\n"
+  -endif
   file_update=${_path_rc}update$_version.gmic
   need_update={"Y = date(0); M = date(1); D = date(2); date_current = Y*365 + M*31 + D;
                 Y = date(0,"$file_update"); M = date(1,"$file_update"); D = date(2,"$file_update"); date_file = Y*365 + M*31 + D;
@@ -153,15 +153,6 @@ _cli_noarg1 :
       -v + -e[] "\r[gmic] Update commands: "${r}"Failed!"$n -v -
     -endl
   -endif
-
-_cli_noarg2 :
-  g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_
-  -if {{*,u}>0}
-    -v + -e[] "[gmic] "${c}"Running in demo mode."$n -v - -demo , -e[] ""
-  -else
-    -v + -e[] "\n"
-  -endif
-  -v -
 
 # This command is called each time the cli interface 'gmic' starts.
 # Overload it in your local user command file if necessary.
@@ -4124,7 +4115,7 @@ update_server :
     -o raw:${_path_rc}update$_version.gmic,uchar
     -o cimgz:/tmp/update$_version.gmic,uchar
 
-    (175,176,177,178)
+    (178)
     -repeat {w}
       v={i[$>]}
       -_update_server_upload[] ${_path_rc}update$_version.gmic,plain_update$v.gmic
@@ -9880,13 +9871,13 @@ pointcloud : -check "${1=0}<=2" -skip ${2=0},${3=0},${4=0}
     # Draw point cloud.
     $dx,$dy,$dz,{$1!=2?s-3:1}
     -if {$1<0}
-      -f.. ">V = I; P = V[0,2]; C = V[3,size(V) - 1]; I(#-1,P) = (1+$1)*I(#-1,P) - $1*C; V"
+      -f.. ">V = I; P = V[0,3]; C = V[3,size(V) - 3]; I(#-1,P) = (1+$1)*I(#-1,P) - $1*C; V"
     -elif {$1==0}
-      -f.. ">V = I; P = V[0,2]; C = V[3,size(V) - 1]; I(#-1,P) = C; V"
+      -f.. ">V = I; P = V[0,3]; C = V[3,size(V) - 3]; I(#-1,P) = C; V"
     -elif {$1==1}
-      -f.. ">V = I; P = V[0,2]; C = V[3,size(V) - 1]; I(#-1,P) += C; V"
+      -f.. ">V = I; P = V[0,3]; C = V[3,size(V) - 3]; I(#-1,P) += C; V"
     -else
-      -f.. ">init(l = 0); V = I; P = V[0,2]; C = V[3,size(V) - 1]; I(#-1,P) = ++l; V"
+      -f.. ">init(l = 0); V = I; P = V[0,3]; C = V[3,size(V) - 3]; I(#-1,P) = ++l; V"
     -endif
 
   -k. -nm $nm -endl -done -v +
