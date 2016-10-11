@@ -3167,7 +3167,7 @@ shape_polygon : -check "${1=512}>=0 && isint(${2=5}) && $2>=3" -skip ${3=0}
   -nm "[2d $2-polygon shape]"
   -v +
 
-#@gmic shape_snowflake : size>=0,_nb_recursions>=0
+#@gmic shape_snowflake : size>=0,0<=_nb_recursions<=6
 #@gmic : Input a 2d snowflake binary shape with specified size.
 #@gmic : Default values: 'size=512' and 'nb_recursions=5'.
 #@gmic : $ -repeat 6 -shape_snowflake 256,$> -done
