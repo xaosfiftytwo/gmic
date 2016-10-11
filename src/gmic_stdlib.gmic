@@ -16552,49 +16552,80 @@ math_lib :
     nan;
   );
 
-  draw_polygon(ind,pts,opacity,color) = ( # Draw a polygon on image #ind
-    const _dp_wm1 = w#ind - 1;
-    _dp_pts = pts;
-    const _dp_N = size(_dp_pts)/2;
-    _dp_opacity = opacity;
-    _dp_color = resize(color,s#ind);
-    _dp_none = max(resize(_dp_pts,_dp_N,1));
-    _dp_Ys = resize([_dp_pts[1,size(_dp_pts)-1],0],_dp_N,1);
-    _dp_ymin = max(0,min(_dp_Ys));
-    _dp_ymax = min(h - 1,max(_dp_Ys));
-    (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _dp_none;
+  draw_polygon(_ind,_pts,_opacity,_color) = ( # Draw filled polygon on image #ind
+    unref(pts,wm1,N,Xcoords,Ycoords,Xs,Xsy);
+    pts = _pts;
+    opacity = _opacity;
+    color = resize(_color,s#_ind);
 
-    for (_dp_n = 0, _dp_n<_dp_N, ++_dp_n,
-      _dp_ind = 2*_dp_n;
-      _dp_nind = (_dp_ind + 2)%size(_dp_pts);
-      _dp_aind = (_dp_nind + 2)%size(_dp_pts);
-      _dp_P0 = [ _dp_pts[_dp_ind],_dp_pts[_dp_ind + 1] ];
-      _dp_P0P1 = [ _dp_pts[_dp_nind],_dp_pts[_dp_nind + 1] ];  # P1
-      _dp_P1P2 = [ _dp_pts[_dp_aind],_dp_pts[_dp_aind + 1] ];  # P2
-      _dp_P1P2-=_dp_P0P1;
-      _dp_P0P1-=_dp_P0;
-      _dp_tmax = max(1,abs(_dp_P0P1[1]));
-      _dp_tend = _dp_tmax - (sign(_dp_P0P1[1])==sign(_dp_P1P2[1]));
-      _dp_y = _dp_P0[1];
-      _dp_dy = sign(_dp_P0P1[1]);
-      for (_dp_t = 0, _dp_t<=_dp_tend, ++_dp_t,
-        _dp_x = round(_dp_P0[0] + _dp_t*_dp_P0P1[0]/(_dp_tmax));
-        _dp_Xs[_dp_n + _dp_N*_dp_y] = max(0,min(_dp_wm1,_dp_x));
-        _dp_y+=_dp_dy;
+    const wm1 = w#_ind - 1;
+    const N = size(pts)/2;
+
+    Xcoords = resize(pts,N,1);
+    Ycoords = resize([pts[1,size(pts)-1],0],N,1);
+    xmin = min(Xcoords);
+    xmax = max(Xcoords);
+    ymin = min(Ycoords);
+    ymax = max(Ycoords);
+
+    if (xmax>=0 && xmin<w#_ind && ymax>=0 && ymin<h#_ind,  # Polygon is visible
+
+      ymin = max(0,ymin);
+      ymax = min(h - 1,ymax);
+
+      none = xmax + 1;
+      (Xs = resize(pts,N*h#_ind,0)) = none;
+
+      n = 0;
+      nn = 1;
+      go_on = 1;
+      whiledo (go_on,
+
+       an = (nn + 1)%N;
+       x0 = pts[2*n];
+       y0 = pts[2*n + 1];
+
+       if (pts[2*nn + 1]==y0,
+         whiledo (pts[2*an+1]==y0, nn = an; (an+=1)%=N; );
+       );
+
+       x1 = pts[2*nn];
+       y1 = pts[2*nn + 1];
+
+       tn = an;
+       whiledo (pts[2*tn+1]==y1, (tn+=1)%=N);
+
+       if (y0!=y1,
+
+         y2 = pts[2*tn + 1];
+         x01 = x1 - x0;
+         y01 = y1 - y0;
+         y12 = y2 - y1;
+         dy = sign(y01);
+         tmax = max(1,abs(y01));
+         tend = tmax - (dy==sign(y12));
+         for (t = 0, t<=tend, ++t,
+           if (y0>=0 && y0<h#_ind, Xs[n + y0*N] = round(x0 + t*x01/tmax));
+           y0+=dy;
+         );
+       );
+
+        go_on = nn>n;
+        n = nn;
+        nn = an;
       );
-    );
 
-    for (_dp_y = _dp_ymin, _dp_y<=_dp_ymax, ++_dp_y,
-      _dp_Xsy = sort(_dp_Xs[_dp_y*_dp_N,_dp_N]);
-      for (_dp_n = 0, _dp_n<_dp_N,
-        dowhile (_dp_x0 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x0==_dp_none);
-        if (_dp_x0!=_dp_none,
-          dowhile (_dp_x1 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x1==_dp_none);
-          if (_dp_x1!=_dp_none,
-            _dp_x0 = max(0,_dp_x0);
-            _dp_x1 = min(_dp_wm1,_dp_x1);
-            _dp_x1-=_dp_x0 - 1;
-            for (_dp_c = 0, _dp_c<s#ind, ++_dp_c, copy(i(_dp_x0,_dp_y,0,_dp_c),_dp_color[_dp_c],_dp_x1,1,0,_dp_opacity));
+      for (y0 = ymin, y0<=ymax, ++y0,
+        Xsy = sort(Xs[y0*N,N]);
+        for (n = 0, n<N,
+          dowhile (x0 = Xsy[n++], n<N && x0==none);
+          if (x0!=none,
+            dowhile (x1 = Xsy[n++], n<N && x1==none);
+            if (x1!=none,
+              x0 = max(0,x0);
+              dx = min(wm1,x1) - x0 + 1;
+              for (c = 0, c<s#_ind, ++c, copy(i(x0,y0,0,c),color[c],dx,1,0,opacity));
+            );
           );
         );
       );
