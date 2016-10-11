@@ -16518,7 +16518,6 @@ math_lib :
   -v -
   -u "
   draw_circle(ind,P0,radius,opacity,color) = ( # Draw a circle centered at P0 on image #ind
-    unref(_dc_P0,_dc_radius,_dc_opacity,_dc_color,_dc_ymin,_dc_ymax,_dc_y,_dc_dx,_dc_xmin,_dc_xmax,_dc_c);
     _dc_P0 = round(P0);
     _dc_radius = round(radius);
     _dc_opacity = opacity;
@@ -16540,7 +16539,6 @@ math_lib :
   );
 
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
-    unref(_dl_P0,_dl_P0P1,_dl_color,_dl_opacity,_dl_omopacity,_dl_t,_dl_tmax,_dl_P);
     _dl_P0 = P0;
     (_dl_P0P1 = P1)-=_dl_P0;
     _dl_opacity = opacity;
@@ -16555,10 +16553,6 @@ math_lib :
   );
 
   draw_polygon(ind,pts,opacity,color) = ( # Draw a polygon on image #ind
-    unref(_dp_wp1,_dp_wm1,_dp_pts,_dp_N,_dp_opacity,_dp_color,_dp_Ys,_dp_ymin,_dp_ymax,_dp_Xs,
-          _dp_n,_dp_ind,_dp_nind__dp_aind,_dp_P0,_dp_P01P1,_dp_P1P2,_dp_tmax,_dp_tend,_tp_t,_dp_dy,
-          _dp_t,_dp_x,_dp_Xsy,_dp_x0,_dp_x1,_dp_c);
-
     const _dp_wm1 = w#ind - 1;
     _dp_pts = pts;
     const _dp_N = size(_dp_pts)/2;
@@ -16608,8 +16602,6 @@ math_lib :
   );
 
   draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
-    unref(_dr_P0,_dr_P1,_dr_opacity,_dr_omopacity,_dr_color,_dr_xs,_dr_ys,
-          _dr_xmin,_dr_xmax,_dr_ymin,_dr_ymax,_dr_dx,_dr_x,_dr_y,_dr_c,_dr_scanline);
     _dr_P0 = round(P0);
     _dr_P1 = round(P1);
     _dr_opacity = opacity;
@@ -16644,7 +16636,6 @@ math_lib :
   );
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
-    unref(_dt_A,_dt_B,_dt_C,_dt_AB,_dt_AC,_dt_BC,_dt_opacity,_dt_color,_dt_ymin,_dt_ymax,_dt_y,_dt_x0,_dt_x1,_dt_c);
     _dt_A = round(P0);
     _dt_B = round(P1);
     _dt_C = round(P2);
