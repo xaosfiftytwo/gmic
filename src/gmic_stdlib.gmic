@@ -139,7 +139,7 @@ cli_noarg :
   -if {{*,u}>0}
     -v + -e[] "[gmic] "${c}"Running in demo mode."$n -v - -parallel 0,"-demo ," -e[] ""
   -else
-    -v + -e[] "\n"
+    -v + -e[] "\n" -v -
   -endif
   file_update=${_path_rc}update$_version.gmic
   need_update={"Y = date(0); M = date(1); D = date(2); date_current = Y*365 + M*31 + D;
