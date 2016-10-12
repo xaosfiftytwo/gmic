@@ -16619,6 +16619,7 @@ math_lib :
         );
       );
     );
+    nan;
   );
 
   draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
