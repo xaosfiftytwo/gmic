@@ -16584,7 +16584,7 @@ math_lib :
           _xmin = max(_xmin,0);
           _xmax = min(_xmax,_wm1);
           _dx = _xmax - _xmin + 1;
-          for (_c = 0, _c<s#ind, ++_c, copy(i(_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
+          for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
         );
       );
     );
@@ -16668,7 +16668,7 @@ math_lib :
               _x0 = max(_x0,0);
               _x1 = min(_x1,_wm1);
               _dx = _x1 - _x0 + 1;
-              for (_c = 0, _c<s#ind, ++_c, copy(i(_x0,_y0,0,_c),_color[_c],_dx,1,0,_opacity));
+              for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y0,0,_c),_color[_c],_dx,1,0,_opacity));
             );
           );
         );
