@@ -16554,8 +16554,8 @@ math_lib :
     _wm1 = w#ind - 1;
     _hm1 = h#ind - 1;
     _P0 = round(P0);
-    _r1 = round(abs(r1));
-    _r2 = round(abs(r2));
+    _r1 = abs(r1);
+    _r2 = abs(r2);
     _angle = angle*pi/180;
     _opacity = opacity;
     _color = resize(color,s#ind);
@@ -16568,8 +16568,8 @@ math_lib :
     _tb = _u*_v*(_l1 - _l2);
     _tc = _l1*_v^2 + _l2*_u^2;
     _yb = sqrt(_ta*_rmax^2/(_ta*_tc - _tb^2));
-    _ymin = _P0[1] - _yb - 1;
-    _ymax = _P0[1] + _yb + 1;
+    _ymin = round(_P0[1] - _yb - 1);
+    _ymax = round(_P0[1] + _yb + 1);
     if (_ymax>=0 && _ymin<=_hm1, # Ellipse is visible
       _ymin = max(_ymin,0);
       _ymax = min(_ymax,_hm1);
@@ -16588,6 +16588,12 @@ math_lib :
         );
       );
     );
+    nan;
+  );
+
+  draw_ellipse(ind,P0,T,opacity,color) = ( # Draw ellipse defined by 2x2 tensor T at P0 on image #ind
+    _eig = eig(T);
+    draw_ellipse(#ind,P0,_eig[0],_eig[1],180*atan2(_eig[3],_eig[2])/pi,opacity,color);
   );
 
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
@@ -16758,6 +16764,10 @@ math_lib :
     unref(x#,_k);
     for (_k = 0, _k<size(V#), ++_k, x# = V#[_k]; V#[_k] = fnx#);
     V#;
+  );
+
+  rgb() = ( # Return a random RGB color
+    u([255,255,255]);
   );
 
   swap(x,y) = ( # Swap content of variables x and y
