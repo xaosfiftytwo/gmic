@@ -16557,46 +16557,36 @@ math_lib :
     _dp_pts = round(pts);
     _dp_opacity = opacity;
     _dp_color = resize(color,s#ind);
-
     const _dp_wm1 = w#ind - 1;
     const _dp_N = size(_dp_pts)/2;
-
     _dp_Xcoords = resize(_dp_pts,_dp_N,1);
     _dp_Ycoords = resize([_dp_pts[1,size(_dp_pts) - 1],0],_dp_N,1);
     _dp_xmin = min(_dp_Xcoords);
     _dp_xmax = max(_dp_Xcoords);
     _dp_ymin = min(_dp_Ycoords);
     _dp_ymax = max(_dp_Ycoords);
-
     if (_dp_xmax>=0 && _dp_xmin<w#ind && _dp_ymax>=0 && _dp_ymin<h#ind, # Polygon is visible
-
       _dp_ymin = max(0,_dp_ymin);
       _dp_ymax = min(h#ind - 1,_dp_ymax);
-
       _dp_none = _dp_xmax + 1;
       (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _dp_none;
-
       _dp_n = 0;
       _dp_nn = 1;
       _dp_go_on = 1;
-      whiledo (_dp_go_on,
 
+      whiledo (_dp_go_on,
        _dp_an = (_dp_nn + 1)%_dp_N;
        _dp_x0 = _dp_pts[2*_dp_n];
        _dp_y0 = _dp_pts[2*_dp_n + 1];
-
        if (_dp_pts[2*_dp_nn + 1]==_dp_y0,
          whiledo (_dp_pts[2*_dp_an + 1]==_dp_y0, _dp_nn = _dp_an; (_dp_an+=1)%=_dp_N; );
        );
-
        _dp_x1 = _dp_pts[2*_dp_nn];
        _dp_y1 = _dp_pts[2*_dp_nn + 1];
-
        _dp_tn = _dp_an;
        whiledo (_dp_pts[2*_dp_tn + 1]==_dp_y1, (_dp_tn+=1)%=_dp_N);
 
        if (_dp_y0!=_dp_y1,
-
          _dp_y2 = _dp_pts[2*_dp_tn + 1];
          _dp_x01 = _dp_x1 - _dp_x0;
          _dp_y01 = _dp_y1 - _dp_y0;
@@ -16609,7 +16599,6 @@ math_lib :
            _dp_y0+=_dp_dy;
          );
        );
-
         _dp_go_on = _dp_nn>_dp_n;
         _dp_n = _dp_nn;
         _dp_nn = _dp_an;
