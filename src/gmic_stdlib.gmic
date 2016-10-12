@@ -16518,29 +16518,82 @@ math_lib :
   -v -
   -u "
   draw_circle(ind,P0,radius,opacity,color) = ( # Draw a circle centered at P0 on image #ind
+    unref(_dc_color);
+    _dc_wm1 = w#ind - 1;
+    _dc_hm1 = h#ind - 1;
     _dc_P0 = round(P0);
     _dc_radius = round(radius);
     _dc_opacity = opacity;
     _dc_color = resize(color,s#ind);
-    _dc_ymin = round(max(0,_dc_P0[1] - _dc_radius));
-    _dc_ymax = round(min(h#ind - 1,_dc_P0[1] + _dc_radius));
-    _dc_radius = (_dc_radius - 0.75)^2;
-    for (_dc_y = _dc_ymin, _dc_y<=_dc_ymax, ++_dc_y,
-      _dc_dx = _dc_radius - (_dc_y - _dc_P0[1])^2;
-      if (_dc_dx>=0,
-        _dc_dx^=0.5;
-        _dc_xmin = round(max(0,_dc_P0[0] - _dc_dx));
-        _dc_xmax = round(min(w#ind - 1,_dc_P0[0] + _dc_dx));
-        _dc_dx = _dc_xmax - _dc_xmin + 1;
-        for (_dc_c = 0, _dc_c<s#ind, ++_dc_c, copy(i(#ind,_dc_xmin,_dc_y,0,_dc_c),_dc_color[_dc_c],_dc_dx,1,0,_dc_opacity));
+    _dc_ymin = _dc_P0[1] - _dc_radius;
+    _dc_ymax = _dc_P0[1] + _dc_radius;
+    if (_dc_ymax>=0 && _dc_ymin<=_dc_wm1, # Circle is visible
+      _dc_ymin = max(_dc_ymin,0);
+      _dc_ymax = min(_dc_ymax,_dc_hm1);
+      _dc_radius = (_dc_radius - 0.75)^2;
+      for (_dc_y = _dc_ymin, _dc_y<=_dc_ymax, ++_dc_y,
+        _dc_dx = _dc_radius - (_dc_y - _dc_P0[1])^2;
+        if (_dc_dx>=0,
+          _dc_dx^=0.5;
+          _dc_xmin = max(_dc_P0[0] - _dc_dx,0);
+          _dc_xmax = min(_dc_P0[0] + _dc_dx,_dc_wm1);
+          if (_dc_xmax>=0 && _dc_xmin<=_dc_wm1,
+            _dc_xmin = max(_dc_xmin,0);
+            _dc_xmax = min(_dc_xmax,_dc_wm1);
+            _dc_dx = _dc_xmax - _dc_xmin + 1;
+            for (_dc_c = 0, _dc_c<s#ind, ++_dc_c, copy(i(#ind,_dc_xmin,_dc_y,0,_dc_c),_dc_color[_dc_c],_dc_dx,1,0,_dc_opacity));
+          );
+        );
       );
     );
     nan;
   );
 
+  draw_ellipse(ind,P0,r1,r2,angle,opacity,color) = (
+    unref(_de_color);
+    _de_wm1 = w#ind - 1;
+    _de_hm1 = h#ind - 1;
+    _de_P0 = round(P0);
+    _de_r1 = round(abs(r1));
+    _de_r2 = round(abs(r2));
+    _de_angle = angle*pi/180;
+    _de_opacity = opacity;
+    _de_color = resize(color,s#ind);
+    _de_u = cos(_de_angle);
+    _de_v = sin(_de_angle);
+    _de_rmax = max(_de_r1,_de_r2);
+    _de_l1 = (_de_rmax/max(_de_r1,1e-6))^2;
+    _de_l2 = (_de_rmax/max(_de_r2,1e-6))^2;
+    _de_ta = _de_l1*_de_u^2 + _de_l2*_de_v^2;
+    _de_tb = _de_u*_de_v*(_de_l1 - _de_l2);
+    _de_tc = _de_l1*_de_v^2 + _de_l2*_de_u^2;
+    _de_yb = sqrt(_de_ta*_de_rmax^2/(_de_ta*_de_tc - _de_tb^2));
+    _de_ymin = _de_P0[1] - _de_yb - 1;
+    _de_ymax = _de_P0[1] + _de_yb + 1;
+    if (_de_ymax>=0 && _de_ymin<=_de_hm1, # Ellipse is visible
+      _de_ymin = max(_de_ymin,0);
+      _de_ymax = min(_de_ymax,_de_hm1);
+      for (_de_y = _de_ymin, _de_y<=_de_ymax, ++_de_y,
+        _de_Y = _de_y - _de_P0[1] + (_de_y<_de_P0[1]?0.5:-0.5);
+        _de_delta = _de_tb^2*_de_Y^2 - _de_ta*(_de_tc*_de_Y^2 - _de_rmax^2);
+        _de_sdelta = _de_delta>0?sqrt(_de_delta)/_de_ta:0;
+        _de_bY = _de_tb*_de_Y/_de_ta;
+        _de_xmin = _de_P0[0] - 0.5 - _de_bY - _de_sdelta;
+        _de_xmax = _de_P0[0] + 0.5 - _de_bY + _de_sdelta;
+        if (_de_xmax>=0 && _de_xmin<=_de_wm1,
+          _de_xmin = max(_de_xmin,0);
+          _de_xmax = min(_de_xmax,_de_wm1);
+          _de_dx = _de_xmax - _de_xmin + 1;
+          for (_de_c = 0, _de_c<s#ind, ++_de_c, copy(i(_de_xmin,_de_y,0,_de_c),_de_color[_de_c],_de_dx,1,0,_de_opacity));
+        );
+      );
+    );
+  );
+
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
-    _dl_P0 = P0;
-    (_dl_P0P1 = P1)-=_dl_P0;
+    unref(_dl_color);
+    _dl_P0 = round(P0);
+    (_dl_P0P1 = round(P1))-=_dl_P0;
     _dl_opacity = opacity;
     _dl_color = color*abs(_dl_opacity);
     _dl_omopacity = 1 - max(_dl_opacity,0);
@@ -16553,11 +16606,12 @@ math_lib :
   );
 
   draw_polygon(ind,pts,opacity,color) = ( # Draw filled polygon on image #ind
-    unref(_dp_pts,_dp_wm1,_dp_N,_dp_Xcoords,_dp_Ycoords,_dp_Xs,_dp_Xsy);
+    unref(_dp_pts,_dp_color,_dp_N,_dp_Xcoords,_dp_Ycoords,_dp_Xs,_dp_Xsy);
+    _dp_wm1 = w#ind - 1;
+    _dp_hm1 = h#ind - 1;
     _dp_pts = round(pts);
     _dp_opacity = opacity;
     _dp_color = resize(color,s#ind);
-    const _dp_wm1 = w#ind - 1;
     const _dp_N = size(_dp_pts)/2;
     _dp_Xcoords = resize(_dp_pts,_dp_N,1);
     _dp_Ycoords = resize([_dp_pts[1,size(_dp_pts) - 1],0],_dp_N,1);
@@ -16566,8 +16620,8 @@ math_lib :
     _dp_ymin = min(_dp_Ycoords);
     _dp_ymax = max(_dp_Ycoords);
     if (_dp_xmax>=0 && _dp_xmin<w#ind && _dp_ymax>=0 && _dp_ymin<h#ind, # Polygon is visible
-      _dp_ymin = max(0,_dp_ymin);
-      _dp_ymax = min(h#ind - 1,_dp_ymax);
+      _dp_ymin = max(_dp_ymin,0);
+      _dp_ymax = min(_dp_ymax,_dp_hm1);
       _dp_none = _dp_xmax + 1;
       (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _dp_none;
       _dp_n = 0;
@@ -16610,9 +16664,10 @@ math_lib :
           dowhile (_dp_x0 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x0==_dp_none);
           if (_dp_x0!=_dp_none,
             dowhile (_dp_x1 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x1==_dp_none);
-            if (_dp_x1!=_dp_none,
-              _dp_x0 = max(0,_dp_x0);
-              _dp_dx = min(_dp_wm1,_dp_x1) - _dp_x0 + 1;
+            if (_dp_x1!=_dp_none && _dp_x1>=0 && _dp_x0<=_dp_wm1,
+              _dp_x0 = max(_dp_x0,0);
+              _dp_x1 = min(_dp_x1,_dp_wm1);
+              _dp_dx = _dp_x1 - _dp_x0 + 1;
               for (_dp_c = 0, _dp_c<s#ind, ++_dp_c, copy(i(_dp_x0,_dp_y0,0,_dp_c),_dp_color[_dp_c],_dp_dx,1,0,_dp_opacity));
             );
           );
@@ -16623,6 +16678,7 @@ math_lib :
   );
 
   draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
+    unref(_dr_color);
     _dr_P0 = round(P0);
     _dr_P1 = round(P1);
     _dr_opacity = opacity;
@@ -16641,7 +16697,7 @@ math_lib :
   );
 
   draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw spline P0-P1 with tangents T0,T1 on image #ind
-    unref(_ds_C,_ds_P0,_ds_P,_ds_t,_ds_dt,_ds_opacity,_ds_color);
+    unref(_ds_color);
     _ds_P0 = P0;
     _ds_P1 = P1;
     _ds_opacity = opacity;
@@ -16657,6 +16713,7 @@ math_lib :
   );
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
+    unref(_dt_color);
     _dt_A = round(P0);
     _dt_B = round(P1);
     _dt_C = round(P2);
