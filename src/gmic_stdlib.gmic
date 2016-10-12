@@ -1830,15 +1830,14 @@ _display_tensors : -check "${1=16}>0 && ${2=0.92}>=0" -skip "${3=1}"
     -r[0] .,. -n[0] 0,255 -*
   -endl -done -else -repeat $! -l[$>]
     w={w} h={h}
-    -* {($2*$1/2)^2/max(abs(im),abs(iM))}     # Normalize tensor values.
-    -s c -i.. .. -a c -s yx -r 2,2,1,1,-1     # Decompose field into list of 2x2 matrices.
-    (0.5,0;0,0.5) -+[^-1] . -rm.              # Add 0.5*Id to ensure tensor positivity.
-    -invert -y c -r $1,$1                     # Optimized code for ellipses drawing.
-    $1,$1,1,1,'x' --. {w/2}
-    $1,$1,1,1,'y' --. {h/2}
-    --sqr. -*.. ... -sqr... -i.. .. -a[-4--1] c
-    -*[^-1] . -rm. -compose_channels + -<= 1
-    -append_tiles $w,$h                       # Recompose ellipses as a tensor field.
+    -* {($2*$1/2)/max(abs(im),abs(iM))}     # Normalize tensor values.
+    {$1*w},{$1*h},1,1
+    -f.. ${-math_lib}"
+      X = ([ x,y ]+=0.5)*$1;
+      T = [ R, G, G, B ];
+      draw_ellipse(#1,X,T,1,1);
+    "
+    -rm..
   -endl -done -endif
   -v +
 
