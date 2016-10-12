@@ -16518,30 +16518,30 @@ math_lib :
   -v -
   -u "
   draw_circle(ind,P0,radius,opacity,color) = ( # Draw a circle centered at P0 on image #ind
-    unref(_dc_color);
-    _dc_wm1 = w#ind - 1;
-    _dc_hm1 = h#ind - 1;
-    _dc_P0 = round(P0);
-    _dc_radius = round(radius);
-    _dc_opacity = opacity;
-    _dc_color = resize(color,s#ind);
-    _dc_ymin = _dc_P0[1] - _dc_radius;
-    _dc_ymax = _dc_P0[1] + _dc_radius;
-    if (_dc_ymax>=0 && _dc_ymin<=_dc_wm1, # Circle is visible
-      _dc_ymin = max(_dc_ymin,0);
-      _dc_ymax = min(_dc_ymax,_dc_hm1);
-      _dc_radius = (_dc_radius - 0.75)^2;
-      for (_dc_y = _dc_ymin, _dc_y<=_dc_ymax, ++_dc_y,
-        _dc_dx = _dc_radius - (_dc_y - _dc_P0[1])^2;
-        if (_dc_dx>=0,
-          _dc_dx^=0.5;
-          _dc_xmin = max(_dc_P0[0] - _dc_dx,0);
-          _dc_xmax = min(_dc_P0[0] + _dc_dx,_dc_wm1);
-          if (_dc_xmax>=0 && _dc_xmin<=_dc_wm1,
-            _dc_xmin = max(_dc_xmin,0);
-            _dc_xmax = min(_dc_xmax,_dc_wm1);
-            _dc_dx = _dc_xmax - _dc_xmin + 1;
-            for (_dc_c = 0, _dc_c<s#ind, ++_dc_c, copy(i(#ind,_dc_xmin,_dc_y,0,_dc_c),_dc_color[_dc_c],_dc_dx,1,0,_dc_opacity));
+    unref(_color);
+    _wm1 = w#ind - 1;
+    _hm1 = h#ind - 1;
+    _P0 = round(P0);
+    _radius = round(radius);
+    _opacity = opacity;
+    _color = resize(color,s#ind);
+    _ymin = _P0[1] - _radius;
+    _ymax = _P0[1] + _radius;
+    if (_ymax>=0 && _ymin<=_wm1, # Circle is visible
+      _ymin = max(_ymin,0);
+      _ymax = min(_ymax,_hm1);
+      _radius = (_radius - 0.75)^2;
+      for (_y = _ymin, _y<=_ymax, ++_y,
+        _dx = _radius - (_y - _P0[1])^2;
+        if (_dx>=0,
+          _dx^=0.5;
+          _xmin = max(_P0[0] - _dx,0);
+          _xmax = min(_P0[0] + _dx,_wm1);
+          if (_xmax>=0 && _xmin<=_wm1,
+            _xmin = max(_xmin,0);
+            _xmax = min(_xmax,_wm1);
+            _dx = _xmax - _xmin + 1;
+            for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
           );
         );
       );
@@ -16549,126 +16549,126 @@ math_lib :
     nan;
   );
 
-  draw_ellipse(ind,P0,r1,r2,angle,opacity,color) = (
-    unref(_de_color);
-    _de_wm1 = w#ind - 1;
-    _de_hm1 = h#ind - 1;
-    _de_P0 = round(P0);
-    _de_r1 = round(abs(r1));
-    _de_r2 = round(abs(r2));
-    _de_angle = angle*pi/180;
-    _de_opacity = opacity;
-    _de_color = resize(color,s#ind);
-    _de_u = cos(_de_angle);
-    _de_v = sin(_de_angle);
-    _de_rmax = max(_de_r1,_de_r2);
-    _de_l1 = (_de_rmax/max(_de_r1,1e-6))^2;
-    _de_l2 = (_de_rmax/max(_de_r2,1e-6))^2;
-    _de_ta = _de_l1*_de_u^2 + _de_l2*_de_v^2;
-    _de_tb = _de_u*_de_v*(_de_l1 - _de_l2);
-    _de_tc = _de_l1*_de_v^2 + _de_l2*_de_u^2;
-    _de_yb = sqrt(_de_ta*_de_rmax^2/(_de_ta*_de_tc - _de_tb^2));
-    _de_ymin = _de_P0[1] - _de_yb - 1;
-    _de_ymax = _de_P0[1] + _de_yb + 1;
-    if (_de_ymax>=0 && _de_ymin<=_de_hm1, # Ellipse is visible
-      _de_ymin = max(_de_ymin,0);
-      _de_ymax = min(_de_ymax,_de_hm1);
-      for (_de_y = _de_ymin, _de_y<=_de_ymax, ++_de_y,
-        _de_Y = _de_y - _de_P0[1] + (_de_y<_de_P0[1]?0.5:-0.5);
-        _de_delta = _de_tb^2*_de_Y^2 - _de_ta*(_de_tc*_de_Y^2 - _de_rmax^2);
-        _de_sdelta = _de_delta>0?sqrt(_de_delta)/_de_ta:0;
-        _de_bY = _de_tb*_de_Y/_de_ta;
-        _de_xmin = _de_P0[0] - 0.5 - _de_bY - _de_sdelta;
-        _de_xmax = _de_P0[0] + 0.5 - _de_bY + _de_sdelta;
-        if (_de_xmax>=0 && _de_xmin<=_de_wm1,
-          _de_xmin = max(_de_xmin,0);
-          _de_xmax = min(_de_xmax,_de_wm1);
-          _de_dx = _de_xmax - _de_xmin + 1;
-          for (_de_c = 0, _de_c<s#ind, ++_de_c, copy(i(_de_xmin,_de_y,0,_de_c),_de_color[_de_c],_de_dx,1,0,_de_opacity));
+  draw_ellipse(ind,P0,r1,r2,angle,opacity,color) = ( # Draw an ellipse at P0 on image #ind
+    unref(_color);
+    _wm1 = w#ind - 1;
+    _hm1 = h#ind - 1;
+    _P0 = round(P0);
+    _r1 = round(abs(r1));
+    _r2 = round(abs(r2));
+    _angle = angle*pi/180;
+    _opacity = opacity;
+    _color = resize(color,s#ind);
+    _u = cos(_angle);
+    _v = sin(_angle);
+    _rmax = max(_r1,_r2);
+    _l1 = (_rmax/max(_r1,1e-6))^2;
+    _l2 = (_rmax/max(_r2,1e-6))^2;
+    _ta = _l1*_u^2 + _l2*_v^2;
+    _tb = _u*_v*(_l1 - _l2);
+    _tc = _l1*_v^2 + _l2*_u^2;
+    _yb = sqrt(_ta*_rmax^2/(_ta*_tc - _tb^2));
+    _ymin = _P0[1] - _yb - 1;
+    _ymax = _P0[1] + _yb + 1;
+    if (_ymax>=0 && _ymin<=_hm1, # Ellipse is visible
+      _ymin = max(_ymin,0);
+      _ymax = min(_ymax,_hm1);
+      for (_y = _ymin, _y<=_ymax, ++_y,
+        _Y = _y - _P0[1] + (_y<_P0[1]?0.5:-0.5);
+        _delta = _tb^2*_Y^2 - _ta*(_tc*_Y^2 - _rmax^2);
+        _sdelta = _delta>0?sqrt(_delta)/_ta:0;
+        _bY = _tb*_Y/_ta;
+        _xmin = _P0[0] - 0.5 - _bY - _sdelta;
+        _xmax = _P0[0] + 0.5 - _bY + _sdelta;
+        if (_xmax>=0 && _xmin<=_wm1,
+          _xmin = max(_xmin,0);
+          _xmax = min(_xmax,_wm1);
+          _dx = _xmax - _xmin + 1;
+          for (_c = 0, _c<s#ind, ++_c, copy(i(_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
         );
       );
     );
   );
 
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
-    unref(_dl_color);
-    _dl_P0 = round(P0);
-    (_dl_P0P1 = round(P1))-=_dl_P0;
-    _dl_opacity = opacity;
-    _dl_color = color*abs(_dl_opacity);
-    _dl_omopacity = 1 - max(_dl_opacity,0);
-    _dl_tmax = max(abs(_dl_P0P1));
-    for (_dl_t = 0, _dl_t<_dl_tmax, ++_dl_t,
-      _dl_P = round(_dl_P0 + _dl_t*_dl_P0P1/_dl_tmax);
-      I(#ind,_dl_P) = _dl_color + _dl_omopacity*I(#ind,_dl_P);
+    unref(_color);
+    _P0 = round(P0);
+    (_P0P1 = round(P1))-=_P0;
+    _opacity = opacity;
+    _color = color*abs(_opacity);
+    _omopacity = 1 - max(_opacity,0);
+    _tmax = max(abs(_P0P1));
+    for (_t = 0, _t<_tmax, ++_t,
+      _P = round(_P0 + _t*_P0P1/_tmax);
+      I(#ind,_P) = _color + _omopacity*I(#ind,_P);
     );
     nan;
   );
 
   draw_polygon(ind,pts,opacity,color) = ( # Draw filled polygon on image #ind
-    unref(_dp_pts,_dp_color,_dp_N,_dp_Xcoords,_dp_Ycoords,_dp_Xs,_dp_Xsy);
-    _dp_wm1 = w#ind - 1;
-    _dp_hm1 = h#ind - 1;
-    _dp_pts = round(pts);
-    _dp_opacity = opacity;
-    _dp_color = resize(color,s#ind);
-    const _dp_N = size(_dp_pts)/2;
-    _dp_Xcoords = resize(_dp_pts,_dp_N,1);
-    _dp_Ycoords = resize([_dp_pts[1,size(_dp_pts) - 1],0],_dp_N,1);
-    _dp_xmin = min(_dp_Xcoords);
-    _dp_xmax = max(_dp_Xcoords);
-    _dp_ymin = min(_dp_Ycoords);
-    _dp_ymax = max(_dp_Ycoords);
-    if (_dp_xmax>=0 && _dp_xmin<w#ind && _dp_ymax>=0 && _dp_ymin<h#ind, # Polygon is visible
-      _dp_ymin = max(_dp_ymin,0);
-      _dp_ymax = min(_dp_ymax,_dp_hm1);
-      _dp_none = _dp_xmax + 1;
-      (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _dp_none;
-      _dp_n = 0;
-      _dp_nn = 1;
-      _dp_go_on = 1;
+    unref(_pts,_color,_N,_Xcoords,_Ycoords,_Xs,_Xsy);
+    _wm1 = w#ind - 1;
+    _hm1 = h#ind - 1;
+    _pts = round(pts);
+    _opacity = opacity;
+    _color = resize(color,s#ind);
+    const _N = size(_pts)/2;
+    _xcoords = resize(_pts,_N,1);
+    _ycoords = resize([_pts[1,size(_pts) - 1],0],_N,1);
+    _xmin = min(_xcoords);
+    _xmax = max(_xcoords);
+    _ymin = min(_ycoords);
+    _ymax = max(_ycoords);
+    if (_xmax>=0 && _xmin<w#ind && _ymax>=0 && _ymin<h#ind, # Polygon is visible
+      _ymin = max(_ymin,0);
+      _ymax = min(_ymax,_hm1);
+      _none = _xmax + 1;
+      (_Xs = resize(_pts,_N*h#ind,0)) = _none;
+      _n = 0;
+      _nn = 1;
+      _go_on = 1;
 
-      whiledo (_dp_go_on,
-       _dp_an = (_dp_nn + 1)%_dp_N;
-       _dp_x0 = _dp_pts[2*_dp_n];
-       _dp_y0 = _dp_pts[2*_dp_n + 1];
-       if (_dp_pts[2*_dp_nn + 1]==_dp_y0,
-         whiledo (_dp_pts[2*_dp_an + 1]==_dp_y0, _dp_nn = _dp_an; (_dp_an+=1)%=_dp_N; );
+      whiledo (_go_on,
+       _an = (_nn + 1)%_N;
+       _x0 = _pts[2*_n];
+       _y0 = _pts[2*_n + 1];
+       if (_pts[2*_nn + 1]==_y0,
+         whiledo (_pts[2*_an + 1]==_y0, _nn = _an; (_an+=1)%=_N; );
        );
-       _dp_x1 = _dp_pts[2*_dp_nn];
-       _dp_y1 = _dp_pts[2*_dp_nn + 1];
-       _dp_tn = _dp_an;
-       whiledo (_dp_pts[2*_dp_tn + 1]==_dp_y1, (_dp_tn+=1)%=_dp_N);
+       _x1 = _pts[2*_nn];
+       _y1 = _pts[2*_nn + 1];
+       _tn = _an;
+       whiledo (_pts[2*_tn + 1]==_y1, (_tn+=1)%=_N);
 
-       if (_dp_y0!=_dp_y1,
-         _dp_y2 = _dp_pts[2*_dp_tn + 1];
-         _dp_x01 = _dp_x1 - _dp_x0;
-         _dp_y01 = _dp_y1 - _dp_y0;
-         _dp_y12 = _dp_y2 - _dp_y1;
-         _dp_dy = sign(_dp_y01);
-         _dp_tmax = max(1,abs(_dp_y01));
-         _dp_tend = _dp_tmax - (_dp_dy==sign(_dp_y12));
-         for (_dp_t = 0, _dp_t<=_dp_tend, ++_dp_t,
-           if (_dp_y0>=0 && _dp_y0<h#ind, _dp_Xs[_dp_n + _dp_y0*_dp_N] = round(_dp_x0 + _dp_t*_dp_x01/_dp_tmax));
-           _dp_y0+=_dp_dy;
+       if (_y0!=_y1,
+         _y2 = _pts[2*_tn + 1];
+         _x01 = _x1 - _x0;
+         _y01 = _y1 - _y0;
+         _y12 = _y2 - _y1;
+         _dy = sign(_y01);
+         _tmax = max(1,abs(_y01));
+         _tend = _tmax - (_dy==sign(_y12));
+         for (_t = 0, _t<=_tend, ++_t,
+           if (_y0>=0 && _y0<h#ind, _Xs[_n + _y0*_N] = round(_x0 + _t*_x01/_tmax));
+           _y0+=_dy;
          );
        );
-        _dp_go_on = _dp_nn>_dp_n;
-        _dp_n = _dp_nn;
-        _dp_nn = _dp_an;
+        _go_on = _nn>_n;
+        _n = _nn;
+        _nn = _an;
       );
 
-      for (_dp_y0 = _dp_ymin, _dp_y0<=_dp_ymax, ++_dp_y0,
-        _dp_Xsy = sort(_dp_Xs[_dp_y0*_dp_N,_dp_N]);
-        for (_dp_n = 0, _dp_n<_dp_N,
-          dowhile (_dp_x0 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x0==_dp_none);
-          if (_dp_x0!=_dp_none,
-            dowhile (_dp_x1 = _dp_Xsy[_dp_n++], _dp_n<_dp_N && _dp_x1==_dp_none);
-            if (_dp_x1!=_dp_none && _dp_x1>=0 && _dp_x0<=_dp_wm1,
-              _dp_x0 = max(_dp_x0,0);
-              _dp_x1 = min(_dp_x1,_dp_wm1);
-              _dp_dx = _dp_x1 - _dp_x0 + 1;
-              for (_dp_c = 0, _dp_c<s#ind, ++_dp_c, copy(i(_dp_x0,_dp_y0,0,_dp_c),_dp_color[_dp_c],_dp_dx,1,0,_dp_opacity));
+      for (_y0 = _ymin, _y0<=_ymax, ++_y0,
+        _Xsy = sort(_Xs[_y0*_N,_N]);
+        for (_n = 0, _n<_N,
+          dowhile (_x0 = _Xsy[_n++], _n<_N && _x0==_none);
+          if (_x0!=_none,
+            dowhile (_x1 = _Xsy[_n++], _n<_N && _x1==_none);
+            if (_x1!=_none && _x1>=0 && _x0<=_wm1,
+              _x0 = max(_x0,0);
+              _x1 = min(_x1,_wm1);
+              _dx = _x1 - _x0 + 1;
+              for (_c = 0, _c<s#ind, ++_c, copy(i(_x0,_y0,0,_c),_color[_c],_dx,1,0,_opacity));
             );
           );
         );
@@ -16678,82 +16678,90 @@ math_lib :
   );
 
   draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
-    unref(_dr_color);
-    _dr_P0 = round(P0);
-    _dr_P1 = round(P1);
-    _dr_opacity = opacity;
-    _dr_color = resize(color,s#ind);
-    _dr_xs = [ _dr_P0[0],_dr_P1[0] ];
-    _dr_ys = [ _dr_P0[1],_dr_P1[1] ];
-    _dr_xmin = max(0,min(_dr_xs));
-    _dr_xmax = min(w#ind - 1,max(_dr_xs));
-    _dr_ymin = max(0,min(_dr_ys));
-    _dr_ymax = min(h#ind - 1,max(_dr_ys));
-    _dr_dx = _dr_xmax - _dr_xmin + 1;
-    for (_dr_y = _dr_ymin, _dr_y<=_dr_ymax, ++_dr_y,
-      for (_dr_c = 0, _dr_c<s#ind, ++_dr_c, copy(i(#ind,_dr_xmin,_dr_y,0,_dr_c),_dr_color[_dr_c],_dr_dx,1,0,_dr_opacity));
+    unref(_color);
+    _wm1 = w#ind - 1;
+    _hm1 = h#ind - 1;
+    _P0 = round(P0);
+    _P1 = round(P1);
+    _opacity = opacity;
+    _color = resize(color,s#ind);
+    _Xcoords = [ _P0[0],_P1[0] ];
+    _Ycoords = [ _P0[1],_P1[1] ];
+    _xmin = min(_Xcoords);
+    _xmax = max(_Xcoords);
+    _ymin = min(_Ycoords);
+    _ymax = max(_Ycoords);
+    if (_xmax>=0 && _xmin<=_wm1 && _ymax>=0 && _ymin<=_hm1, # Rectangle is visible
+      _xmin = max(_xmin,0);
+      _xmax = min(_xmax,_wm1);
+      _ymin = max(_ymin,0);
+      _ymax = min(_ymax,_hm1);
+      _dx = _xmax - _xmin + 1;
+      for (_y = _ymin, _y<=_ymax, ++_y,
+        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
+      );
     );
     nan;
   );
 
   draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw spline P0-P1 with tangents T0,T1 on image #ind
-    unref(_ds_color);
-    _ds_P0 = P0;
-    _ds_P1 = P1;
-    _ds_opacity = opacity;
-    _ds_color = color;
-    _ds_C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ _ds_P0,P1,T0,T1 ],2);
-    _ds_dt = 10/max(abs(_ds_P1 - _ds_P0));
-    for (_ds_t = 0, _ds_t<1, _ds_t+=_ds_dt,
-      _ds_P = mul([_ds_t^3,_ds_t^2,_ds_t,1],_ds_C,2);
-      draw_line(#ind,_ds_P0,_ds_P,_ds_opacity,_ds_color);
-      _ds_P0 = _ds_P;
+    unref(_color);
+    _P0 = P0;
+    _P1 = P1;
+    _opacity = opacity;
+    _color = color;
+    _C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ _P0,P1,T0,T1 ],2);
+    _dt = 10/max(abs(_P1 - _P0));
+    for (_t = 0, _t<1, _t+=_dt,
+      _P = mul([_t^3,_t^2,_t,1],_C,2);
+      draw_line(#ind,_P0,_P,_opacity,_color);
+      _P0 = _P;
     );
     nan;
   );
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
-    unref(_dt_color);
-    _dt_A = round(P0);
-    _dt_B = round(P1);
-    _dt_C = round(P2);
-    if (_dt_A[1]>_dt_B[1],swap(_dt_A,_dt_B));
-    if (_dt_A[1]>_dt_C[1],swap(_dt_A,_dt_C));
-    if (_dt_B[1]>_dt_C[1],swap(_dt_B,_dt_C));
-    _dt_ymin = max(0,_dt_A[1]);
-    _dt_ymax = min(h#ind - 1,_dt_C[1]);
-    _dt_A[1]+=0.25;
-    _dt_C[1]+=0.25;
-    _dt_AB = _dt_B - _dt_A;
-    _dt_AC = _dt_C - _dt_A;
-    _dt_BC = _dt_C - _dt_B;
-    _dt_AB[1] = max(_dt_AB[1],0.5);
-    _dt_BC[1] = max(_dt_BC[1],0.5);
-    _dt_opacity = opacity;
-    _dt_color = resize(color,s#ind);
-    for (_dt_y = _dt_ymin, _dt_y<=_dt_ymax, ++_dt_y,
-      _dt_x0 = _dt_A[0] + (_dt_y - _dt_A[1])*_dt_AC[0]/_dt_AC[1];
-      if (_dt_y<=_dt_B[1],
-        _dt_x1 = _dt_B[0] + (_dt_y - _dt_B[1])*_dt_AB[0]/_dt_AB[1], # Upper part
-        _dt_x1 = _dt_C[0] + (_dt_y - _dt_C[1])*_dt_BC[0]/_dt_BC[1]  # Lower part
+    unref(_color);
+    _A = round(P0);
+    _B = round(P1);
+    _C = round(P2);
+    if (_A[1]>_B[1],swap(_A,_B));
+    if (_A[1]>_C[1],swap(_A,_C));
+    if (_B[1]>_C[1],swap(_B,_C));
+    _ymin = max(0,_A[1]);
+    _ymax = min(h#ind - 1,_C[1]);
+    _A[1]+=0.25;
+    _C[1]+=0.25;
+    _AB = _B - _A;
+    _AC = _C - _A;
+    _BC = _C - _B;
+    _AB[1] = max(_AB[1],0.5);
+    _BC[1] = max(_BC[1],0.5);
+    _opacity = opacity;
+    _color = resize(color,s#ind);
+    for (_y = _ymin, _y<=_ymax, ++_y,
+      _x0 = _A[0] + (_y - _A[1])*_AC[0]/_AC[1];
+      if (_y<=_B[1],
+        _x1 = _B[0] + (_y - _B[1])*_AB[0]/_AB[1], # Upper part
+        _x1 = _C[0] + (_y - _C[1])*_BC[0]/_BC[1]  # Lower part
       );
-      if (_dt_x0>_dt_x1,swap(_dt_x0,_dt_x1));
-      _dt_x0 = round(max(0,_dt_x0 - 0.25));
-      _dt_x1 = round(min(w#ind - 1,_dt_x1 + 0.25));
-      (_dt_x1-=_dt_x0)+=1;
-      for (_dt_c = 0, _dt_c<s#ind, ++_dt_c, copy(i(#ind,_dt_x0,_dt_y,0,_dt_c),_dt_color[_dt_c],_dt_x1,1,0,_dt_opacity));
+      if (_x0>_x1,swap(_x0,_x1));
+      _x0 = round(max(0,_x0 - 0.25));
+      _x1 = round(min(w#ind - 1,_x1 + 0.25));
+      (_x1-=_x0)+=1;
+      for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_color[_c],_x1,1,0,_opacity));
     );
     nan;
   );
 
   map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
     unref(x#,_k);
-    for (_m_k = 0, _m_k<size(V#), ++_m_k, x# = V#[_m_k]; V#[_m_k] = fnx#);
+    for (_k = 0, _k<size(V#), ++_k, x# = V#[_k]; V#[_k] = fnx#);
     V#;
   );
 
   swap(x,y) = ( # Swap content of variables x and y
-    unref(_s_tmp); _s_tmp = x#; x# = y#; y# = _s_tmp;
+    unref(_tmp); _tmp = x#; x# = y#; y# = _tmp;
   );
   "
   -v +
