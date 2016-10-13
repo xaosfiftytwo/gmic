@@ -854,8 +854,8 @@ _help_usage :
 \n          (and returns its value).
 \n       . '"${c}"debug(expression)"$n" prints detailed debug information about the sequence of operations
 \n          done by the math parser to evaluate the expression (and returns its value).
-\n       . '"${c}"display(_X)"$n" displays the contents of the specified vector '"${c}"X"$n"', and wait for user events.
-\n          if no arguments are provided, a memory snapshot of the math parser environment is displayed.
+\n       . '"${c}"display(_X)"$n" prints and displays the contents of the specified vector '"${c}"X"$n"', and wait for user events.
+\n          if no arguments are provided, a memory snapshot of the math parser environment is displayed instead.
 \n       . '"${c}"init(expression)"$n" evaluates the specified expression only once, even when multiple
 \n          evaluations are required (e.g. in '"${c}"-fill init(foo=0);++foo"$n"').
 \n       . '"${c}"copy(dest,src,_nb_elts,_inc_d,_inc_s,_opacity)"$n" copies an entire memory block of '"${c}"nb_elts"$n"'
