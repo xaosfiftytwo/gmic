@@ -1813,35 +1813,41 @@ dt :
   -v - _gmic_s="$?" -v +
   -_display_tensors $*
 
-#@gmic display_tensors : _size_factor>0,_ellipse_factor>=0,_colored_mode={ 0 | 1 }
+#@gmic display_tensors : _size_factor>0,_ellipse_factor>=0,_color_mode={ 0 | 1 },_outline>=0
 #@gmic : Render selected mask field of 2x2 tensors with ellipses.
 #@gmic : (eq. to '-dt').
-#@gmic : Default values: 'size_factor=16', 'ellipse_factor=0.92', 'color_mode=1'.
+#@gmic : Default values: 'size_factor=16', 'ellipse_factor=0.92', 'color_mode=1' and 'outline=0'.
 #@gmic : $ image.jpg -diffusiontensors 0.7,0.6 -crop 60,10,90,30 --display_tensors ,
 #@gmic : $$
 display_tensors :
   -v - _gmic_s="$?" -v +
   -_$0 $*
 
-_display_tensors : -check "${1=16}>0 && ${2=0.92}>=0" -skip "${3=1}"
-  -e[0--3] "Render field of 2x2 tensors from image"$_gmic_s", with size factor $1, ellipse factor $2 in "${-arg\ 1+!$3,colored,masked}" mode."
-  -v -
-  -if {$3} -repeat $! -l[$>]
-    --_display_tensors $1,$2,0
-    -s[0] c --min[0,2] -*[1] -1 -+[1,-1] -a[0-2] c
-    -r[0] .,. -n[0] 0,255 -*
-  -endl -done -else -repeat $! -l[$>]
-    w={w} h={h}
-    -* {($2*$1/2)/max(abs(im),abs(iM))}     # Normalize tensor values.
-    {$1*w},{$1*h},1,1
+_display_tensors : -check "${1=16}>0 && ${2=0.92}>=0 && isval(${3=1}) && ${4=0}>=0"
+  -e[0--3] "Render field of 2x2 tensors from image"$_gmic_s", with size factor $1, ellipse factor $2 in "${-arg\ 1+!$3,color,monochrome}" mode and outline $4."
+  -v - -repeat $! -l[$>]
+    -* {($2*$1/2)/max(abs(im),abs(iM))} # Normalize tensor values.
+    {$1*w},{$1*h},1,{$3==1?3:1}
     -f.. ${-math_lib}"
       X = ([ x,y ]+=0.5)*$1;
       T = [ R, G, G, B ];
-      draw_ellipse(#1,X,T,1,1);
+      E = eig(T);
+      r1 = E[0];
+      r2 = E[1];
+      ang = atan2(E[3],E[2])*180/pi;
+      if (!$3,
+        # Monochrome rendering.
+        if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
+        draw_ellipse(#1,X,r1,r2,ang,1,255),
+
+        # Colored rendering.
+        C = hsv2rgb([ang,1-r2/r1,3*r1/($1*$2)]);
+        if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
+        draw_ellipse(#1,X,r1,r2,ang,1,C);
+      );
     "
     -rm..
-  -endl -done -endif
-  -v +
+  -endl -done -v +
 
 #@gmic dw : eq. to '-display_warp'.
 dw :
@@ -16592,11 +16598,6 @@ math_lib :
     nan;
   );
 
-  draw_ellipse(ind,P0,T,opacity,color) = ( # Draw ellipse defined by 2x2 tensor T at P0 on image #ind
-    _eig = eig(T);
-    draw_ellipse(#ind,P0,_eig[0],_eig[1],180*atan2(_eig[3],_eig[2])/pi,opacity,color);
-  );
-
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
     unref(_color);
     _P0 = round(P0);
@@ -16759,6 +16760,20 @@ math_lib :
       for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_color[_c],_x1,1,0,_opacity));
     );
     nan;
+  );
+
+  hsv2rgb(I) = ( # Convert HSV vector to RGB
+    _I = I;
+    _I[0]%=360;
+    _I[1] = cut(_I[1],0,1);
+    _I[2] = cut(_I[2],0,1);
+    _c = _I[2]*_I[1];
+    _x = _c*(1-abs((_I[0]/60)%2-1));
+    ((_I[0]<=60?[_c,_x,0]:
+      _I[0]<=120?[_x,_c,0]:
+      _I[0]<=180?[0,_c,_x]:
+      _I[0]<=240?[0,_x,_c]:
+      _I[0]<=300?[_x,0,_c]:[_c,0,_x])+=_I[2] - _c)*=255;
   );
 
   map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
