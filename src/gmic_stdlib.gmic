@@ -8154,7 +8154,7 @@ denoise_haar : -check "${1=1.4}>=0 && isint(${2=0}) && $2>=0 && isint(${3=10}) &
 #@gmic : $ image.jpg --noise 20 -c[-1] 0,255 --denoise_patchpca[-1] ,
 denoise_patchpca : -check "${1=1.8} && $1>=0 && isint(${2=7}) && $2>0 && isint(${3=11}) && $3>0 && isint(${4=5}) && $4>0"
   -e[^-1] "Denoise image$? using patch-pca, with strength $1, patch size $2, lookup size $3 and spatial sampling $4."
-  -v - -repeat $! -l[$>]
+  -v - -repeat $! -l[$>] nm={n}
     N2={$2*$2} M2={$3*$3} stdnoise=${-std_noise}
     100%,100%,1,100% -nm. aggreg
     100%,100% -nm. weights
@@ -8201,7 +8201,7 @@ denoise_patchpca : -check "${1=1.8} && $1>=0 && isint(${2=7}) && $2>0 && isint($
         )
       );
     0);0"
-    -max[weights] 0.01 -/[aggreg,weights] -k[aggreg]
+    -max[weights] 0.01 -/[aggreg,weights] -k[aggreg] -nm $nm
   -endl -done -v +
 
 #@gmic deriche : std_variation>=0[%],order={ 0 | 1 | 2 },axis={ x | y | z | c },_boundary : (+)
