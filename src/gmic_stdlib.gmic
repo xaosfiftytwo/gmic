@@ -16579,8 +16579,8 @@ math_lib :
         _delta = _tb^2*_Y^2 - _ta*(_tc*_Y^2 - _rmax^2);
         _sdelta = _delta>0?sqrt(_delta)/_ta:0;
         _bY = _tb*_Y/_ta;
-        _xmin = _P0[0] - 0.5 - _bY - _sdelta;
-        _xmax = _P0[0] + 0.5 - _bY + _sdelta;
+        _xmin = int(_P0[0] - 0.5 - _bY - _sdelta);
+        _xmax = int(_P0[0] + 0.5 - _bY + _sdelta);
         if (_xmax>=0 && _xmin<=_wm1,
           _xmin = max(_xmin,0);
           _xmax = min(_xmax,_wm1);
