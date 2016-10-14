@@ -1808,28 +1808,30 @@ display_quiver :
 _display_quiver : -check "${1=16}>0 && ${2=1.5}>=0 && isval(${3=2})"
   -e[0--3] "Render field of 2d arrows from image"$_gmic_s", with size factor $1, arrow size $2 in "${-arg\ 1+!$3,color,monochrome}" mode."
   -v - -repeat $! -l[$>]
-    --norm. -*.. {$1*$2/max(1e-6,iM)} -rm. # Normalize vector values.
-    {$1*w},{$1*h},1,{$3==2?3:1}
+    --norm. -/.. {max(1e-6,iM)} -rm. # Normalize vector values.
+    {$1*w},{$1*h},1,{"1<<cut($3,0,2)"}
     -f.. "
       init(C = resize([255],s#1,1));
       "${-math_lib}"
       len = norm2(I(x,y));
       ang = atan2(i(x,y,0,1),i(x,y,0,0))*180/pi;
       P = [ -0.5,-0.05, 0.3,-0.05, 0.2,-0.25, 0.5,0, 0.2,0.25, 0.3,0.05, -0.5,0.05 ];
-      P*=len;
+      P*=$1*$2*len;
       X = resize([(x+0.5)*w#1/w,(y+0.5)*h#1/h],size(P),0,2);
       X+=mul(P,rot(ang),2);
       if ($3,
-        v = max(0.5,3*len/($1*$2));
+        v = min(1,max(0.5,3*len));
         if ($3==1,
-          C = 255*v,
-          C = hsv2rgb([ ang,1,v ]);
+          C = [ 255*v,255 ],
+          C = [ hsv2rgb([ ang,1,v ]), 255 ];
         );
       );
-#      draw_polygon(#1,X,1,C);
-      draw_triangle(#1,X[0,2],X[2,2],X[12,2],1,C);
-      draw_triangle(#1,X[2,2],X[10,2],X[12,2],1,C);
-      draw_triangle(#1,X[4,2],X[6,2],X[8,2],1,C);
+      for (k = 0, k<3, ++k,
+        i0 = arg(k + 1,0,2,4);
+        i1 = arg(k + 1,2,10,6);
+        i2 = arg(k + 1,12,12,8);
+        draw_triangle(#1,X[i0,2],X[i1,2],X[i2,2],1,C);
+      );
       I"
     -rm..
   -endl -done -v +
@@ -1871,9 +1873,9 @@ _display_tensors : -check "${1=16}>0 && ${2=1.5}>=0 && isval(${3=2}) && ${4=2}>=
   -e[0--3] "Render field of 2x2 tensors from image"$_gmic_s", with size factor $1, ellipse size $2 in "${-arg\ 1+!$3,color,monochrome}" mode and outline $4."
   -v - -repeat $! -l[$>]
     -* {($2*$1/2)/max(abs(im),abs(iM))} # Normalize tensor values.
-    {$1*w},{$1*h},1,{$3==2?3:1}
+    {$1*w},{$1*h},1,{"1<<cut($3,0,2)"}
     -f.. "
-      init(C = resize([255],s#1,1));
+      init(C = resize([255],s#1,1); Co = resize([0],s#1,1); Co[s#1 - 1] = 255);
       "${-math_lib}"
       X = ([ x,y ]+=0.5)*$1;
       T = [ R, G, G, B ];
@@ -1881,15 +1883,14 @@ _display_tensors : -check "${1=16}>0 && ${2=1.5}>=0 && isval(${3=2}) && ${4=2}>=
       r1 = E[0];
       r2 = E[1];
       ang = atan2(E[3],E[2])*180/pi;
-      if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
       if ($3,
-        v = max(0.5,3*r1/($1*$2));
+        v = min(1,max(0.5,3*r1/($1*$2)));
         if ($3==1,
-          C = 255*v,
-          C = hsv2rgb([ 2*ang,1-r2/r1,v ]);
+          C = [ 255*v,255 ],
+          C = [ hsv2rgb([ 2*ang,1-r2/r1,v ]), 255 ];
         );
       );
-      draw_ellipse(#1,X,r1,r2,ang,1,C);
+      for (k = 1, k>=0, --k, draw_ellipse(#1,X,r1 + k*$4,r2 + k*$4,ang,1,arg(k + 1,C,Co)));
       I"
     -rm..
   -endl -done -v +
