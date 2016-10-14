@@ -1841,7 +1841,7 @@ _display_tensors : -check "${1=16}>0 && ${2=1.2}>=0 && isval(${3=1}) && ${4=2}>=
         draw_ellipse(#1,X,r1,r2,ang,1,255),
 
         # Colored rendering.
-        C = hsv2rgb([ang,1-r2/r1,3*r1/($1*$2)]);
+        C = hsv2rgb([2*ang,1-r2/r1,3*r1/($1*$2)]);
         if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
         draw_ellipse(#1,X,r1,r2,ang,1,C);
       );
