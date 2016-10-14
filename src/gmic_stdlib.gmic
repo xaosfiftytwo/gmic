@@ -1826,11 +1826,10 @@ _display_quiver : -check "${1=16}>0 && ${2=1.5}>=0 && isval(${3=2})"
           C = hsv2rgb([ ang,1,v ]);
         );
       );
-      draw_polygon(#1,X,1,C);
-      # draw_triangle(#1,X[0,2],X[2,2],X[12,2],1,C);
-      # draw_triangle(#1,X[2,2],X[10,2],X[12,2],1,C);
-      # draw_triangle(#1,X[4,2],X[6,2],X[8,2],1,C);
-
+#      draw_polygon(#1,X,1,C);
+      draw_triangle(#1,X[0,2],X[2,2],X[12,2],1,C);
+      draw_triangle(#1,X[2,2],X[10,2],X[12,2],1,C);
+      draw_triangle(#1,X[4,2],X[6,2],X[8,2],1,C);
       I"
     -rm..
   -endl -done -v +
@@ -16797,14 +16796,14 @@ math_lib :
     _xmax = max(_A[0],_B[0],_C[0]);
     if (_xmax>=0 && _xmin<=_wm1 && _C[1]>=0 && _A[1]<=_hm1, # Triangle is visible
       _xmin = max(_xmin,0);
-      _xmax = max(_xmax,_wm1);
+      _xmax = min(_xmax,_wm1);
       _ymin = max(_A[1],0);
       _ymax = min(_C[1],_hm1);
       if (_ymin==_ymax,
 
         # Particular case of horizontal line.
         _dx = _xmax - _xmin + 1;
-        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_ymin,0,_c),_dt_color[_c],_dx,1,0,_opacity));
+        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_ymin,0,_c),_dt_color[_c],_dx,1,0,_opacity)),
 
         # General case.
         _AB = _B - _A;
