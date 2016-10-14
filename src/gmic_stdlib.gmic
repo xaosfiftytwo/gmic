@@ -16525,13 +16525,13 @@ math_lib :
   -v -
   -u "
   draw_circle(ind,P0,radius,opacity,color) = ( # Draw a circle centered at P0 on image #ind
-    unref(_color);
+    unref(_dc_color);
     _wm1 = w#ind - 1;
     _hm1 = h#ind - 1;
     _P0 = round(P0);
     _radius = round(radius);
     _opacity = opacity;
-    _color = resize(color,s#ind);
+    _dc_color = resize(color,s#ind);
     _ymin = _P0[1] - _radius;
     _ymax = _P0[1] + _radius;
     if (_ymax>=0 && _ymin<=_wm1, # Circle is visible
@@ -16548,7 +16548,7 @@ math_lib :
             _xmin = max(_xmin,0);
             _xmax = min(_xmax,_wm1);
             _dx = _xmax - _xmin + 1;
-            for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
+            for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_dc_color[_c],_dx,1,0,_opacity));
           );
         );
       );
@@ -16557,7 +16557,7 @@ math_lib :
   );
 
   draw_ellipse(ind,P0,r1,r2,angle,opacity,color) = ( # Draw an ellipse at P0 on image #ind
-    unref(_color);
+    unref(_de_color);
     _wm1 = w#ind - 1;
     _hm1 = h#ind - 1;
     _P0 = round(P0);
@@ -16565,7 +16565,7 @@ math_lib :
     _r2 = abs(r2);
     _angle = angle*pi/180;
     _opacity = opacity;
-    _color = resize(color,s#ind);
+    _de_color = resize(color,s#ind);
     _u = cos(_angle);
     _v = sin(_angle);
     _rmax = max(_r1,_r2);
@@ -16591,7 +16591,7 @@ math_lib :
           _xmin = max(_xmin,0);
           _xmax = min(_xmax,_wm1);
           _dx = _xmax - _xmin + 1;
-          for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
+          for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_de_color[_c],_dx,1,0,_opacity));
         );
       );
     );
@@ -16599,61 +16599,64 @@ math_lib :
   );
 
   draw_line(ind,P0,P1,opacity,color) = ( # Draw a line P0-P1 on image #ind
-    unref(_color);
+    unref(_dl_color);
     _P0 = round(P0);
     (_P0P1 = round(P1))-=_P0;
     _opacity = opacity;
-    _color = color*abs(_opacity);
+    _dl_color = resize(color,s#ind)*=abs(_opacity);
     _omopacity = 1 - max(_opacity,0);
     _tmax = max(abs(_P0P1));
     for (_t = 0, _t<_tmax, ++_t,
       _P = round(_P0 + _t*_P0P1/_tmax);
-      I(#ind,_P) = _color + _omopacity*I(#ind,_P);
+      I(#ind,_P) = _dl_color + _omopacity*I(#ind,_P);
     );
     nan;
   );
 
   draw_polygon(ind,pts,opacity,color) = ( # Draw filled polygon on image #ind
-    unref(_pts,_color,_N,_Xcoords,_Ycoords,_Xs,_Xsy);
+    unref(_dp_pts,_dp_color,_dp_N,_dp_Xcoords,_dp_Ycoords,_dp_Xs,_dp_Xsy);
     _wm1 = w#ind - 1;
     _hm1 = h#ind - 1;
-    _pts = round(pts);
+    _dp_pts = round(pts);
     _opacity = opacity;
-    _color = resize(color,s#ind);
-    const _N = size(_pts)/2;
-    _xcoords = resize(_pts,_N,1);
-    _ycoords = resize([_pts[1,size(_pts) - 1],0],_N,1);
-    _xmin = min(_xcoords);
-    _xmax = max(_xcoords);
-    _ymin = min(_ycoords);
-    _ymax = max(_ycoords);
+    _dp_color = resize(color,s#ind);
+    const _dp_N = size(_dp_pts)/2;
+    _dp_Xcoords = resize(_dp_pts,_dp_N,1);
+    _dp_Ycoords = resize([_dp_pts[1,size(_dp_pts) - 1],0],_dp_N,1);
+    _xmin = min(_dp_Xcoords);
+    _xmax = max(_dp_Xcoords);
+    _ymin = min(_dp_Ycoords);
+    _ymax = max(_dp_Ycoords);
     if (_xmax>=0 && _xmin<w#ind && _ymax>=0 && _ymin<h#ind, # Polygon is visible
+      _go_on = 1;
       _ymin = max(_ymin,0);
       _ymax = min(_ymax,_hm1);
       if (_ymin==_ymax,
-        draw_line(#ind,[_xmin,_ymin],[_xmax,_ymax],opacity,color);
+        _go_on = 0;
+        if (_xmin==_xmax,
+          I(#ind,_xmin,_xmax) = _dp_color; 0,
+          draw_line(#ind,[_xmin,_ymin],[_xmax,_ymax],opacity,_dp_color);
+        );
       );
-
       _none = _xmax + 1;
-      (_Xs = resize(_pts,_N*h#ind,0)) = _none;
+      (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _none;
       _n = 0;
       _nn = 1;
-      _go_on = 1;
 
       whiledo (_go_on,
-       _an = (_nn + 1)%_N;
-       _x0 = _pts[2*_n];
-       _y0 = _pts[2*_n + 1];
-       if (_pts[2*_nn + 1]==_y0,
-         whiledo (_pts[2*_an + 1]==_y0, _nn = _an; (_an+=1)%=_N; );
+       _an = (_nn + 1)%_dp_N;
+       _x0 = _dp_pts[2*_n];
+       _y0 = _dp_pts[2*_n + 1];
+       if (_dp_pts[2*_nn + 1]==_y0,
+         whiledo (_dp_pts[2*_an + 1]==_y0, _nn = _an; (_an+=1)%=_dp_N; );
        );
-       _x1 = _pts[2*_nn];
-       _y1 = _pts[2*_nn + 1];
+       _x1 = _dp_pts[2*_nn];
+       _y1 = _dp_pts[2*_nn + 1];
        _tn = _an;
-       whiledo (_pts[2*_tn + 1]==_y1, (_tn+=1)%=_N);
+       whiledo (_dp_pts[2*_tn + 1]==_y1, (_tn+=1)%=_dp_N);
 
        if (_y0!=_y1,
-         _y2 = _pts[2*_tn + 1];
+         _y2 = _dp_pts[2*_tn + 1];
          _x01 = _x1 - _x0;
          _y01 = _y1 - _y0;
          _y12 = _y2 - _y1;
@@ -16661,7 +16664,7 @@ math_lib :
          _tmax = max(1,abs(_y01));
          _tend = _tmax - (_dy==sign(_y12));
          for (_t = 0, _t<=_tend, ++_t,
-           if (_y0>=0 && _y0<h#ind, _Xs[_n + _y0*_N] = round(_x0 + _t*_x01/_tmax));
+           if (_y0>=0 && _y0<h#ind, _dp_Xs[_n + _y0*_dp_N] = round(_x0 + _t*_x01/_tmax));
            _y0+=_dy;
          );
        );
@@ -16671,16 +16674,16 @@ math_lib :
       );
 
       for (_y0 = _ymin, _y0<=_ymax, ++_y0,
-        _Xsy = sort(_Xs[_y0*_N,_N]);
-        for (_n = 0, _n<_N,
-          dowhile (_x0 = _Xsy[_n++], _n<_N && _x0==_none);
+        _dp_Xsy = sort(_dp_Xs[_y0*_dp_N,_dp_N]);
+        for (_n = 0, _n<_dp_N,
+          dowhile (_x0 = _dp_Xsy[_n++], _n<_dp_N && _x0==_none);
           if (_x0!=_none,
-            dowhile (_x1 = _Xsy[_n++], _n<_N && _x1==_none);
+            dowhile (_x1 = _dp_Xsy[_n++], _n<_dp_N && _x1==_none);
             if (_x1!=_none && _x1>=0 && _x0<=_wm1,
               _x0 = max(_x0,0);
               _x1 = min(_x1,_wm1);
               _dx = _x1 - _x0 + 1;
-              for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y0,0,_c),_color[_c],_dx,1,0,_opacity));
+              for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y0,0,_c),_dp_color[_c],_dx,1,0,_opacity));
             );
           );
         );
@@ -16690,13 +16693,13 @@ math_lib :
   );
 
   draw_rectangle(ind,P0,P1,opacity,color) = ( # Draw rectangle P0-P1 on image #ind
-    unref(_color);
+    unref(_dr_color);
     _wm1 = w#ind - 1;
     _hm1 = h#ind - 1;
     _P0 = round(P0);
     _P1 = round(P1);
     _opacity = opacity;
-    _color = resize(color,s#ind);
+    _dr_color = resize(color,s#ind);
     _Xcoords = [ _P0[0],_P1[0] ];
     _Ycoords = [ _P0[1],_P1[1] ];
     _xmin = min(_Xcoords);
@@ -16710,30 +16713,30 @@ math_lib :
       _ymax = min(_ymax,_hm1);
       _dx = _xmax - _xmin + 1;
       for (_y = _ymin, _y<=_ymax, ++_y,
-        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_color[_c],_dx,1,0,_opacity));
+        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_y,0,_c),_dr_color[_c],_dx,1,0,_opacity));
       );
     );
     nan;
   );
 
   draw_spline(ind,P0,T0,P1,T1,opacity,color) = ( # Draw spline P0-P1 with tangents T0,T1 on image #ind
-    unref(_color);
+    unref(_ds_color);
     _P0 = P0;
     _P1 = P1;
     _opacity = opacity;
-    _color = color;
+    _ds_color = color;
     _C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ _P0,P1,T0,T1 ],2);
     _dt = 10/max(abs(_P1 - _P0));
     for (_t = 0, _t<1, _t+=_dt,
       _P = mul([_t^3,_t^2,_t,1],_C,2);
-      draw_line(#ind,_P0,_P,_opacity,_color);
+      draw_line(#ind,_P0,_P,_opacity,_ds_color);
       _P0 = _P;
     );
     nan;
   );
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
-    unref(_color);
+    unref(_dt_color);
     _A = round(P0);
     _B = round(P1);
     _C = round(P2);
@@ -16750,7 +16753,7 @@ math_lib :
     _AB[1] = max(_AB[1],0.5);
     _BC[1] = max(_BC[1],0.5);
     _opacity = opacity;
-    _color = resize(color,s#ind);
+    _dt_color = resize(color,s#ind);
     for (_y = _ymin, _y<=_ymax, ++_y,
       _x0 = _A[0] + (_y - _A[1])*_AC[0]/_AC[1];
       if (_y<=_B[1],
@@ -16761,7 +16764,7 @@ math_lib :
       _x0 = round(max(0,_x0 - 0.25));
       _x1 = round(min(w#ind - 1,_x1 + 0.25));
       (_x1-=_x0)+=1;
-      for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_color[_c],_x1,1,0,_opacity));
+      for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_dt_color[_c],_x1,1,0,_opacity));
     );
     nan;
   );
