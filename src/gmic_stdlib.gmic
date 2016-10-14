@@ -1828,23 +1828,18 @@ _display_tensors : -check "${1=16}>0 && ${2=1.2}>=0 && isval(${3=1}) && ${4=2}>=
   -v - -repeat $! -l[$>]
     -* {($2*$1/2)/max(abs(im),abs(iM))} # Normalize tensor values.
     {$1*w},{$1*h},1,{$3==1?3:1}
-    -f.. ${-math_lib}"
+    -f.. "
+      init(C = resize([255],s#1,1));
+      "${-math_lib}"
       X = ([ x,y ]+=0.5)*$1;
       T = [ R, G, G, B ];
       E = eig(T);
       r1 = E[0];
       r2 = E[1];
       ang = atan2(E[3],E[2])*180/pi;
-      if (!$3,
-        # Monochrome rendering.
-        if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
-        draw_ellipse(#1,X,r1,r2,ang,1,255),
-
-        # Colored rendering.
-        C = hsv2rgb([2*ang,1-r2/r1,3*r1/($1*$2)]);
-        if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
-        draw_ellipse(#1,X,r1,r2,ang,1,C);
-      );
+      if ($4,draw_ellipse(#1,X,r1+$4,r2+$4,ang,1,0));
+      if ($3, C = hsv2rgb([2*ang,1-r2/r1,max(0.25,3*r1/($1*$2))]));
+      draw_ellipse(#1,X,r1,r2,ang,1,C);
     "
     -rm..
   -endl -done -v +
@@ -16634,8 +16629,9 @@ math_lib :
       if (_ymin==_ymax,
         _go_on = 0;
         if (_xmin==_xmax,
-          I(#ind,_xmin,_xmax) = _dp_color; 0,
-          draw_line(#ind,[_xmin,_ymin],[_xmax,_ymax],opacity,_dp_color);
+          I(#ind,_xmin,_xmax) = _dp_color; nan,
+          _dx = _xmax - _xmin + 1;
+          for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_ymin,0,_c),_dp_color[_c],_dx,1,0,_opacity));
         );
       );
       _none = _xmax + 1;
@@ -16737,6 +16733,8 @@ math_lib :
 
   draw_triangle(ind,P0,P1,P2,opacity,color) = ( # Draw triangle P0-P1-P2 on image #ind
     unref(_dt_color);
+    _wm1 = w#ind - 1;
+    _hm1 = h#ind - 1;
     _A = round(P0);
     _B = round(P1);
     _C = round(P2);
@@ -16744,7 +16742,7 @@ math_lib :
     if (_A[1]>_C[1],swap(_A,_C));
     if (_B[1]>_C[1],swap(_B,_C));
     _ymin = max(0,_A[1]);
-    _ymax = min(h#ind - 1,_C[1]);
+    _ymax = min(_hm1,_C[1]);
     _A[1]+=0.25;
     _C[1]+=0.25;
     _AB = _B - _A;
@@ -16762,7 +16760,7 @@ math_lib :
       );
       if (_x0>_x1,swap(_x0,_x1));
       _x0 = round(max(0,_x0 - 0.25));
-      _x1 = round(min(w#ind - 1,_x1 + 0.25));
+      _x1 = round(min(_wm1,_x1 + 0.25));
       (_x1-=_x0)+=1;
       for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_dt_color[_c],_x1,1,0,_opacity));
     );
