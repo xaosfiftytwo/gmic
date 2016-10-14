@@ -1827,6 +1827,10 @@ _display_quiver : -check "${1=16}>0 && ${2=1.5}>=0 && isval(${3=2})"
         );
       );
       draw_polygon(#1,X,1,C);
+      # draw_triangle(#1,X[0,2],X[2,2],X[12,2],1,C);
+      # draw_triangle(#1,X[2,2],X[10,2],X[12,2],1,C);
+      # draw_triangle(#1,X[4,2],X[6,2],X[8,2],1,C);
+
       I"
     -rm..
   -endl -done -v +
@@ -16675,13 +16679,10 @@ math_lib :
       _ymax = min(_ymax,_hm1);
       if (_ymin==_ymax,
         _go_on = 0;
-        if (_xmin==_xmax,
-          I(#ind,_xmin,_xmax) = _dp_color; nan,
-          _xmin = max(_xmin,0);
-          _xmax = min(_xmax,_wm1);
-          _dx = _xmax - _xmin + 1;
-          for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_ymin,0,_c),_dp_color[_c],_dx,1,0,_opacity));
-        );
+        _xmin = max(_xmin,0);
+        _xmax = min(_xmax,_wm1);
+        _dx = _xmax - _xmin + 1;
+        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_ymin,0,_c),_dp_color[_c],_dx,1,0,_opacity));
       );
       _none = _xmax + 1;
       (_dp_Xs = resize(_dp_pts,_dp_N*h#ind,0)) = _none;
@@ -16784,34 +16785,46 @@ math_lib :
     unref(_dt_color);
     _wm1 = w#ind - 1;
     _hm1 = h#ind - 1;
+    _opacity = opacity;
+    _dt_color = resize(color,s#ind);
     _A = round(P0);
     _B = round(P1);
     _C = round(P2);
     if (_A[1]>_B[1],swap(_A,_B));
     if (_A[1]>_C[1],swap(_A,_C));
     if (_B[1]>_C[1],swap(_B,_C));
-    _ymin = max(0,_A[1]);
-    _ymax = min(_hm1,_C[1]);
-    _A[1]+=0.25;
-    _C[1]+=0.25;
-    _AB = _B - _A;
-    _AC = _C - _A;
-    _BC = _C - _B;
-    _AB[1] = max(_AB[1],0.5);
-    _BC[1] = max(_BC[1],0.5);
-    _opacity = opacity;
-    _dt_color = resize(color,s#ind);
-    for (_y = _ymin, _y<=_ymax, ++_y,
-      _x0 = _A[0] + (_y - _A[1])*_AC[0]/_AC[1];
-      if (_y<=_B[1],
-        _x1 = _B[0] + (_y - _B[1])*_AB[0]/_AB[1], # Upper part
-        _x1 = _C[0] + (_y - _C[1])*_BC[0]/_BC[1]  # Lower part
+    _xmin = min(_A[0],_B[0],_C[0]);
+    _xmax = max(_A[0],_B[0],_C[0]);
+    if (_xmax>=0 && _xmin<=_wm1 && _C[1]>=0 && _A[1]<=_hm1, # Triangle is visible
+      _xmin = max(_xmin,0);
+      _xmax = max(_xmax,_wm1);
+      _ymin = max(_A[1],0);
+      _ymax = min(_C[1],_hm1);
+      if (_ymin==_ymax,
+
+        # Particular case of horizontal line.
+        _dx = _xmax - _xmin + 1;
+        for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_xmin,_ymin,0,_c),_dt_color[_c],_dx,1,0,_opacity));
+
+        # General case.
+        _AB = _B - _A;
+        _AC = _C - _A;
+        _BC = _C - _B;
+        _AB[1] = max(_AB[1],0.5);
+        _BC[1] = max(_BC[1],0.5);
+        for (_y = _ymin, _y<=_ymax, ++_y,
+          _x0 = _A[0] + (_y - _A[1])*_AC[0]/_AC[1];
+          if (_y<=_B[1],
+            _x1 = _B[0] + (_y - _B[1])*_AB[0]/_AB[1], # Upper part
+            _x1 = _C[0] + (_y - _C[1])*_BC[0]/_BC[1]  # Lower part
+          );
+          if (_x0>_x1,swap(_x0,_x1));
+          _x0 = round(max(0,_x0 - 0.25));
+          _x1 = round(min(_wm1,_x1 + 0.25));
+          (_x1-=_x0)+=1;
+          for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_dt_color[_c],_x1,1,0,_opacity));
+        );
       );
-      if (_x0>_x1,swap(_x0,_x1));
-      _x0 = round(max(0,_x0 - 0.25));
-      _x1 = round(min(_wm1,_x1 + 0.25));
-      (_x1-=_x0)+=1;
-      for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y,0,_c),_dt_color[_c],_x1,1,0,_opacity));
     );
     nan;
   );
