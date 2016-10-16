@@ -847,11 +847,12 @@ _help_usage :
 \n          returns the Nth value of the Fibonacci sequence, for "${g}"N>=0"$n" (e.g., "${g}"46368"$n" for "${g}"N=24"$n").
 \n       . '"${c}"whiledo(condition,expression)"$n"' is exactly the same as '"${c}"for(init,condition,expression)"$n"'
 \n          without the specification of an initializing expression.
+\n       . '"${c}"break()"$n" breaks the execution of the current loop.
 \n       . '"${c}"date(attr,path)"$n"' returns the date attribute for the given 'path' (file or directory),
 \n          with '"${g}"attr"$n"' being "$g"{ 0=year | 1=month | 2=day | 3=day of week | 4=hour | 5=minute | 6=second }"$n".
 \n       . '"${c}"date(_attr)"$n" returns the specified attribute for the current (locale) date.
-\n       . '"${c}"print(expression)"$n" prints the value of the specified expression on the console
-\n          (and returns its value).
+\n       . '"${c}"print(expr1,expr2,...)"$n" prints the value of the specified expressions on the console
+\n          (and returns the value of the last expression).
 \n       . '"${c}"debug(expression)"$n" prints detailed debug information about the sequence of operations
 \n          done by the math parser to evaluate the expression (and returns its value).
 \n       . '"${c}"display(_X)"$n" prints and displays the contents of the specified vector '"${c}"X"$n"', and wait for user events.
