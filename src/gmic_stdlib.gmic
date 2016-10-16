@@ -834,9 +834,9 @@ _help_usage :
 \n          For instance, "${-GMIC}" commands '"${c}"-fill if(x%10==0,255,i)"$n"' and '"${c}"-fill x%10?i:255"$n"' both draw blank
 \n          vertical lines on every 10th column of an image.
 \n       . '"${c}"dowhile(expression,_condition)"$n"' repeats the evaluation of '"${c}"expression"$n"' until '"${c}"condition"$n"'
-\n           vanishes (or until '"${c}"expression"$n"' vanishes if no '"${c}"condition"$n"' is specified). For instance,
-\n           the expression: '"${c}"if(N<2,N,n=N-1;F0=0;F1=1;dowhile(F2=F0+F1;F0=F1;F1=F2,n=n-1))"$n"' returns
-\n           the Nth value of the Fibonacci sequence, for "${g}"N>=0"$n" (e.g., "${g}"46368"$n" for "${g}"N=24"$n").
+\n          vanishes (or until '"${c}"expression"$n"' vanishes if no '"${c}"condition"$n"' is specified). For instance,
+\n          the expression: '"${c}"if(N<2,N,n=N-1;F0=0;F1=1;dowhile(F2=F0+F1;F0=F1;F1=F2,n=n-1))"$n"' returns
+\n          the Nth value of the Fibonacci sequence, for "${g}"N>=0"$n" (e.g., "${g}"46368"$n" for "${g}"N=24"$n").
 \n          '"${c}"dowhile(expression,condition)"$n"' always evaluates the specified expression at least once,
 \n          then check for the nullity condition. When done, it returns the last value of '"${c}"expression"$n"'.
 \n       . '"${c}"for(init,condition,_procedure,body)"$n"' first evaluates the expression '"${c}"init"$n"', then iteratively
