@@ -847,8 +847,8 @@ _help_usage :
 \n          returns the Nth value of the Fibonacci sequence, for "${g}"N>=0"$n" (e.g., "${g}"46368"$n" for "${g}"N=24"$n").
 \n       . '"${c}"whiledo(condition,expression)"$n"' is exactly the same as '"${c}"for(init,condition,expression)"$n"'
 \n          without the specification of an initializing expression.
-\n       . '"${c}"break()"$n"' and '"${c}"continue()"$n"' respectively breaks and continues the current loop, init bloc or
-\n          global environment.
+\n       . '"${c}"break()"$n"' and '"${c}"continue()"$n"' respectively breaks and continues the current running bloc (loop, init or
+\n          main environment).
 \n       . '"${c}"date(attr,path)"$n"' returns the date attribute for the given 'path' (file or directory),
 \n          with '"${g}"attr"$n"' being "$g"{ 0=year | 1=month | 2=day | 3=day of week | 4=hour | 5=minute | 6=second }"$n".
 \n       . '"${c}"date(_attr)"$n" returns the specified attribute for the current (locale) date.
@@ -21898,7 +21898,7 @@ gimp_gmicky_preview :
 #@gimp : - <b>08/20/2014</b> : version <i>1.6.0</i>.\n
 #@gimp : - <b>03/25/2016</b> : version <i>1.7.0</i>.\n
 #@gimp : - <span foreground="purple"><b>09/21/2016</b> : version <i>1.7.7</i> (Current stable).</span>\n
-##@gimp : - <b>09/20/2016</b> : version <i>1.7.7</i> (Current pre-release).\n
+##@gimp : - <b>09/20/2016</b> : version <i>1.7.8</i> (Current pre-release).\n
 #@gimp : "}
 #@gimp : sep = separator()
 #@gimp : link = link("View latest changelog","https://discuss.pixls.us/t/release-of-gmic-1-7-7")
