@@ -1802,7 +1802,6 @@ dq :
 #@gmic : (eq. to '-dq').
 #@gmic : Default values: 'size_factor=16', 'arrow_size=1.5' and 'color_mode=1'.
 #@gmic : $ image.jpg --luminance -gradient[-1] xy -rv[-2,-1] -*[-2] -1 -a[-2,-1] c -crop 60,10,90,30 --display_quiver[1] ,
-#@gmic : $$
 display_quiver :
   -v - _gmic_s="$?" -v +
   -_$0 $*
@@ -16625,6 +16624,7 @@ math_lib :
     _yb = sqrt(_ta*_rmax^2/(_ta*_tc - _tb^2));
     _ymin = round(_P0[1] - _yb - 1);
     _ymax = round(_P0[1] + _yb + 1);
+    continue(10);
     if (_ymax>=0 && _ymin<=_hm1, # Ellipse is visible
       _ymin = max(_ymin,0);
       _ymax = min(_ymax,_hm1);
