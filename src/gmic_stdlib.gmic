@@ -16624,7 +16624,6 @@ math_lib :
     _yb = sqrt(_ta*_rmax^2/(_ta*_tc - _tb^2));
     _ymin = round(_P0[1] - _yb - 1);
     _ymax = round(_P0[1] + _yb + 1);
-    continue(10);
     if (_ymax>=0 && _ymin<=_hm1, # Ellipse is visible
       _ymin = max(_ymin,0);
       _ymax = min(_ymax,_hm1);
