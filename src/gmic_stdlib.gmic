@@ -19870,7 +19870,7 @@ x_quantize_rgb : -check "isint(${1=16}) && $1>1"
     -endif
 
     -if {!$pause" || "{*,SPACE}}  # Do one iteration of k-means.
-      pause={*,SPACE}
+      pause={*,-SPACE}
 
       # Estimate new centroids positions.
       -&[colors] 255 --index[colors] [centroids] -*. 256 -+[colors,-1]      # Estimate nearest centroids for all colors.
