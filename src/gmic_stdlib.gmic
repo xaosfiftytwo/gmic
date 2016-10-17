@@ -1864,7 +1864,7 @@ dt :
 #@gmic : Render selected image of tensors as a field of 2d ellipses.
 #@gmic : (eq. to '-dt').
 #@gmic : Default values: 'size_factor=16', 'ellipse_size=1.5', 'color_mode=2' and 'outline=2'.
-#@gmic : $ image.jpg -diffusiontensors 0.7,0.6 -crop 60,10,90,30 --display_tensors ,
+#@gmic : $ image.jpg -diffusiontensors 0.1,0.9 -resize2dx 32 --display_tensors 64,2
 #@gmic : $$
 display_tensors :
   -v - _gmic_s="$?" -v +
