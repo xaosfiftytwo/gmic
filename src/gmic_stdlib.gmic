@@ -28438,9 +28438,10 @@ gimp_crystal_background :
     -if $5 col="rgb()" -else col="u(255)" -endif
     -srand $3
     -skip {${-math_lib}"
+    const M = max(w,h);
     for (k = 0, k<$1, ++k,
       P = vector"$N"();
-      map(P,i,u(-w/2,3*w/2));
+      map(P,i,u(-M/2,3*M/2));
       draw_polygon(#0,P,-$4/100,"$col");
     )"}
     -n 0,255
