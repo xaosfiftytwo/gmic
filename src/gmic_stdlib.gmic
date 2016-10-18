@@ -31993,6 +31993,7 @@ gmicol_light_leaks_preview :
 #@gmicol clone("3d lathing")
 #@gmicol clone("3d random objects")
 #@gmicol clone("Ball")
+#@gmicol clone("Barnsley fern")
 #@gmicol clone("Circle art")
 #@gmicol clone("Cupid")
 #@gmicol clone("Equation plot [parametric]")
