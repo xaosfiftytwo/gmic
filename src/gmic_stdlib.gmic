@@ -3234,7 +3234,7 @@ shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0
       -permute xczy
       -i.. 2,2,1,1,{"R=rot(-$3); R[2] = -R[2]; R[3] = -R[3]; R"} -**
       -repeat 2 -sh. $>,$>,0,0 --. {im} -rm. -done -n 0,{$ir-1}
-     -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
+      -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
   -endl -endif
   -nm "[2d Barnsley fern]"
   -v +
