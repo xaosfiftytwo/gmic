@@ -29844,6 +29844,29 @@ gimp_ball_preview :
   -gimp_ball $*
   -if {$!>1} -rv[-2,-1] -blend[-2,-1] alpha -endif
 
+#@gimp Barnsley fern : gimp_barnsley_fern, gimp_barnsley_fern_preview(1)
+#@gimp : Density (%) = float(100,0,300)
+#@gimp : Angle = float(30,-180,180)
+#@gimp : Opacity (%) = float(40,0,100)
+#@gimp : Color = color(255,255,255,255);
+#@gimp : Add as a new layer = _bool(1)
+#@gimp : sep = separator()
+#@gimp : note = note("This filter renders the Barnsley fern fractal, described here:")
+#@gimp : link = link("https://en.wikipedia.org/wiki/Barnsley_fern");
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>10/18/2016</i>.</small>")
+gimp_barnsley_fern :
+  -repeat $! -l[$<]
+    -shape_fern {min(w,h)},$1%,$2,{$3%} -*. 255
+    100%,100%,1,3,[${4-6}]
+    -rv[-2,-1] -a[-2,-1] c
+    -if {!$8} -blend alpha,{$7/255}
+    -else -nm. "name(Barnsley Fern),opacity("{round($7*100/255)})")" -rv[-2,-1]
+    -endif
+  -endl -done
+
+gimp_barnsley_fern_preview :
+  -gimp_barnsley_fern ${1-7},0
+
 #@gimp Circle art : gimp_circle_art, gimp_circle_art
 #@gimp : Type = choice(1,"Random","Lissajous spiral")
 #@gimp : Density = float(15,0,100)
