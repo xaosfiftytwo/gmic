@@ -28442,7 +28442,7 @@ gimp_crystal_background :
     for (k = 0, k<$1, ++k,
       P = vector"$N"();
       map(P,i,u(-M/2,3*M/2));
-      draw_polygon(#0,P,-$4/100,"$col");
+      draw_polygon(#0,P,-$4%,"$col");
     )"}
     -n 0,255
   -endl -a c -endl -done
