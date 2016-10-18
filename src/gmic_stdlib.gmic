@@ -28435,16 +28435,10 @@ gimp_crystal_preview :
 gimp_crystal_background :
   -repeat $! -l[$>] -split_opacity -l[0]
     N={2*max(3,round((${"-is_percent $2"}?4*wh*$2:$2)))}
-    -if $5 col="rgb()" -else col="u(255)" -endif
-    -srand $3
-    -skip {${-math_lib}"
-    const M = max(w,h);
-    for (k = 0, k<$1, ++k,
-      P = vector"$N"();
-      map(P,i,u(-M/2,3*M/2));
-      draw_polygon(#0,P,-$4%,"$col");
-    )"}
-    -n 0,255
+    -if $5 col="u([255,255,255])" -else col="u(255)" -endif
+    -srand $3 M={max(w,h)} 2,$N
+    -repeat $1 -rand. {-$M/2},{3*$M/2} -polygon.. $N,{^},{-$4%},{$col} -done
+    -rm. -n 0,255
   -endl -a c -endl -done
 
 #@gimp Halftone : gimp_halftone, gimp_halftone_preview(0)
