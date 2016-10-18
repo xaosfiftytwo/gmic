@@ -28425,6 +28425,27 @@ gimp_crystal :
 gimp_crystal_preview :
   -gimp_split_preview "-gimp_crystal $*",$-1
 
+#@gimp Crystal background : gimp_crystal_background, gimp_crystal_background
+#@gimp : Iterations = int(10,1,32)
+#@gimp : Density (%) = float(25,0,100)
+#@gimp : Random seed = int(0,0,65535)
+#@gimp : Opacity (%) = float(100,0,100)
+#@gimp : Color = bool(1)
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>10/18/2016</i>.</small>")
+gimp_crystal_background :
+  -repeat $! -l[$>] -split_opacity -l[0]
+    N={2*max(3,round((${"-is_percent $2"}?4*wh*$2:$2)))}
+    -if $5 col="rgb()" -else col="u(255)" -endif
+    -srand $3
+    -skip {${-math_lib}"
+    for (k = 0, k<$1, ++k,
+      P = vector"$N"();
+      map(P,i,u(-w/2,3*w/2));
+      draw_polygon(#0,P,-$4/100,"$col");
+    )"}
+    -n 0,255
+  -endl -a c -endl -done
+
 #@gimp Halftone : gimp_halftone, gimp_halftone_preview(0)
 #@gimp : note = note("<b><small>Image parameters :</small></b>")
 #@gimp : Brightness (%) = float(0,-100,100)
