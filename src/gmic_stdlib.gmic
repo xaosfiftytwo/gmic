@@ -29852,7 +29852,7 @@ gimp_ball_preview :
 #@gimp : Add as a new layer = _bool(1)
 #@gimp : sep = separator()
 #@gimp : note = note("This filter renders the Barnsley fern fractal, described here:")
-#@gimp : link = link("https://en.wikipedia.org/wiki/Barnsley_fern");
+#@gimp : link = link("https://en.wikipedia.org/wiki/Barnsley_fern")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>10/18/2016</i>.</small>")
 gimp_barnsley_fern :
   -repeat $! -l[$<]
