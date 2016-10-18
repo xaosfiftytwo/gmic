@@ -31981,6 +31981,7 @@ gmicol_light_leaks_preview :
 #@gmicol clone("Canvas texture")
 #@gmicol clone("Cracks")
 #@gmicol clone("Crystal")
+#@gmicol clone("Crystal background")
 #@gmicol clone("Halftone")
 #@gmicol clone("Hearts")
 #@gmicol clone("Lava")
