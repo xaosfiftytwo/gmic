@@ -3202,6 +3202,43 @@ shape_diamond : -check "${1=512}>=0"
   -nm. "[2d diamond shape]"
   -v +
 
+#@gmic shape_fern : _size>=0,_density(%)>=0,_angle,_opacity
+#@gmic : Input a 2d Barnsley fern with specified size.
+#@gmic : Default value: 'size=512', 'density=50%', 'angle=30' and 'opacity=0.3'
+#@gmic : $ -shape_fern ,
+shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0 && $4<=1"
+  -e[^-1] "Input a $1x$1 Barnsley fern, with density $2."
+  -v -
+  ir={round($1)}
+  -if {!$ir} 0
+  -else -l[]
+    N={${"-is_percent $2"}?$ir^2*$2:$2}
+    $N,1,1,2
+    -skip {"
+      R = rot(-$3);
+      R[2] = -R[2]; R[3] = -R[3];
+      f1 = [ 0,0,0,0.16 ];
+      g1 = [ 0,0 ];
+      f2 = [ 0.2,-0.26,0.23,0.22 ];
+      g2 = [ 0,1.6 ];
+      f3 = [ -0.15,0.28,0.26,0.24 ];
+      g3 = [ 0,0.44 ];
+      f4 = [ 0.85,0.04,-0.04,0.85 ];
+      g4 = [ 0,1.6 ];
+      xy = [ 0,0 ];
+      for (n = 0, n<"$N", ++n,
+        r = u(100);
+        xy = r<=1?((f1**xy)+=g1):
+             r<=8?((f2**xy)+=g2):
+             r<=15?((f3**xy)+=g3):((f4**xy)+=g4);
+        I[n] = R**xy
+      )"}
+    -repeat 2 -sh. $> --. {im} -rm. -done -n 0,{$ir-1}
+    -permute xczy -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
+  -endl -endif
+  -nm "[2d Barnsley fern]"
+  -v +
+
 #@gmic shape_polygon : _size>=0,_nb_vertices>=3,_angle
 #@gmic : Input a 2d polygonal binary shape with specified geometry.
 #@gmic : Default value: 'size=512', 'nb_vertices=5' and 'angle=0'.
