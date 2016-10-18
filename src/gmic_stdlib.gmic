@@ -3202,7 +3202,7 @@ shape_diamond : -check "${1=512}>=0"
   -nm. "[2d diamond shape]"
   -v +
 
-#@gmic shape_fern : _size>=0,_density(%)>=0,_angle,_opacity
+#@gmic shape_fern : _size>=0,_density[%]>=0,_angle,0<=_opacity<=1
 #@gmic : Input a 2d Barnsley fern with specified size.
 #@gmic : Default value: 'size=512', 'density=50%', 'angle=30' and 'opacity=0.3'
 #@gmic : $ -shape_fern ,
