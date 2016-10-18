@@ -16759,15 +16759,17 @@ math_lib :
 
       for (_y0 = _ymin, _y0<=_ymax, ++_y0,
         _dp_Xsy = sort(_dp_Xs[_y0*_dp_N,_dp_N]);
+        _px = w#ind;
         for (_n = 0, _n<_dp_N,
           dowhile (_x0 = _dp_Xsy[_n++], _n<_dp_N && _x0==_none);
           if (_x0!=_none,
             dowhile (_x1 = _dp_Xsy[_n++], _n<_dp_N && _x1==_none);
             if (_x1!=_none && _x1>=0 && _x0<=_wm1,
-              _x0 = max(_x0,0);
+              _x0 = max(_x0 + (_px==_x0),0);
               _x1 = min(_x1,_wm1);
               _dx = _x1 - _x0 + 1;
               for (_c = 0, _c<s#ind, ++_c, copy(i(#ind,_x0,_y0,0,_c),_dp_color[_c],_dx,1,0,_opacity));
+              _px = _x1;
             );
           );
         );
