@@ -3215,8 +3215,6 @@ shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0
     N={${"-is_percent $2"}?$ir^2*$2:$2}
     $N,1,1,2
     -skip {"
-      R = rot(-$3);
-      R[2] = -R[2]; R[3] = -R[3];
       f1 = [ 0,0,0,0.16 ];
       g1 = [ 0,0 ];
       f2 = [ 0.2,-0.26,0.23,0.22 ];
@@ -3231,10 +3229,12 @@ shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0
         xy = r<=1?((f1**xy)+=g1):
              r<=8?((f2**xy)+=g2):
              r<=15?((f3**xy)+=g3):((f4**xy)+=g4);
-        I[n] = R**xy
+        I[n] = xy
       )"}
-    -repeat 2 -sh. $> --. {im} -rm. -done -n 0,{$ir-1}
-    -permute xczy -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
+      -permute xczy
+      -i.. 2,2,1,1,{"R=rot(-$3); R[2] = -R[2]; R[3] = -R[3]; R"} -**
+      -repeat 2 -sh. $>,$>,0,0 --. {im} -rm. -done -n 0,{$ir-1}
+     -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
   -endl -endif
   -nm "[2d Barnsley fern]"
   -v +
