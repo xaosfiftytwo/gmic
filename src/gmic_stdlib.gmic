@@ -4314,7 +4314,7 @@ _update_server_binaries :
   t0=$|
   -v + -e[] "- Waiting for binary files to be build." -v -
   -do
-    -repeat 17
+    -repeat $N
       file=${file$>}
       -if $file
         -strreplace $file,_$1_,_
