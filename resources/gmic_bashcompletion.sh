@@ -82,6 +82,7 @@ _gmic_stdlib()
 	      -print --print\
 	      -rainbow_lut --rainbow_lut\
 	      -roddy --roddy\
+	      -screen --screen\
 	      -select --select\
 	      -serialize --serialize\
 	      -shape_heart --shape_heart\
@@ -94,7 +95,6 @@ _gmic_stdlib()
 	      -shape_star --shape_star\
 	      -sh --sh\
 	      -shared --shared\
-	      -screen --screen\
 	      -sp --sp\
 	      -sample --sample\
 	      -srand --srand\
@@ -1034,6 +1034,7 @@ _gmic_stdlib()
 	      print\
 	      rainbow_lut\
 	      roddy\
+	      screen\
 	      select\
 	      serialize\
 	      shape_heart\
@@ -1046,7 +1047,6 @@ _gmic_stdlib()
 	      shape_star\
 	      sh\
 	      shared\
-	      screen\
 	      sp\
 	      sample\
 	      srand\
@@ -2006,6 +2006,10 @@ _gmic_stdlib()
 		COMPREPLY=( $(compgen -W "_plot_type,_vertex_type,_xmin,_xmax,_ymin,_ymax,_exit_on_anykey={0|1} 'formula',_resolution>=0,_plot_type,_vertex_type,_xmin,xmax,_ymin,_ymax,_exit_on_anykey={0|1}") )
 		return 0
 		;;
+		"-screen" | "--screen")
+		COMPREPLY=( $(compgen -W "_x0[%],_y0[%],_x1[%],_y1[%] >") )
+		return 0
+		;;
 		"-select" | "--select")
 		COMPREPLY=( $(compgen -W "feature_type,_X,_Y,_Z,_exit_on_anykey={0|1} >") )
 		return 0
@@ -2048,10 +2052,6 @@ _gmic_stdlib()
 		;;
 		"-shared" | "--shared")
 		COMPREPLY=( $(compgen -W "x0[%],x1[%],y[%],z[%],v[%] y0[%],y1[%],z[%],v[%] z0[%],z1[%],v[%] v0[%],v1[%] v0[%] (noarg)") )
-		return 0
-		;;
-		"-screen" | "--screen")
-		COMPREPLY=( $(compgen -W "_x0[%],_y0[%],_x1[%],_y1[%] >") )
 		return 0
 		;;
 		"-sample" | "--sample")
