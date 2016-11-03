@@ -8928,25 +8928,56 @@ _inpaint_patchmatch :
     -warp[0] [1],0,0,1
   -else
     -if $4 -erode. $3 -endif
-    -f[0] "*init(boundary=1);
-            if (i#2,i,
-              avg = norm = 0;
-              for (q = -"$p1", q<="$p2", ++q,
-                for (p = -"$p1", p<="$p2", ++p,
-                  X = x + p;
-                  Y = y + q;
-                  u = i(#1,X,Y,0,0);
-                  v = i(#1,X,Y,0,1);
-                  X = u - p;
-                  Y = v - q;
-                  val = i(X,Y,0,c);
-                  if (X>=0 && X<w && Y>=0 && Y<h,
-                    avg+=val;
-                    ++norm;
-                  )
-                )
-              );
-              avg/norm)"
+    # -f[0] "*init(boundary=1);
+    #         if (i#2,i,
+    #           avg = norm = 0;
+    #           for (q = -"$p1", q<="$p2", ++q,
+    #             for (p = -"$p1", p<="$p2", ++p,
+    #               X = x + p;
+    #               Y = y + q;
+    #               u = i(#1,X,Y,0,0);
+    #               v = i(#1,X,Y,0,1);
+    #               X = u - p;
+    #               Y = v - q;
+    #               val = i(X,Y,0,c);
+    #               if (X>=0 && X<w && Y>=0 && Y<h,
+    #                 avg+=val;
+    #                 ++norm;
+    #               )
+    #             )
+    #           );
+    #           avg/norm)"
+
+    -f[0] "*init(
+      boundary = 1;
+      const patch_size = $3;
+      const p2 = int(patch_size/2);
+      const p1 = patch_size - p2 - 1;
+      avg = resize([0],s#0);
+
+      # Pre-compute gaussian kernel for patch blending.
+      wpq = resize([0],patch_size^2);
+      g = 0;
+      for (q = -p1, q<=p2, ++q,
+        for (p = -p1, p<=p2, ++p,
+          wpq[g++] = exp(-(p^2 + q^2)/(2*(0.3*patch_size)^2));
+        );
+      );
+    );
+
+    if (i#2,I,
+      g = 0;
+      avg = 0;
+      norm = 0;
+      for (q = -p1, q<=p2, ++q,
+        for (p = -p1, p<=p2, ++p,
+          U = I(#1,x + p,y + q);
+          w = wpq[g++];
+          norm+=w;
+          avg+=w*I(#0,U[0,2] - [p,q]);
+        );
+      );
+      avg/norm)"
   -endif
   -k[0]
 
