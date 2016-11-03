@@ -8901,7 +8901,7 @@ inpaint_patchmatch : -check ${-is_image_arg\ $1}"&& ${2=0}>=0 && isint(${3=9}) &
           -_inpaint_patchmatch[scaled_img] [correspondence],[scaled_mask],$blend_size,$6
           --patchmatch[scaled_img] [scaled_reference],$patch_size,$patch_size,1,4,4,0,[correspondence]
           -j[correspondence] . -rm.
-          -if {*} -w[scaled_img] $visu_size,0 -endif
+          -if {*} -w1[scaled_img] $visu_size,0 -endif
           -if {*2} -w2[correspondence] $visu_size,1 -endif
         -done
         -rm[scaled_img,scaled_mask,scaled_reference] -channels[correspondence] 0,1
@@ -8922,32 +8922,11 @@ inpaint_patchmatch : -check ${-is_image_arg\ $1}"&& ${2=0}>=0 && isint(${3=9}) &
 
 # _inpaint_patchmatch : [correspondence_map],[mask],blend_size>0,_allow_outer_blending={ 0 | 1 }
 _inpaint_patchmatch :
-  #  p1={int($3/2)} p2={$3-$p1-1}
   -pass$1 1 -pass$2 {!$3" || "!$4}
   -if {!$3}
     -warp[0] [1],0,0,1
   -else
     -if $4 -erode. $3 -endif
-    # -f[0] "*init(boundary=1);
-    #         if (i#2,i,
-    #           avg = norm = 0;
-    #           for (q = -"$p1", q<="$p2", ++q,
-    #             for (p = -"$p1", p<="$p2", ++p,
-    #               X = x + p;
-    #               Y = y + q;
-    #               u = i(#1,X,Y,0,0);
-    #               v = i(#1,X,Y,0,1);
-    #               X = u - p;
-    #               Y = v - q;
-    #               val = i(X,Y,0,c);
-    #               if (X>=0 && X<w && Y>=0 && Y<h,
-    #                 avg+=val;
-    #                 ++norm;
-    #               )
-    #             )
-    #           );
-    #           avg/norm)"
-
     -f[0] "*init(
       boundary = 1;
       const patch_size = $3;
@@ -8964,7 +8943,6 @@ _inpaint_patchmatch :
         );
       );
     );
-
     if (i#2,I,
       g = 0;
       avg = 0;
@@ -29338,7 +29316,7 @@ gimp_inpaint_patchmatch :
     -if $10 -dilate. {1+2*$10} -endif
     -if $11
       visu_size=${-fitscreen[]" "{0,w},{0,h},1,25%,50%}
-      -w.. $visu_size,0,"[Preview] G'MIC: Inpaint [multi-scale]"
+      -w1.. $visu_size,0,"[Preview] G'MIC: Inpaint [multi-scale]"
     -endif
     -srand 0 -inpaint_patchmatch.. [1],${1-5}
     -rm.
