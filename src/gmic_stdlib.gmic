@@ -8922,7 +8922,7 @@ inpaint_patchmatch : -check ${-is_image_arg\ $1}"&& ${2=0}>=0 && isint(${3=9}) &
 
 # _inpaint_patchmatch : [correspondence_map],[mask],blend_size>0,_allow_outer_blending={ 0 | 1 }
 _inpaint_patchmatch :
-  p1={int($3/2)} p2={$3-$p1-1}
+  #  p1={int($3/2)} p2={$3-$p1-1}
   -pass$1 1 -pass$2 {!$3" || "!$4}
   -if {!$3}
     -warp[0] [1],0,0,1
