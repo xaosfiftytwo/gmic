@@ -310,7 +310,7 @@ _help_usage :
 \n
 \n  - There are no hard limitations on the size the image along each dimension. For instance,
 \n     the number of image slices or channels can be of arbitrary size within the limits of
-\n     available memory
+\n     the available memory.
 \n
 \n  - The "${g}"width, height"$n" and "${g}"depth"$n" of an image are considered as spatial dimensions, while the
 \n     "${g}"spectrum"$n" has a multi-spectral meaning. Thus, a 4d image in "${-GMIC}" should be most often
