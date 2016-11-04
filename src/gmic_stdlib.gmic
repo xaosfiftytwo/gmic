@@ -798,7 +798,7 @@ _help_usage :
 \n    _ The following "${g}"specific functions"$n" are also defined:
 \n
 \n       . '"${c}"normP(u1,...,un)"$n"' computes the LP-norm of the specified vector
-\n         (P being an "${g}"unsigned integer"$n" or '"${g}"inf"$n"').
+\n         (P being an "${g}"unsigned integer"$n" constant or '"${g}"inf"$n"').
 \n       . '"${c}"u(max)"$n"' or '"${c}"u(min,max)"$n"': return a random value between "$g"[0,max]"$n" or "$g"[min,max]"$n",
 \n          following a uniform distribution.
 \n       . '"${c}"i(_a,_b,_c,_d,_interpolation_type,_boundary_conditions)"$n"': return the value of the pixel
