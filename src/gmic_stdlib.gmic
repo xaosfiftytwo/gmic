@@ -22021,10 +22021,11 @@ _gimp_download_all_data :
 #@gimp : </i>"}
 #@gimp : sep = separator()
 #@gimp : note = note{"\n<span foreground="purple" underline="single">Postcard senders:</span>"}
-#@gimp : note = note{" <b>-</b> We've received <b>38</b> postcards from <b>G'MIC</b> enthusiasts so far.
-#@gimp :               You could be the <b>39th</b> sender :)"}
+#@gimp : note = note{" <b>-</b> We've received <b>39</b> postcards from <b>G'MIC</b> enthusiasts so far.
+#@gimp :               You could be the <b>40st</b> sender :)"}
 #@gimp : note = note{" <b>-</b> A big hug goes to these postcard senders (recently received first) :"}
 #@gimp : note = note{"<i>
+#@gimp : <a href="http://cimg.eu/img/postcard65.jpg">Volker Doebel</a> (Haldern/Germany),
 #@gimp : <a href="http://cimg.eu/img/postcard64.jpg">Patrick Wauters</a> (Bilbao/Spain),
 #@gimp : <a href="http://cimg.eu/img/postcard63.jpg">Sebastien Fourey</a> (Konstanz/Germany),
 #@gimp : <a href="http://cimg.eu/img/postcard62.jpg">David Revoy</a> (Toulouse/France),
