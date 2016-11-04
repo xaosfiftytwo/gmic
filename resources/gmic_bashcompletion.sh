@@ -215,7 +215,7 @@ _gmic_stdlib()
 	      -map --map\
 	      -map_clut --map_clut\
 	      -mix_channels --mix_channels\
-	      -negative --negative\
+	      -negate --negate\
 	      -noise --noise\
 	      -normlp --normlp\
 	      -norm --norm\
@@ -1167,7 +1167,7 @@ _gmic_stdlib()
 	      map\
 	      map_clut\
 	      mix_channels\
-	      negative\
+	      negate\
 	      noise\
 	      normlp\
 	      norm\
@@ -2284,6 +2284,10 @@ _gmic_stdlib()
 		;;
 		"-mix_channels" | "--mix_channels")
 		COMPREPLY=( $(compgen -W "(a00,...,aMN) >") )
+		return 0
+		;;
+		"-negate" | "--negate")
+		COMPREPLY=( $(compgen -W "base_value (noarg)") )
 		return 0
 		;;
 		"-noise" | "--noise")
