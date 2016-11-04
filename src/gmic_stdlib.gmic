@@ -4291,27 +4291,27 @@ _update_server_binaries :
   -e[^-1] "Upload released binaries ($1) on the G'MIC web server."
   -v -
   is_pre=${"-strcontains $1,_pre"}
-  file0=gmic_$1_debian_jessie_amd64.deb
-  file1=gmic_$1_debian_jessie_i386.deb
-  file2=gmic_$1_debian_wheezy_amd64.deb
-  file3=gmic_$1_debian_wheezy_i386.deb
-  file4=gmic_$1_ubuntu_yakkety_amd64.deb
-  file5=gmic_$1_ubuntu_xenial_amd64.deb
-  file6=gmic_$1_ubuntu_trusty_i386.deb
-  file7=gmic_$1_ubuntu_vivid_amd64.deb
-  file8=gmic_$1_win32.zip
-  file9=gmic_$1_win64.zip
-  file10=gmic_gimp_$1_linux32.zip
-  file11=gmic_gimp_$1_linux64.zip
-  file12=gmic_gimp_$1_yakkety64.zip
-  file13=gmic_gimp_$1_win32.exe
-  file14=gmic_gimp_$1_win32.zip
-  file15=gmic_gimp_$1_win64.exe
-  file16=gmic_gimp_$1_win64.zip
-  file17=gmic_static_$1_linux32.zip
-  file18=gmic_static_$1_linux64.zip
-  N=19
-  t0=$|
+  N=0
+  file$N=gmic_$1_debian_jessie_amd64.deb  N+=1
+  file$N=gmic_$1_debian_jessie_i386.deb   N+=1
+  file$N=gmic_$1_debian_wheezy_amd64.deb  N+=1
+  file$N=gmic_$1_debian_wheezy_i386.deb   N+=1
+  file$N=gmic_$1_ubuntu_yakkety_amd64.deb N+=1
+  file$N=gmic_$1_ubuntu_xenial_amd64.deb  N+=1
+  file$N=gmic_$1_ubuntu_trusty_i386.deb   N+=1
+  file$N=gmic_$1_ubuntu_vivid_amd64.deb   N+=1
+  file$N=gmic_$1_win32.zip                N+=1
+  file$N=gmic_$1_win64.zip                N+=1
+  file$N=gmic_gimp_$1_linux32.zip         N+=1
+  file$N=gmic_gimp_$1_linux64.zip         N+=1
+  file$N=gmic_gimp_$1_yakkety64.zip       N+=1
+  file$N=gmic_gimp_$1_win32.exe           N+=1
+  file$N=gmic_gimp_$1_win32.zip           N+=1
+  file$N=gmic_gimp_$1_win64.exe           N+=1
+  file$N=gmic_gimp_$1_win64.zip           N+=1
+  file$N=gmic_static_$1_linux32.zip       N+=1
+  file$N=gmic_static_$1_linux64.zip       N+=1
+  t0=$| n=0
   -v + -e[] "- Waiting for binary files to be build." -v -
   -do
     -repeat $N
@@ -4332,13 +4332,13 @@ _update_server_binaries :
           -_update_server_upload $file,"files/"$folder/$file_short
         -endif
 
-        file$>= N-=1
+        file$>= n+=1
       -endif
     -done
-    -if $N -wait 5000 -endif
-  -while {$N" && "$|<$t0+60*120}
+    -if {$n<$N} -wait 5000 -endif
+  -while {$n<$N" && "$|<$t0+60*120}
   -v +
-  -if $N -e[] "- Partial uploads done (timeout reached)."
+  -if {$n<$N} -e[] "- Partial uploads done (timeout reached)."
   -else -e[] "- All uploads done !"
   -endif
 
