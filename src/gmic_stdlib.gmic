@@ -2616,7 +2616,7 @@ _document_gmic :
       -if ${IS_3D$>} 0 -t. (3d\ object),0,0,13,1,255
       -else 0 -t. (${W$>}x${H$>}x${D$>}x${S$>}),0,0,13,1,255
       -endif
-      -negative. -n. 0,255 -+. 164 -c. 0,255 -to_rgb.
+      -negate. -n. 0,255 -+. 164 -c. 0,255 -to_rgb.
       -j.. .,{{-2,w}-w-5},{{-2,h}-h-1} -rm.
     -else -t. [$>]:,3,3,15 -endif
     -rv[-2,-1] -a[-2,-1] y
@@ -3704,7 +3704,7 @@ update_gallery_html :
 
   -_update_gallery_html "-luminance"
   -_update_gallery_html "-solarize"
-  -_update_gallery_html "-negative"
+  -_update_gallery_html "-negate"
   -_update_gallery_html "-select_color 100,0,0,0 -n 0,255"
   -_update_gallery_html "-array_fade 4,4"
 
@@ -3810,11 +3810,11 @@ update_gallery_html :
   -_update_gallery_html "-old_photo -drop_shadow 3,3 -rotate -20,1 -display_rgba"
   -_update_gallery_html "-old_photo -drop_shadow 3,3 -rotate -25,1 -display_rgba"
 
-  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 40,0,1,1,3 -normalize 0,255 -negative"
-  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 60,0,1,1,3 -normalize 0,255 -negative"
-  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 80,0,1,1,3 -normalize 0,255 -negative"
-  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 100,0,1,1,3 -normalize 0,255 -negative"
-  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 120,0,1,1,3 -normalize 0,255 -negative"
+  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 40,0,1,1,3 -normalize 0,255 -negate"
+  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 60,0,1,1,3 -normalize 0,255 -negate"
+  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 80,0,1,1,3 -normalize 0,255 -negate"
+  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 100,0,1,1,3 -normalize 0,255 -negate"
+  -_update_gallery_html "-erode 10 --erode 3 -- -equalize 255 -smooth 120,0,1,1,3 -normalize 0,255 -negate"
 
   -_update_gallery_html "-light_relief ,"
   -_update_gallery_html "-light_relief ,"
@@ -5140,7 +5140,7 @@ div_complex : -check ${3=1e-8}>=0
 #@gmic : $ image.jpg --mul 2 -cut 0,255
 #@gmic : $ image.jpg (1,2,3,4,5,6,7,8) -resize[-1] [0] -mul[0] [-1]
 #@gmic : $ image.jpg -mul '1-3*abs(x/w-0.5)' -cut 0,255
-#@gmic : $ image.jpg --luminance -negative[-1] --mul
+#@gmic : $ image.jpg --luminance -negate[-1] --mul
 
 #@gmic mul_channels : value1,_value2,...,_valueN
 #@gmic : Multiply channels of selected images by specified sequence of values.
@@ -5633,12 +5633,20 @@ mix_channels :
     whd={w},{h},{d} -r {w*h*d},{s},1,1,-1 -i[0] ${^0} -** -r $whd,{h},-1
   -nm $nm -endl -done -v +
 
-#@gmic negative
-#@gmic : Compute negative of selected images.
-#@gmic : $ image.jpg --negative
-negative :
-  -e[^-1] "Compute negative of image$?."
-  -v - -repeat $! -l[$>] -- {iM} -endl -done -* -1 -v +
+#@gmic negate : base_value : (no arg)
+#@gmic : Negate image values.
+#@gmic : Default value: 'base_value=(undefined)'.
+#@gmic : $ image.jpg -negate
+negate : -skip ${1=,}
+  -if {isval($1)}
+    -e[0--3] "Negate values of image$?, according to base value $1."
+    -v - -- $1 -* -1 -v +
+  -else
+    -e[0--3] "Negate values of image$?."
+    -v - -repeat $! --[$>] {$>,iM} -done -* -1
+    -if {;['$1']!=','} -noarg -endif
+    -v +
+  -endif
 
 #@gmic noise : std_variation>=0[%],_noise_type : (+)
 #@gmic : Add random noise to selected images.
@@ -5694,7 +5702,7 @@ not :
 
 #@gmic orientation
 #@gmic : Compute the pointwise orientation of vector-valued pixels in selected images.
-#@gmic : $ image.jpg --orientation --norm[-2] -negative[-1] -mul[-2] [-1] -reverse[-2,-1]
+#@gmic : $ image.jpg --orientation --norm[-2] -negate[-1] -mul[-2] [-1] -reverse[-2,-1]
 #@gmic : $$
 orientation :
   -e[^-1] "Compute pointwise orientation vectors, in image$?."
@@ -8528,7 +8536,7 @@ diffusiontensors : -check "${1=0.7}>=0 && ${2=0.3}>=0 && $2<=1" -skip ${3=0.6},$
 #@gmic : $ image.jpg --edges 15%
 edges : -skip ${1=15%}
   -e[^-1] "Estimate image contours of image$?, with threshold $1."
-  -v - -gradient_norm -b 0.5 ->= $1 -distance 0 -equalize -negative -c 30%,70% -n 0,1 -v +
+  -v - -gradient_norm -b 0.5 ->= $1 -distance 0 -equalize -negate -c 30%,70% -n 0,1 -v +
 
 #@gmic erode : size>=0 : size_x>=0,size_y>=0,_size_z>=0 : [kernel],_boundary,_is_real={ 0=binary-mode | 1=real-mode } : (+)
 #@gmic : Erode selected images by a rectangular or the specified structuring element.
@@ -10433,7 +10441,7 @@ cie1931 :
     {-2,w},{-2,h} -j3d. ..,2,30,0,1,2 -rm..
     --erode. 4 --. .. -==. 0 -*[-3,-1]
     -a[-2,-1] c -blend[-2,-1] alpha
-    100%,100%,1,1,255 -axes. 0,0.75,0.85,0,14,1 --erode. 3 -negative. -to_rgb..
+    100%,100%,1,1,255 -axes. 0,0.75,0.85,0,14,1 --erode. 3 -negate. -to_rgb..
     -j... ..,0,0,0,0,1,.,400 -rm[-2,-1]
   -mv. 2 -done -rm[0,1] -v +
 
@@ -10589,7 +10597,7 @@ marble : -skip ${1=0.2},${2=0.1},${3=45},${4=0},${5=0.4},${6=0.8},${7=0.6},${8=1
 
 #@gmic maze : _width>0,_height>0,_cell_size>0
 #@gmic : Input maze with specified size.
-#@gmic : $ -maze 30,20 -negative -normalize 0,255
+#@gmic : $ -maze 30,20 -negate -normalize 0,255
 maze : -check "isint(${1=15}) && $1>0 && isint(${2=$1}) && $2>0 && isint(${3=24}) && $3>0"
   -e[^-1] "Input $1x$2 maze."
   -v -
@@ -10646,13 +10654,13 @@ _render_maze :
 #@gmic maze_mask : _cellsize>0
 #@gmic : Input maze according to size and shape of selected mask images.
 #@gmic : Mask may contain disconnected shapes.
-#@gmic : $ 0 -text "G'MIC",0,0,53,1,1 -dilate 3 -autocrop 0 -frame 1,1,0 -maze_mask 8 -dilate 3 -negative -mul 255
+#@gmic : $ 0 -text "G'MIC",0,0,53,1,1 -dilate 3 -autocrop 0 -frame 1,1,0 -maze_mask 8 -dilate 3 -negate -mul 255
 maze_mask : -check "isint(${1=24}) && $1>0"
   -e[^-1] "Input masked maze from image$? with cell size $1."
   -v - -norm ->= 50% -repeat $! -l[$>]
     -do
       --rand[0] 0,1 -*. [0] ({xM},{yM}) -rm..  # Select one starting point in the mask.
-      --flood[0] {^},0,0,0,1,2 ->=. 2 --negative. -*.. 15 -a[-2,-1] c
+      --flood[0] {^},0,0,0,1,2 ->=. 2 --negate. -*.. 15 -a[-2,-1] c
       -flood[0] {-2,^},0,0,0,1,0
       -_generate_maze {w},{h}
     -while {0,iM}
@@ -14339,13 +14347,13 @@ rodilius : -check "${1=10}>=0 && $1<=200 && ${2=10}>=0 && $2<=100 && ${3=400}>=0
   -e[^-1] "Apply rodilius filter on image$? with amplitude $1, thickness $2, sharpness $3, $4 orientations, offset $5 and "\
     ${-arg\ 1+!$6,brighter,darker}" color mode."
   -v - -repeat $! -l[$>] -split_opacity -rv
-    -if {!$6} -negative. -endif
+    -if {!$6} -negate. -endif
     --f. 0 -nm. {-2,n}
     -repeat {round($4)}
       angle={$5+$>*180/round($4)}
       --blur_linear.. $1%,{$1*$2/100}%,$angle,1 -b. 0.7 -sharpen. $3 -max[-2,-1]
     -done -rm..
-    -if {!$6} -negative. -endif
+    -if {!$6} -negate. -endif
   -rv -a c -endl -done -v +
 
 #@gmic stained_glass : _edges[%]>=0, shading>=0, is_thin_separators={ 0 | 1 }
@@ -16171,22 +16179,22 @@ pink_wshed : -check "${1=4}==4 || $1==8 || $1==6 || $1==26" -skip ${2=0},${3=0}
     -if {d==1}
       -check "${1=4}==4 || $1==8"
       -repeat $! -l[$>]
-        -if {$2!=0} -negative -endif
+        -if {$2!=0} -negate -endif
         -f max(min(i,255),0)
         -if {$3>=0} -pink heightminima,$1,$3 -endif
         -pink wshedtopo,$1
-        -if {$2!=0} -negative -endif
+        -if {$2!=0} -negate -endif
       -endl -done
     -else
       -check "$1==6 || $1==26"
       -repeat $! -l[$>]
-        -if {$2!=0} -negative -endif
+        -if {$2!=0} -negate -endif
         -f max(min(i,255),0)
         -if {$3>=0}
           -pink heightminima,$1,$3
         -endif
         -pink wshedtopo,$1
-        -if {$2!=0} -negative -endif
+        -if {$2!=0} -negate -endif
       -endl -done
     -endif
     -if {$s>1} -a[-$s--1] c -endif
@@ -19358,7 +19366,7 @@ x_minesweeper : -check "${1=20}>=8 && $1<=30 && ${2=$1}>=8 && $2<=30"
   # Pre-calculate offsets and canvas for faster board rendering.
   (0,23;0,23^0,0;23,23) -r. 24,24,1,2,3 -r. {board,w*24},{board,h*24},1,2,0,2 -nm. offsets
   .,.,1,3,255 -frame. 1,1,0 -frame. 23,23,255
-  0 -t. "Number of mines : "$nb_mines,0,0,18,1,100,200,255 -negative. -j.. .,{({-2,w}-w)/2},{{-2,h}-h-2} -rm.
+  0 -t. "Number of mines : "$nb_mines,0,0,18,1,100,200,255 -negate. -j.. .,{({-2,w}-w)/2},{{-2,h}-h-2} -rm.
   -nm. canvas
 
   # Start user interaction loop.
@@ -19374,20 +19382,20 @@ x_minesweeper : -check "${1=20}>=8 && $1<=30 && ${2=$1}>=8 && $2<=30"
     -if $failed
       0 -t. "Game\nOver!",3,3,38,1,255 -r. 100%,100%,1,4 -sh. 3 -dilate. 5 -/. 2 -rm.
       -drop_shadow. 5,5,1 -blend[canvas,-1] alpha
-      0 -t. "Boom! You failed!",0,0,18,1,100,255,255 -r. {canvas,w},100%,1,3,0,0,0.5,0.5 -negative. -j[canvas] .,0,3 -rm.
+      0 -t. "Boom! You failed!",0,0,18,1,100,255,255 -r. {canvas,w},100%,1,3,0,0,0.5,0.5 -negate. -j[canvas] .,0,3 -rm.
       -do -w[canvas] {w},{h} -wait -while {{*}" && "!{*,ESC}" && "!{*,Q}}
     -elif $succeeded
       0 -t. "Success!",3,3,38,1,255 -r. 100%,100%,1,4 -sh. 3 -dilate. 5 -/. 2 -rm.
       -drop_shadow. 5,5,1 -blend[canvas,-1] alpha
       0 -t. "Congratulations! ("{round($|-$tic)}" s)",0,0,18,1,255,100,255 -r. {canvas,w},100%,1,3,0,0,0.5,0.5
-      -negative. -j[canvas] .,0,3 -rm.
+      -negate. -j[canvas] .,0,3 -rm.
       -do -w[canvas] {w},{h} -wait -while {{*}" && "!{*,ESC}" && "!{*,Q}}
     -else
       --==[board] 10 nb_flags={is} -rm.
       -do
         -if {!$started} tic=$| -endif
         0 -t. "Elapsed time : "{round($|-$tic)}" s / Flags : "$nb_flags,0,0,18,1,255,200,0 -r. {canvas,w},100%,1,3,0,0,0.5,0.5
-        -negative. -j[canvas] .,0,3 -rm.
+        -negate. -j[canvas] .,0,3 -rm.
         -wait 50
         x={int(({*,x}-24)/24)} y={int(({*,y}-24)/24)} b={*,b}
         -w[canvas] {w},{h},0,"[G"{`39`}"MIC] Minesweeper"
@@ -22520,13 +22528,13 @@ gimp_asciiart : -skip ${10=},${11=},${12=}
     -elif {$1==6} dict=" \16\17\20\21"
     -elif {$1==7} dict=" \200\201\202\203\204\205\206\207\210\211\212\213\214\215\216\217\220\221\222\223\224\225\226\227\230\231"
     -endif
-    -if {$6==1} -negative -endif
+    -if {$6==1} -negate -endif
     -if $-3 --img2ascii $dict,$3,$4%,$5,"$-2"/"$-1"
     -else --img2ascii $dict,$3,$4%,$5
     -endif
     wh=${}
     -if {$6==0} -k. -n 0,255
-    -elif {$6==1} -k. -negative -n 0,255
+    -elif {$6==1} -k. -negate -n 0,255
     -elif {$6==2||$6==3}
       -r[0] $wh,1,100%,1
       -if {$9>=7} -luminance[0] -endif
@@ -22571,7 +22579,7 @@ gimp_dices :
 
     # Create dice patterns.
     -repeat 6 {2*$2},{2*$2} -_dice$> -done
-    -if {$3%2} -negative[-6--1] -endif
+    -if {$3%2} -negate[-6--1] -endif
     -frame_round[-6--1] 10,10,0,0,128,128,128,0
     -r2dy[-6--1] $2 -a[-6--1] x
 
@@ -24163,7 +24171,7 @@ gimp_hardsketchbw :
   -b $3
   -if {$7==4} -repeat $! -l[$>] --hardsketchbw $1,$2,$4,$5,$6 -blend hardlight -endl -done -return -endif
   -hardsketchbw $1,$2,$4,$5,$6
-  -if {$7&1} -negative -endif
+  -if {$7&1} -negate -endif
   -if {$7==2} -r 100%,100%,1,4 -repeat $! -sh[$>] 3 -*. -2 -+. {2*255} -c. 0,255 -rm. -done
   -elif {$7==3} -r 100%,100%,1,4 -repeat $! -sh[$>] 3 -*. 2 -c. 0,255 -rm. -done
   -endif
@@ -24184,7 +24192,7 @@ gimp_houghsketchbw :
   -b $1 -n 0,255
   -if {$6==4} -repeat $! -l[$>] --houghsketchbw ${2-5} -blend hardlight -endl -done -return -endif
   -houghsketchbw ${2-5}
-  -if {$6&1} -negative -endif
+  -if {$6&1} -negate -endif
   -if {$6==2} -r 100%,100%,1,4 -repeat $! -sh[$>] 3 -*. -2 -+. {2*255} -c. 0,255 -rm. -done
   -elif {$6==3} -r 100%,100%,1,4 -repeat $! -sh[$>] 3 -*. 2 -c. 0,255 -rm. -done
   -endif
@@ -24288,7 +24296,7 @@ gimp_pencil_portraitbw_preview :
 gimp_sketchbw :
   -if {$15==4} -repeat $! -l[$>] --sketchbw ${1-14} -blend hardlight -endl -done -return -endif
   -sketchbw ${1-14}
-  -if {$15&1} -negative -endif
+  -if {$15&1} -negate -endif
   -if {$15==2} -r 100%,100%,1,4 -repeat $! -sh[$>] 3 -*. -2 -+. {2*255} -c. 0,255 -rm. -done
   -elif {$15==3} -r 100%,100%,1,4 -repeat $! -sh[$>] 3 -*. 2 -c. 0,255 -rm. -done
   -endif
@@ -24316,7 +24324,7 @@ gimp_stamp :
     -b {if($7,1.5,1)*$3},0 -sharpen $4 -n 0,255
     -apply_curve 1,0,0,101,33,170,229,255,255
     -if $7 -r $wh,1,1,2 -endif
-    -if $6 -negative -endif
+    -if $6 -negate -endif
   -endl -a c -endl -done
 
 gimp_stamp_preview :
@@ -24418,7 +24426,7 @@ _gimp_channel_processing :
   -endif
   -if {$8!=256} -quantize. $8,1,0 -endif
   -if $9 -equalize. -endif
-  -if $10 -negative. -endif
+  -if $10 -negate. -endif
 
 gimp_channel_processing :
   -repeat $! -l. -split_opacity -rv -to_rgb.
@@ -25341,7 +25349,7 @@ gimp_curvature :
     -b $1 -iee
     -if $4 -abs -endif
     -c $2%,$3%
-    -if $5 -negative -endif
+    -if $5 -negate -endif
     -n 0,255
   -endl -a c -endl -done
 
@@ -25360,7 +25368,7 @@ gimp_dog :
   -dog $1%,$2%
   -if $5 -norm -endif
   -c $3%,{100-$3}%
-  -if $4 -negative -endif
+  -if $4 -negate -endif
   -n 0,255
 
 gimp_dog_preview :
@@ -25393,7 +25401,7 @@ gimp_distance_preview :
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
 gimp_edges :
   -to_rgb -b $1% -edges $2%
-  -if $3 -negative -endif
+  -if $3 -negate -endif
   -n 0,255
 
 gimp_edges_preview :
@@ -25411,7 +25419,7 @@ gimp_edge_offsets :
   -repeat $!
     os={s}
     -b. $1% -gradient_norm. ->=. $2% -skeleton. 0 -distance. 1 -round. 1 -%. $3 ->=. {max(1,$3-$4)}
-    -if {!$5} -negative. -endif
+    -if {!$5} -negate. -endif
     -n. 0,255 -to_colormode. $os
   -mv. 0 -done
 
@@ -25487,7 +25495,7 @@ gimp_extract_foreground :
 gimp_gradient_norm :
   -b $1 -gradient_norm -^ $2
   -c $3%,$4%
-  -if $5 -negative -endif
+  -if $5 -negate -endif
   -n 0,255
 
 gimp_gradient_norm_preview :
@@ -25504,7 +25512,7 @@ gimp_gradient_norm_preview :
 gimp_gradient2rgb :
   -b $1 -gradient2rgb $4
   -c $2%,$3%
-  -if $5 -negative -endif
+  -if $5 -negate -endif
   -n 0,255
 
 gimp_gradient2rgb_preview :
@@ -25538,7 +25546,7 @@ gimp_laplacian :
   -b $1 -laplacian
   -if $4 -abs -endif
   -c $2%,$3%
-  -if $5 -negative -endif
+  -if $5 -negate -endif
   -n 0,255
 
 gimp_laplacian_preview :
@@ -25556,7 +25564,7 @@ _gimp_local_orientation :
   -repeat $! -l[$>] -split_opacity -l[0]
     -b $1% -gradient_orientation 2 -complex2polar -rm[0--1:2]
     -c $2%,$3%
-    -if $4 -negative -endif
+    -if $4 -negate -endif
     -n 0,255
   -endl -a c -endl -done
 
@@ -25613,7 +25621,7 @@ _gimp_morpho_v2 :
     -my_action[0]
     -a c
   -endl -done
-  -if $5 -repeat $! -l[$>] -split_opacity -negative[0] -a c -endl -done -endif
+  -if $5 -repeat $! -l[$>] -split_opacity -negate[0] -a c -endl -done -endif
   -uncommand my_erode,my_dilate
 
 #@gimp Segmentation : gimp_segment_watershed, gimp_segment_watershed_preview(0)
@@ -25654,7 +25662,7 @@ gimp_skeleton_preview :
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
 gimp_thin_edges :
   -b $1% -gradient_norm ->= $2% -thinning
-  -if {!$3} -negative -endif
+  -if {!$3} -negate -endif
   -n 0,255
 
 gimp_thin_edges_preview :
@@ -26138,9 +26146,9 @@ gimp_twirl :
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>07/13/2011</i>.</small>")
 gimp_wind :
-  -if {!$5} -negative -endif
+  -if {!$5} -negate -endif
   -ac "-wind ${1-4}",$6,$7
-  -if {!$5} -negative -endif
+  -if {!$5} -negate -endif
 
 gimp_wind_preview :
   -gimp_split_preview "-gimp_wind $*",$-1
@@ -28404,7 +28412,7 @@ gimp_contrast_swm :
   -repeat $! -l[$>] -split_opacity -l[0]
    --luminance -to_rgb
     -blur_xy[1] $1,$1
-    -if {$2==0} -negative[1] -endif
+    -if {$2==0} -negate[1] -endif
     -rv -blend hardlight,$3
   -endl -a c -endl -done
 
@@ -28458,7 +28466,7 @@ _gimp_drop_shadow3d :
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Authors: <i>Francois Grassard</i> and <i>David Tschumperl&#233;</i>.      Latest update: <i>11/24/2012</i>.</small>")
 gimp_equalize_shadow :
-  -repeat $! -l[$>] --negative -blend softlight,$1 -endl -done
+  -repeat $! -l[$>] --negate -blend softlight,$1 -endl -done
 
 gimp_equalize_shadow_preview :
   -gimp_split_preview "-gimp_equalize_shadow $1",$-1
@@ -28841,10 +28849,10 @@ gimp_maze :
     w={w} h={h}
     -r. {100/$1}%,{100/$1}%,1,100%,2
     -if {$3==0} -f. 1
-    -elif {$3==1} -negative.
+    -elif {$3==1} -negate.
     -endif
     -maze_mask. $1 -dilate. $2 -*. 255
-    -if {!$5} -negative. -endif
+    -if {!$5} -negate. -endif
     -if $4 -r. $w,$h,100%,100% -endif
   -mv. 0 -done
 
@@ -31119,7 +31127,7 @@ gimp_text_pointcloud3d :
   -done
   -rm[0] -a z -autocrop -1 -to_rgba -s z -replace_color 0,0,-1,-1,-1,255,0,0,0,0
   -if $11 N=$! -repeat $! -l[$>] -rprogress {60+40*$>/$N}
-    -i[0] 100%,100%,1,4 -fc[0] ${8-11} --channels. 3,3 --negative. -b[-2,-1] $14% -to_rgba.
+    -i[0] 100%,100%,1,4 -fc[0] ${8-11} --channels. 3,3 --negate. -b[-2,-1] $14% -to_rgba.
     -j[0] .,$12%,$13%,0,0,1,..,255 -rm[-2,-1] -blend alpha
   -endl -done -endif
   -if {$W>$H} -r2dx $W -else -r2dy $H -endif
@@ -31736,7 +31744,7 @@ _gimp_intarsia :
 gimp_solve_maze :
   -repeat $!
     --norm. ->=. 50%
-    -if {!$10} -negative. -endif
+    -if {!$10} -negate. -endif
     -*. 255 --b. $5% -*.. 1e10 -+[-2,-1]
     -minimal_path. $1%,$2%,0,$3%,$4%,0
     -pointcloud. 0 -dilate. $6 -r. ..,..,1,1,0
@@ -31975,7 +31983,7 @@ gmicol_histogram :
 gmicol_histogram_preview :
   -to_rgb -dh 320,240,$1
 
-#@gmicol Negative : negative, negative
+#@gmicol Negative : negate, negate
 #@gmicol : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>10/23/2012</i>.</small>")
 
 #@gmicol Resize : gmicol_resize, _none_
