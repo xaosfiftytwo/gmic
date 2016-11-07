@@ -25307,7 +25307,7 @@ gimp_custom_transform :
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>06/06/2013</i>.</small>")
-gimp_convolve :
+gimp_convolve : -skip "${3=1}"
   -ac "-_gimp_convolve $1,$2,\"$3\",${4--3}",$-2
 
 _gimp_convolve :
@@ -25334,7 +25334,7 @@ _gimp_convolve14 : 3,3 -f 1 -r 7,7,1,1,4,0,0.5,0.5 -autocrop -normalize_sum # Im
 _gimp_convolve15 : 3,3 -f 1 -r 9,9,1,1,4,0,0.5,0.5 -autocrop -normalize_sum # Impulse 7x7
 _gimp_convolve16 : 3,3 -f 1 -r 11,11,1,1,4,0,0.5,0.5 -autocrop -normalize_sum # Impulse 9x9
 
-gimp_convolve_preview :
+gimp_convolve_preview : -skip "${3=1}"
   -gimp_split_preview "-gimp_convolve $1,$2,\"$3\",${4--1}",$-1
 
 #@gimp Curvature : gimp_curvature, gimp_curvature_preview(0)
