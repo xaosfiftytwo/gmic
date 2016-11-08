@@ -10,6 +10,7 @@ option(BUILD_LIB "Build the GMIC shared library" ON)
 option(BUILD_LIB_STATIC "Build the GMIC static library" ON)
 option(BUILD_CLI "Build the CLI interface" ON)
 option(BUILD_PLUGIN "Build the GIMP plug-in" ON)
+option(BUILD_MAN "Build the manpage" ON)
 option(ENABLE_X "Add support for X11" ON)
 option(ENABLE_FFMPEG "Add support for FFMpeg" ON)
 option(ENABLE_FFTW "Add support for FFTW" ON)
@@ -329,3 +330,15 @@ if(BUILD_PLUGIN)
     endif (GIMPUI_FOUND)
   endif (GIMP_FOUND)
 endif(BUILD_PLUGIN)
+
+if(BUILD_MAN)
+  file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/man)
+  add_custom_command(
+    OUTPUT ${CMAKE_SOURCE_DIR}/man/gmic.1.gz
+    DEPENDS gmic
+    COMMAND ${CMAKE_BINARY_DIR}/gmic -v - ${CMAKE_SOURCE_DIR}/src/gmic_stdlib.gmic raw:${CMAKE_SOURCE_DIR}/src/gmic_stdlib.gmic,uchar -__help man 2> ${CMAKE_SOURCE_DIR}/man/gmic.1
+    COMMAND gzip -f ${CMAKE_SOURCE_DIR}/man/gmic.1
+  )
+  add_custom_target(man ALL DEPENDS ${CMAKE_SOURCE_DIR}/man/gmic.1.gz)
+  INSTALL(FILES ${CMAKE_SOURCE_DIR}/man/gmic.1.gz DESTINATION ${CMAKE_INSTALL_MANDIR}/man1/)
+endif(BUILD_MAN)
