@@ -23719,7 +23719,9 @@ gimp_draw_whirl_preview :
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/11/2016</i>.</small>")
 gimp_autofill_lineart :
   -repeat $! -l[$>]
-    -if {s==2||s==4} --channels 100% -negate.
+    is_alpha={s==2||s==4}
+    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif
+    -if $is_alpha --channels 100% -negate.
     -else --norm -endif
     -ge. $1%
     -label_fg. 0,1
@@ -23728,13 +23730,13 @@ gimp_autofill_lineart :
     --b.. 0.8 -watershed.. . -rm. --. 1
     {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))" -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
     -map.. . -rm.
-    -gimp_set_layer_mode.. multiply
+    -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
   -endl -done
 
 gimp_autofill_lineart_preview :
   -repeat $! -l[$>]
     -gimp_autofill_lineart ${1-2}
-    -if $3 -k. -else -blend multiply -endif
+    -if $3 -k. -else -rv -blend multiply -endif
   -endl -done
 
 #@gimp Black &amp; white : gimp_blackandwhite, gimp_blackandwhite_preview(1)+
