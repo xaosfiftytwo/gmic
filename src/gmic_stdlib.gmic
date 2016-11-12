@@ -23715,7 +23715,7 @@ gimp_draw_whirl_preview :
 #@gimp Auto-fill lineart : gimp_autofill_lineart, gimp_autofill_lineart_preview(0)
 #@gimp : Edge threshold (%) = float(90,0,100)
 #@gimp : Minimal region area = int(8,0,256)
-#@gimp : Tolerance to gaps = int(1,0,10)
+#@gimp : Tolerance to gaps = int(0,0,10)
 #@gimp : Preview type = choice("Lineart + colors","Colors only")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/11/2016</i>.</small>")
 gimp_autofill_lineart :
