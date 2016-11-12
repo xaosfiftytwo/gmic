@@ -23713,35 +23713,65 @@ gimp_draw_whirl_preview :
 #-------------------------------
 
 #@gimp Auto-fill lineart : gimp_autofill_lineart, gimp_autofill_lineart_preview(0)
-#@gimp : Edge threshold (%) = float(95,0,100)
-#@gimp : Minimal area = int(8,0,256)
+#@gimp : Edge threshold (%) = float(90,0,100)
+#@gimp : Minimal region area = int(8,0,256)
+#@gimp : Tolerance to gaps = int(1,0,10)
 #@gimp : Preview type = choice("Lineart + colors","Colors only")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/11/2016</i>.</small>")
 gimp_autofill_lineart :
-  min_area={round($2*sqrt($2))}
   -repeat $! -l[$>] nm=${-gimp_layer_name}
+
+    # Format input lineart to expected format.
     is_alpha={s==2||s==4}
-    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif
+    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif # Check is alpha-channel contains lineart
     -if $is_alpha --channels 100% -negate.
     -else --norm -endif
-    -ge. $1%
-    -label_fg. 0,1
-    --area. 0,1 label_maxarea={"P=[xM,yM];i(#-2,P)-1"}
-    -ge. $min_area -*[-2,-1]
-    --b.. 0.8 -watershed.. . -rm. N={iM} --. 1
-    -if $N
-      -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))" -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
-      -map.. . -rm.
-    -endif
+    -n. 0,255
+    -l.
+
+      # Start multi-scale filling.
+      -repeat {1+$3}
+        fact={2^-$<}
+        nw={0,max(1,round(w*$fact))}
+        nh={0,max(1,round(h*$fact))}
+        --r[0] $nw,$nh,1,1,2 --ge. $1%
+
+        -if $colors
+          -scale2x[colors] -r[colors] .,1 -*[colors,-1] -rv[-2,-1]
+        -endif
+
+        -label_fg. 0,1 -b.. 0.8 -watershed. .. -rm.. -nm. colors
+      -done
+
+      # Inpaint regions that are too small.
+      --area. 0,1 label_maxarea={"P=[xM,yM];i(#-2,P)-1"}
+      -if {$2>1}
+        -gt. {$2*sqrt($2)} -*[-2,-1]
+        -b.. 0.8 -watershed. ..
+      -else
+        -rm.
+      -endif
+      -rm..
+
+      # Colorize regions.
+      N={iM}
+      -if $N
+        --. 1
+        -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))"
+        -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
+        -map.. . -rm.
+      -endif
+    -endl
+
+    # Format output layers.
     -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
-    -gimp_set_layer_name.. $nm" [lineart]"
     -gimp_set_layer_name. $nm" [colors]"
   -endl -done
 
 gimp_autofill_lineart_preview :
   -repeat $! -l[$>]
-    -gimp_autofill_lineart ${1-2}
-    -if $3 -k. -else -rv -blend multiply -endif
+    -gimp_autofill_lineart ${1-3}
+    -if $4 -k. -else -rv -blend multiply -endif
   -endl -done
 
 #@gimp Black &amp; white : gimp_blackandwhite, gimp_blackandwhite_preview(1)+
