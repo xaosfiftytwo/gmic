@@ -23718,7 +23718,7 @@ gimp_draw_whirl_preview :
 #@gimp : Preview type = choice("Lineart + colors","Colors only")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/11/2016</i>.</small>")
 gimp_autofill_lineart :
-  -repeat $! -l[$>]
+  -repeat $! -l[$>] nm=${-gimp_layer_name}
     is_alpha={s==2||s==4}
     -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif
     -if $is_alpha --channels 100% -negate.
@@ -23733,6 +23733,8 @@ gimp_autofill_lineart :
       -map.. . -rm.
     -endif
     -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
+    -gimp_set_layer_name.. $nm" [lineart]"
+    -gimp_set_layer_name. $nm" [colors]"
   -endl -done
 
 gimp_autofill_lineart_preview :
