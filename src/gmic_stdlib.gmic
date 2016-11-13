@@ -23424,7 +23424,7 @@ gimp_painting : -skip ${4=0},${5=0}
   -repeat $! -l[$>]
     -to_colormode {max(3,s)} -split_opacity -rv
     -repeat $1 -gimp_normalize_local. 10,6,5,20,1,11 -done
-    -gimp_anisotropic_smoothing. {100*$2},0.2,1,$2,{2*$2},0.8,90,2,0,1,1,2,1,16
+    -gimp_smooth_anisotropic. {100*$2},0.2,1,$2,{2*$2},0.8,90,2,0,1,1,2,1,16
     -gimp_mix_lab. 1,0,0,$3,0,0.5,$3,0,0.5,0,2,0
     -if $5 -gimp_segment_watershed. 10,1,0 -endif
     -smooth. $4,0,1,1,1
@@ -23712,69 +23712,6 @@ gimp_draw_whirl_preview :
 #@gimp _<b>Black &amp; white</b>
 #-------------------------------
 
-#@gimp Auto-fill lineart : gimp_autofill_lineart, gimp_autofill_lineart_preview(0)
-#@gimp : Contour threshold (%) = float(90,0,100)
-#@gimp : Contour normalization = bool(1)
-#@gimp : Minimal region area = int(8,0,256)
-#@gimp : Tolerance to gaps = int(0,0,10)
-#@gimp : Preview type = choice("Lineart + colors","Colors only")
-#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/12/2016</i>.</small>")
-gimp_autofill_lineart :
-  -repeat $! -l[$>] nm=${-gimp_layer_name}
-
-    # Format input lineart to expected format.
-    is_alpha={s==2||s==4}
-    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif # Check is alpha-channel contains lineart
-    -if $is_alpha --channels 100% -negate.
-    -else --norm -endif
-    -n. 0,255
-    -l.
-
-      # Start multi-scale filling.
-      -repeat {1+$4}
-        fact={2^-$<}
-        nw={0,max(1,round(w*$fact))}
-        nh={0,max(1,round(h*$fact))}
-        --r[0] $nw,$nh,1,1,2 -if $2 -normalize_local. , -endif --ge. {min(99.5,$1)}%
-
-        -if $colors
-          -scale2x[colors] -r[colors] .,1 -*[colors,-1] -rv[-2,-1]
-        -endif
-
-        -label_fg. 0,1 -b.. 0.8 -watershed. .. -rm.. -nm. colors
-      -done
-
-      # Inpaint regions that are too small.
-      --area. 0,1 label_maxarea={"P=[xM,yM];i(#-2,P)-1"}
-      -if {$3>1}
-        -gt. {$3*sqrt($3)} -*[-2,-1]
-        -b.. 0.8 -watershed. ..
-      -else
-        -rm.
-      -endif
-      -rm..
-
-      # Colorize regions.
-      N={iM}
-      -if $N
-        --. 1
-        -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))"
-        -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
-        -map.. . -rm.
-      -endif
-    -endl
-
-    # Format output layers.
-    -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
-    -gimp_set_layer_name. $nm" [colors]"
-  -endl -done
-
-gimp_autofill_lineart_preview :
-  -repeat $! -l[$>]
-    -gimp_autofill_lineart ${1-4}
-    -if $5 -k. -else -rv -blend multiply -endif
-  -endl -done
-
 #@gimp Black &amp; white : gimp_blackandwhite, gimp_blackandwhite_preview(1)+
 #@gimp : Red level = float(0.299,0,1)
 #@gimp : Red smoothness = float(0,0,10)
@@ -23880,7 +23817,70 @@ gimp_charcoal :
 gimp_charcoal_preview :
   -gimp_split_preview "-gimp_charcoal $*",$-1
 
-#@gimp Colorize [comics] : gimp_colorize_comics, gimp_colorize_comics_preview(1)
+#@gimp Colorize [auto-fill lineart] : gimp_autofill_lineart, gimp_autofill_lineart_preview(0)
+#@gimp : Contour threshold (%) = float(90,0,100)
+#@gimp : Contour normalization = bool(1)
+#@gimp : Minimal region area = int(8,0,256)
+#@gimp : Tolerance to gaps = int(0,0,10)
+#@gimp : Preview type = choice("Lineart + colors","Colors only")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/12/2016</i>.</small>")
+gimp_autofill_lineart :
+  -repeat $! -l[$>] nm=${-gimp_layer_name}
+
+    # Format input lineart to expected format.
+    is_alpha={s==2||s==4}
+    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif # Check is alpha-channel contains lineart
+    -if $is_alpha --channels 100% -negate.
+    -else --norm -endif
+    -n. 0,255
+    -l.
+
+      # Start multi-scale filling.
+      -repeat {1+$4}
+        fact={2^-$<}
+        nw={0,max(1,round(w*$fact))}
+        nh={0,max(1,round(h*$fact))}
+        --r[0] $nw,$nh,1,1,2 -if $2 -normalize_local. , -endif --ge. {min(99.5,$1)}%
+
+        -if $colors
+          -scale2x[colors] -r[colors] .,1 -*[colors,-1] -rv[-2,-1]
+        -endif
+
+        -label_fg. 0,1 -b.. 0.8 -watershed. .. -rm.. -nm. colors
+      -done
+
+      # Inpaint regions that are too small.
+      --area. 0,1 label_maxarea={"P=[xM,yM];i(#-2,P)-1"}
+      -if {$3>1}
+        -gt. {$3*sqrt($3)} -*[-2,-1]
+        -b.. 0.8 -watershed. ..
+      -else
+        -rm.
+      -endif
+      -rm..
+
+      # Colorize regions.
+      N={iM}
+      -if $N
+        --. 1
+        -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))"
+        -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
+        -map.. . -rm.
+      -endif
+    -endl
+
+    # Format output layers.
+    -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
+    -gimp_set_layer_name. $nm" [colors]"
+  -endl -done
+
+gimp_autofill_lineart_preview :
+  -repeat $! -l[$>]
+    -gimp_autofill_lineart ${1-4}
+    -if $5 -k. -else -rv -blend multiply -endif
+  -endl -done
+
+#@gimp Colorize [lineart] : gimp_colorize_lineart, gimp_colorize_lineart_preview(1)
 #@gimp : note = note("<b>Layers ordering:</b>")
 #@gimp : Input layers = choice{0,"Color spots + lineart","Lineart + color spots","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
 #@gimp : Output layers = _choice{1,"Single (merged)","Extrapolated colors + lineart","Lineart + extrapolated colors","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
@@ -23897,7 +23897,7 @@ gimp_charcoal_preview :
 #@gimp : </small>"}
 #@gimp : sep = separator(), link = link("Click here for a detailed description of this filter.","http://www.gimpchat.com/viewtopic.php?f=28&t=7567")
 #@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>Timoth&#233;e Giet</i> and <i>David Revoy</i>.      Latest update: <i>06/19/2013</i>.</small>")
-gimp_colorize_comics :
+gimp_colorize_lineart :
   -if {$!<2} -return -endif
   -if {$1<2} selection=0,1 -else selection=0,1,2 -endif
   -l[$selection]
@@ -23946,8 +23946,8 @@ gimp_colorize_comics :
 
   -endl
 
-gimp_colorize_comics_preview :
-  -gimp_colorize_comics $1,0,$3,$4
+gimp_colorize_lineart_preview :
+  -gimp_colorize_lineart $1,0,$3,$4
 
 #@gimp Colorize [interactive] : gimp_colorize_interactive, gimp_colorize_interactive_preview
 #@gimp : Input type = _choice("B&amp;W photograph","Lineart")
@@ -24311,7 +24311,7 @@ gimp_ink_wash :
   -repeat $! -l[$>] -split_opacity -l[0]
     -gimp_pencilbw. $1,$2,0,0,0
     -if {$3==1} -continue
-    -elif {$3==0} -gimp_anisotropic_smoothing. 60,$4,$5,$6,1.1,0.8,30,2,0,1,1,0,1,16
+    -elif {$3==0} -gimp_smooth_anisotropic. 60,$4,$5,$6,1.1,0.8,30,2,0,1,1,0,1,16
     -endif
     -if {$7==1} -normalize_local. 2,6,5,24,1,0,255
     -elif {$7==2} -normalize_local. 2,6,5,24,1,0,255 -gimp_contrast_swm 2,0,0.512
@@ -29555,7 +29555,7 @@ gimp_solidify_td :
 gimp_solidify_td_preview :
   -gimp_split_preview "-gimp_solidify_td $*",$-1
 
-#@gimp Smooth [anisotropic] : gimp_anisotropic_smoothing, gimp_anisotropic_smoothing_preview(0)
+#@gimp Smooth [anisotropic] : gimp_smooth_anisotropic, gimp_smooth_anisotropic_preview(0)
 #@gimp : Amplitude = float(60,0,1000)
 #@gimp : Sharpness = float(0.7,0,2)
 #@gimp : Anisotropy = float(0.3,0,1)
@@ -29570,41 +29570,57 @@ gimp_solidify_td_preview :
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_anisotropic_smoothing :
+gimp_smooth_anisotropic :
   -repeat $! -l[$>]
     -ac "-repeat $11 -smooth $1,$2,$3,$4,$5,$6,$7,$8,$9,$10 -done",$12
   -endl -done -c 0,255
 
-gimp_anisotropic_smoothing_preview :
-  -gimp_split_preview "-gimp_anisotropic_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_anisotropic_preview :
+  -gimp_split_preview "-gimp_smooth_anisotropic $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [bilateral] : gimp_bilateral, gimp_bilateral_preview(0)
+#@gimp Smooth [antialias] : gimp_smooth_antialias, gimp_smooth_antialias_preview(0)
+#@gimp : Amplitude = float(5,0,100)
+#@gimp : Edge threshold (%) = float(10,0,100)
+#@gimp : Smoothness = float(0.8,0,4)
+#@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>13/11/2016</i>.</small>")
+gimp_smooth_antialias :
+  -repeat $! -l[$>]
+    --diffusiontensors 0,1,1,$3,$3
+    --gradient_norm.. -ge. $2% -*[-2,-1]
+    -smooth.. .,$1,0.5,120,2,1 -rm.
+  -endl -done
+
+gimp_smooth_antialias_preview :
+  -gimp_split_preview "-gimp_smooth_antialias $*",$-1
+
+#@gimp Smooth [bilateral] : gimp_smooth_bilateral, gimp_smooth_bilateral_preview(0)
 #@gimp : Spatial variance = float(10,0,100)
 #@gimp : Value variance = float(7,0,100)
 #@gimp : Iterations = int(2,1,10)
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_bilateral : -skip ${5=0},${6=0}
+gimp_smooth_bilateral : -skip ${5=0},${6=0}
   -ac "-repeat $3 -bilateral $1,$2 -done",$4
 
-gimp_bilateral_preview :
-  -gimp_split_preview "-gimp_bilateral $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_bilateral_preview :
+  -gimp_split_preview "-gimp_smooth_bilateral $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [guided] : gimp_blur_guided, gimp_blur_guided_preview(0)
+#@gimp Smooth [guided] : gimp_smooth_guided, gimp_smooth_guided_preview(0)
 #@gimp : Radius = int(5,1,100)
 #@gimp : Smoothness = float(30,0,512)
 #@gimp : Iterations = int(1,1,10)
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>10/29/2014</i>.</small>")
-gimp_blur_guided : -skip ${5=0},${6=0}
+gimp_smooth_guided : -skip ${5=0},${6=0}
   -ac "-repeat $3 -guided $1,$2 -done",$4
 
-gimp_blur_guided_preview :
-  -gimp_split_preview "-gimp_blur_guided $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_guided_preview :
+  -gimp_split_preview "-gimp_smooth_guided $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [diffusion] : gimp_diffusion_smoothing, gimp_diffusion_smoothing_preview(0)
+#@gimp Smooth [diffusion] : gimp_smooth_diffusion, gimp_smooth_diffusion_preview(0)
 #@gimp : Sharpness = float(0.7,0,2)
 #@gimp : Anisotropy = float(0.3,0,1)
 #@gimp : Gradient smoothness = float(0.6,0,10)
@@ -29615,13 +29631,13 @@ gimp_blur_guided_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_diffusion_smoothing :
+gimp_smooth_diffusion :
   -ac "-gimp_parallel_overlap \"-smooth $6,$1,$2,$3,$4,$5,0 -c 0,255\",$8,$9",$7
 
-gimp_diffusion_smoothing_preview :
-  -gimp_split_preview "-gimp_diffusion_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_diffusion_preview :
+  -gimp_split_preview "-gimp_smooth_diffusion $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [mean-curvature] : gimp_meancurvature_smoothing, gimp_meancurvature_smoothing_preview(0)
+#@gimp Smooth [mean-curvature] : gimp_smooth_meancurvature, gimp_smooth_meancurvature_preview(0)
 #@gimp : Time step = float(30,5,50)
 #@gimp : Iterations = int(4,1,30)
 #@gimp : Keep iterations as different layers = bool(false)
@@ -29629,25 +29645,25 @@ gimp_diffusion_smoothing_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_meancurvature_smoothing :
+gimp_smooth_meancurvature :
   -ac "-gimp_parallel_overlap \"-meancurvature_flow $2,$1,$3 -c 0,255\",$5,$6",$4
 
-gimp_meancurvature_smoothing_preview :
-  -gimp_split_preview "-gimp_meancurvature_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_meancurvature_preview :
+  -gimp_split_preview "-gimp_smooth_meancurvature $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [median] : gimp_median, gimp_median_preview(0)
+#@gimp Smooth [median] : gimp_smooth_median, gimp_smooth_median_preview(0)
 #@gimp : Radius = int(3,1,20)
 #@gimp : Threshold = float(255,0,255)
 #@gimp : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
-gimp_median :
+gimp_smooth_median :
   -ac "-median $1,$2",$3
 
-gimp_median_preview :
-  -gimp_split_preview "-gimp_median $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_median_preview :
+  -gimp_split_preview "-gimp_smooth_median $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [nlmeans] : gimp_nlmeans, gimp_nlmeans_preview(0)
+#@gimp Smooth [nlmeans] : gimp_smooth_nlmeans, gimp_smooth_nlmeans_preview(0)
 #@gimp : Patch size = float(4,0.5,10)
 #@gimp : Spatial bandwidth = int(4,3,13)
 #@gimp : Tonal bandwidth = float(10,1,50)
@@ -29656,24 +29672,24 @@ gimp_median_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical")
 #@gimp : sep = separator(), note = note("<small>Author: <i>J&#233;r&#244;me Boulanger</i>.      Latest update: <i>2015/01/07</i>.</small>")
-gimp_nlmeans:
+gimp_smooth_nlmeans:
   -repeat $! -l[$>]
-    -if {s==1} -nlmeans $1,$2,$3,-_gimp_nlmeans$4 # Handle separatly gray scale images.
-    -else -ac "-gimp_parallel_overlap \"-nlmeans $1,$2,$3,-_gimp_nlmeans$4\",$6,$7",$5
+    -if {s==1} -nlmeans $1,$2,$3,-_gimp_smooth_nlmeans$4 # Handle separatly gray scale images.
+    -else -ac "-gimp_parallel_overlap \"-nlmeans $1,$2,$3,-_gimp_smooth_nlmeans$4\",$6,$7",$5
     -endif
   -endl -done
 
-_gimp_nlmeans0 : -s c -abs -max
-_gimp_nlmeans1 : -s c -abs -+
-_gimp_nlmeans2 : -norm
-_gimp_nlmeans3 : -if {s>=3} -channels 0,2 -luminance -else -norm -endif
-_gimp_nlmeans4 : -if {s>=3} -channels 0,2 -srgb2rgb -rgb2lab -channels 0 -else -norm -endif
-_gimp_nlmeans5 :
+_gimp_smooth_nlmeans0 : -s c -abs -max
+_gimp_smooth_nlmeans1 : -s c -abs -+
+_gimp_smooth_nlmeans2 : -norm
+_gimp_smooth_nlmeans3 : -if {s>=3} -channels 0,2 -luminance -else -norm -endif
+_gimp_smooth_nlmeans4 : -if {s>=3} -channels 0,2 -srgb2rgb -rgb2lab -channels 0 -else -norm -endif
+_gimp_smooth_nlmeans5 :
 
-gimp_nlmeans_preview:
-  -gimp_split_preview "-gimp_nlmeans $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_nlmeans_preview:
+  -gimp_split_preview "-gimp_smooth_nlmeans $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [patch-based] : gimp_patch_smoothing, gimp_patch_smoothing_preview(0)
+#@gimp Smooth [patch-based] : gimp_smooth_patch, gimp_smooth_patch_preview(0)
 #@gimp : Spatial variance = float(10,0.1,200)
 #@gimp : Patch variance = float(10,0.1,200)
 #@gimp : Patch size = int(3,2,21)
@@ -29685,13 +29701,13 @@ gimp_nlmeans_preview:
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_patch_smoothing :
+gimp_smooth_patch :
   -ac "-gimp_parallel_overlap \"-repeat $7 -denoise $1,$2,$3,$4,$5,$6 -done -c 0,255\",$9,$10",$8
 
-gimp_patch_smoothing_preview :
-  -gimp_split_preview "-gimp_patch_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_patch_preview :
+  -gimp_split_preview "-gimp_smooth_patch $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [patch-pca] : gimp_pca_smoothing, gimp_pca_smoothing_preview(0)
+#@gimp Smooth [patch-pca] : gimp_smooth_patchpca, gimp_smooth_patchpca_preview(0)
 #@gimp : Strength = float(4,0,16)
 #@gimp : Patch size = int(7,2,21)
 #@gimp : Lookup size = int(11,2,21)
@@ -29702,13 +29718,13 @@ gimp_patch_smoothing_preview :
 #@gimp : available for the computation :)
 #@gimp : </small>"}
 #@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i> and <i>J&#233;rome Boulanger</i>.      Latest update: <i>03/24/2016</i>.</small>")
-gimp_pca_smoothing :
+gimp_smooth_patchpca :
   -ac "-denoise_patchpca ${1-4} -c 0,255",$5
 
-gimp_pca_smoothing_preview :
-  -gimp_split_preview "-gimp_pca_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_patchpca_preview :
+  -gimp_split_preview "-gimp_smooth_patchpca $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [perona-malik] : gimp_peronamalik_smoothing, gimp_peronamalik_smoothing_preview(0)
+#@gimp Smooth [perona-malik] : gimp_smooth_peronamalik, gimp_smooth_peronamalik_preview(0)
 #@gimp : K-factor = float(20,0,255)
 #@gimp : Time step = float(5,5,50)
 #@gimp : Iterations = int(5,1,30)
@@ -29717,13 +29733,13 @@ gimp_pca_smoothing_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/26/2014</i>.</small>")
-gimp_peronamalik_smoothing :
+gimp_smooth_peronamalik :
   -ac "-gimp_parallel_overlap \"-peronamalik_flow $1,$3,$2,$4 -c 0,255\",$6,$7",$5
 
-gimp_peronamalik_smoothing_preview :
-  -gimp_split_preview "-gimp_peronamalik_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_peronamalik_preview :
+  -gimp_split_preview "-gimp_smooth_peronamalik $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [selective gaussian] : gimp_selective_smoothing, gimp_selective_smoothing_preview(0)
+#@gimp Smooth [selective gaussian] : gimp_smooth_selective, gimp_smooth_selective_preview(0)
 #@gimp : Amplitude = float(5,0,20)
 #@gimp : Edges = float(0.5,0,2)
 #@gimp : Scales = int(5,1,10)
@@ -29732,11 +29748,11 @@ gimp_peronamalik_smoothing_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_selective_smoothing :
+gimp_smooth_selective :
   -ac "-gimp_parallel_overlap \"-repeat $4 -blur_selective $1,$2,$3 -done -c 0,255\",$6,$7",$5
 
-gimp_selective_smoothing_preview :
-  -gimp_split_preview "-gimp_selective_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_selective_preview :
+  -gimp_split_preview "-gimp_smooth_selective $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
 #@gimp Smooth [skin] : gimp_smooth_skin, gimp_smooth_skin_preview(1)
 #@gimp : note = note("<small><b>Step 1:</b> Skin detection</small>")
@@ -29812,7 +29828,7 @@ gimp_smooth_skin_preview :
     -line {$6+0.25*$8}%,{$7-0.25*$8}%,{$6-0.25*$8}%,{$7+0.25*$8}%,0.8,255,255,0
   -endif
 
-#@gimp Smooth [thin brush] : gimp_anisotropic_smoothing, gimp_anisotropic_smoothing(0)
+#@gimp Smooth [thin brush] : gimp_smooth_anisotropic, gimp_smooth_anisotropic(0)
 #@gimp : Amplitude = float(60,0,1000)
 #@gimp : Sharpness = float(0.9,0,2)
 #@gimp : Anisotropy = float(0.64,0,1)
@@ -29829,7 +29845,7 @@ gimp_smooth_skin_preview :
 #@gimp : note = note{"\n<small><b>Note: </b>This set of anisotropic smoothing parameters has been suggested by PhotoComiX.</small>"}
 #@gimp : sep = separator(), note = note("<small>Author: <i>PhotoComiX</i>.      Latest update: <i>12/26/2010</i>.</small>")
 
-#@gimp Smooth [total variation] : gimp_tv_smoothing, gimp_tv_smoothing_preview(0)
+#@gimp Smooth [total variation] : gimp_smooth_tv, gimp_smooth_tv_preview(0)
 #@gimp : Time step = float(30,5,100)
 #@gimp : Iterations = int(10,1,40)
 #@gimp : Keep iterations as different layers = bool(false)
@@ -29837,13 +29853,13 @@ gimp_smooth_skin_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_tv_smoothing :
+gimp_smooth_tv :
   -ac "-gimp_parallel_overlap \"-tv_flow $2,$1,$3 -c 0,255\",$5,$6",$4
 
-gimp_tv_smoothing_preview :
-  -gimp_split_preview "-gimp_tv_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_tv_preview :
+  -gimp_split_preview "-gimp_smooth_tv $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
-#@gimp Smooth [wavelets] : gimp_haar_smoothing, gimp_haar_smoothing_preview(0)
+#@gimp Smooth [wavelets] : gimp_smooth_haar, gimp_smooth_haar_preview(0)
 #@gimp : Threshold = float(1,0,10)
 #@gimp : Iterations = int(10,1,32)
 #@gimp : Scales = int(10,2,10)
@@ -29851,12 +29867,12 @@ gimp_tv_smoothing_preview :
 #@gimp : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gimp : sep = separator(), note = note("<small>Author: <i>J&#233;rome Boulanger and David Tschumperl&#233;</i>.      Latest update: <i>08/27/2013</i>.</small>")
-gimp_haar_smoothing :
+gimp_smooth_haar :
   -remove_opacity
   -ac "-gimp_parallel_overlap \"-denoise_haar $1,$3,$2 -c 0,255\",$5,$6",$4
 
-gimp_haar_smoothing_preview :
-  -gimp_split_preview "-gimp_haar_smoothing $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
+gimp_smooth_haar_preview :
+  -gimp_split_preview "-gimp_smooth_haar $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
 #@gimp Upscale [diffusion] : gimp_upscale_smart, gimp_upscale_smart_preview(0)
 #@gimp : Width = text("200%")
