@@ -6296,19 +6296,20 @@ lab2lch :
     -s c -complex2polar[-2,-1] -a c
   -endl -done -v +
 
-#@gmic lab2rgb : _illuminant={ 0=D50 | 1=D65 } : (no arg) : (+)
+#@gmic lab2rgb : _illuminant={ 0=D50 | 1=D65 } : (+)
 #@gmic : Convert selected images from Lab to RGB colorbases.
 #@gmic : $ (50,50;50,50^-3,3;-3,3^-3,-3;3,3) -resize 400,400,1,3,3 -lab2rgb
 
-#@gmic lab82rgb
+#@gmic lab82rgb : _illuminant={ 0=D50 | 1=D65 }
 #@gmic : Convert selected images from Lab8 to RGB color bases.
-lab82rgb :
+lab82rgb : -skip "${1=,}"
+  -v - -if {isval("$1")} wp={"$1?1:0"} -else -if {["'$1'"]!=','} -noarg -endif wp=1 -endif -v +
   -e[^-1] "Convert image$? from Lab8 to RGB color bases."
   -v - -repeat $!
     -sh[$>] 0 -/. 2.55 -rm.
     -sh[$>] 1 -/. 1.275 --. 100 -rm.
     -sh[$>] 2 -/. 1.15909 --. 110 -rm.
-  -done -lab2rgb -v +
+  -done -lab2rgb $wp -v +
 
 #@gmic lch2lab
 #@gmic : Convert selected images from Lch to Lab color bases.
@@ -6504,17 +6505,18 @@ _rgb2hsx8 :
     -sh[$>] 1,2 -*. 255 -rm.
   -done
 
-#@gmic rgb2lab : _illuminant={ 0=D50 | 1=D65 } : (no arg) : (+)
+#@gmic rgb2lab : _illuminant={ 0=D50 | 1=D65 } : (+)
 #@gmic : Convert selected images from RGB to Lab colorbases.
 #@gmic : $ image.jpg -rgb2lab -split c
 #@gmic : $ image.jpg -rgb2lab --split c -mul[-2,-1] 2.5 -append[-3--1] c -lab2rgb
 
-#@gmic rgb2lab8
+#@gmic rgb2lab8 : _illuminant={ 0=D50 | 1=D65 }
 #@gmic : Convert selected images from RGB to Lab8 color bases.
 #@gmic : $ image.jpg -rgb2lab8 -split c
-rgb2lab8 :
+rgb2lab8 : -skip "${1=,}"
+  -v - -if {isval("$1")} wp={"$1?1:0"} -else -if {["'$1'"]!=','} -noarg -endif wp=1 -endif -v +
   -e[^-1] "Convert image$? from RGB to Lab8 color bases."
-  -v - -rgb2lab -repeat $!
+  -v - -rgb2lab $wp -repeat $!
     -sh[$>] 0 -*. 2.55 -rm.
     -sh[$>] 1 -+. 100 -*. 1.275 -rm.
     -sh[$>] 2 -+. 110 -*. 1.15909 -rm.
@@ -6563,7 +6565,7 @@ rgb2int :
 #@gmic rgb2srgb : (+)
 #@gmic : Convert selected images from RGB to sRGB colorbases.
 
-#@gmic rgb2xyz : _illuminant={ 0=D50 | 1=D65 } : (no arg)
+#@gmic rgb2xyz : _illuminant={ 0=D50 | 1=D65 }
 #@gmic : Convert selected images from RGB to XYZ colorbases.
 #@gmic : Default value: 'illuminant=0'.
 #@gmic : $ image.jpg -rgb2xyz -split c
@@ -6582,12 +6584,13 @@ rgb2xyz : -skip "${1=,}"
              0.01391602,0.09706116,0.71392822
   -endif -v +
 
-#@gmic rgb2xyz8
+#@gmic rgb2xyz8 : _illuminant={ 0=D50 | 1=D65 }
 #@gmic : Convert selected images from RGB to XYZ8 color bases.
 #@gmic : $ image.jpg -rgb2xyz8 -split c
-rgb2xyz8 :
+rgb2xyz8 : -skip "${1=,}"
+  -v - -if {isval("$1")} wp={"$1?1:0"} -else -if {["'$1'"]!=','} -noarg -endif wp=1 -endif -v +
   -e[^-1] "Convert image$? from RGB to XYZ8 color bases."
-  -v - -rgb2xyz -repeat $!
+  -v - -rgb2xyz $wp -repeat $!
     -sh[$>] 0 -*. 255 -rm.
     -sh[$>] 1 -*. 255 -rm.
     -sh[$>] 2 -*. 231.8182 -rm.
@@ -6985,7 +6988,7 @@ _transfer_rgb : -v - -l[] -check "${1=0}>=0 && ${2=1.5}>=0 && ${3=128}>0" gamma=
     -pointcloud 1,$res,$res,$res -f 'if(i,i^$gamma,0)' -b $smoothness% -n 0,1
   -endl -done -v +
 
-#@gmic xyz2rgb : _illuminant={ 0=D50 | 1=D65 } : (no arg)
+#@gmic xyz2rgb : _illuminant={ 0=D50 | 1=D65 }
 #@gmic : Convert selected images from XYZ to RGB colorbases.
 #@gmic : Default value: 'illuminant=0'.
 xyz2rgb : -skip "${1=,}"
@@ -7003,15 +7006,16 @@ xyz2rgb : -skip "${1=,}"
   -endif
   -* 255 -c 0,255 -v +
 
-#@gmic xyz82rgb
+#@gmic xyz82rgb : _illuminant={ 0=D50 | 1=D65 }
 #@gmic : Convert selected images from XYZ8 to RGB color bases.
-xyz82rgb :
+xyz82rgb : -skip "${1=,}"
+  -v - -if {isval("$1")} wp={"$1?1:0"} -else -if {["'$1'"]!=','} -noarg -endif wp=1 -endif -v +
   -e[^-1] "Convert image$? from XYZ8 to RGB color bases."
   -v - -repeat $!
     -sh[$>] 0 -/. 255 -rm.
     -sh[$>] 1 -/. 255 -rm.
     -sh[$>] 2 -/. 231.8182 -rm.
-  -done -xyz2rgb -v +
+  -done -xyz2rgb $wp -v +
 
 #@gmic ycbcr2rgb
 #@gmic : Convert selected images from YCbCr to RGB colorbases.
