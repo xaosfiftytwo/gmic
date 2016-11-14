@@ -29579,7 +29579,7 @@ gimp_smooth_anisotropic_preview :
   -gimp_split_preview "-gimp_smooth_anisotropic $*",$-1,{if(isval($GMIC_GIMP_TIMEOUT),0$GMIC_GIMP_TIMEOUT,8)}
 
 #@gimp Smooth [antialias] : gimp_smooth_antialias, gimp_smooth_antialias_preview(0)
-#@gimp : Amplitude = float(10,0,100)
+#@gimp : Amplitude = float(5,0,100)
 #@gimp : Edge threshold (%) = float(10,0,100)
 #@gimp : Smoothness = float(0.8,0,5)
 #@gimp : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
