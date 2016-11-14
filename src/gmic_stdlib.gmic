@@ -6569,11 +6569,8 @@ rgb2int :
 #@gmic : $ image.jpg -rgb2xyz -split c
 rgb2xyz : -skip "${1=,}"
   -v -
-  -if {isval("$1")} wp={"$1?1:0"} -else
-    -if {["'$1'"]!=','} -noarg -endif
-    wp=0
-  -endif
-  -v + -e[^-1] "Convert image$? from RGB to XYZ color bases, with D"{arg(1+$wp,65,50)}" illuminant." -v -
+  -if {isval("$1")} wp={"$1?1:0"} -else -if {["'$1'"]!=','} -noarg -endif wp=1 -endif
+  -v + -e[^-1] "Convert image$? from RGB to XYZ color bases, with D"{arg(1+$wp,50,65)}" illuminant." -v -
   -/ 255
   -if $wp # D65
     -mix_rgb 0.4124564,0.3575761,0.1804375,\
@@ -6992,11 +6989,7 @@ _transfer_rgb : -v - -l[] -check "${1=0}>=0 && ${2=1.5}>=0 && ${3=128}>0" gamma=
 #@gmic : Convert selected images from XYZ to RGB colorbases.
 #@gmic : Default value: 'illuminant=0'.
 xyz2rgb : -skip "${1=,}"
-  -v -
-  -if {isval("$1")} wp={"$1?1:0"} -else
-    -if {["'$1'"]!=','} -noarg -endif
-    wp=0
-  -endif
+  -v - -if {isval("$1")} wp={"$1?1:0"} -else -if {["'$1'"]!=','} -noarg -endif wp=1 -endif
   -v + -e[^-1] "Convert image$? from XYZ to RGB color bases." -v -
   -if $wp # D65
     -mix_rgb 3.2404542,-1.5371385,-0.4985314,\
