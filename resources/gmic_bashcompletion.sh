@@ -2402,6 +2402,10 @@ _gmic_stdlib()
 		COMPREPLY=( $(compgen -W "_start_pattern=0,_color_grid=0 >") )
 		return 0
 		;;
+		"-rgb2xyz" | "--rgb2xyz")
+		COMPREPLY=( $(compgen -W "_illuminant={0=D65|1=D50} (noarg)") )
+		return 0
+		;;
 		"-select_color" | "--select_color")
 		COMPREPLY=( $(compgen -W "tolerance[%]>=0,col1,...,colN >") )
 		return 0
@@ -2424,6 +2428,10 @@ _gmic_stdlib()
 		;;
 		"-transfer_rgb" | "--transfer_rgb")
 		COMPREPLY=( $(compgen -W "[target],_gamma>=0,_regularization>=0,_luminosity_constraints>=0,_rgb_resolution>=0,_is_constraints={0|1} >") )
+		return 0
+		;;
+		"-xyz2rgb" | "--xyz2rgb")
+		COMPREPLY=( $(compgen -W "_illuminant={0=D65|1=D50} (noarg)") )
 		return 0
 		;;
 		"-append" | "--append")
