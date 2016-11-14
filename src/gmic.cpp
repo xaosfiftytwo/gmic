@@ -7951,7 +7951,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
             use_D65 = *argument=='1';
             ++position;
           }
-          print(images,0,"Convert image%s from Lab to RGB color bases, using D%u illuminant.",
+          print(images,0,"Convert image%s from Lab to RGB color bases, with D%u illuminant.",
                 gmic_selection.data(),use_D65?65:50);
           cimg_forY(selection,l) gmic_apply(LabtoRGB(use_D65));
           is_released = false; continue;
@@ -10294,7 +10294,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
             use_D65 = *argument=='1';
             ++position;
           }
-          print(images,0,"Convert image%s from RGB to Lab color bases, using D%u illuminant.",
+          print(images,0,"Convert image%s from RGB to Lab color bases, with D%u illuminant.",
                 gmic_selection.data(),use_D65?65:50);
           cimg_forY(selection,l) gmic_apply(RGBtoLab(use_D65));
           is_released = false; continue;
