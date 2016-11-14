@@ -7944,7 +7944,18 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
         }
 
         // Lab to RGB
-        gmic_simple_command("-lab2rgb",LabtoRGB,"Convert image%s from Lab to RGB color bases.");
+        if (!std::strcmp("-lab2rgb",command)) {
+          gmic_substitute_args(false);
+          bool use_D65 = true;
+          if ((*argument=='0' || *argument=='1') && !argument[1]) {
+            use_D65 = *argument=='1';
+            ++position;
+          }
+          print(images,0,"Convert image%s from Lab to RGB color bases, using D%u illuminant.",
+                gmic_selection.data(),use_D65?65:50);
+          cimg_forY(selection,l) gmic_apply(LabtoRGB(use_D65));
+          is_released = false; continue;
+        }
 
         // Label connected components.
         if (!std::strcmp("-label",command)) {
@@ -10274,8 +10285,20 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
         gmic_simple_command("-rgb2hsi",RGBtoHSI,"Convert image%s from RGB to HSI color bases.");
         gmic_simple_command("-rgb2hsl",RGBtoHSL,"Convert image%s from RGB to HSL color bases.");
         gmic_simple_command("-rgb2hsv",RGBtoHSV,"Convert image%s from RGB to HSV color bases.");
-        gmic_simple_command("-rgb2lab",RGBtoLab,"Convert image%s from RGB to Lab color bases.");
         gmic_simple_command("-rgb2srgb",RGBtosRGB,"Convert image%s from RGB to sRGB color bases.");
+
+        if (!std::strcmp("-rgb2lab",command)) {
+          gmic_substitute_args(false);
+          bool use_D65 = true;
+          if ((*argument=='0' || *argument=='1') && !argument[1]) {
+            use_D65 = *argument=='1';
+            ++position;
+          }
+          print(images,0,"Convert image%s from RGB to Lab color bases, using D%u illuminant.",
+                gmic_selection.data(),use_D65?65:50);
+          cimg_forY(selection,l) gmic_apply(RGBtoLab(use_D65));
+          is_released = false; continue;
+        }
 
         // Bitwise left rotation.
         gmic_arithmetic_command("-rol",
