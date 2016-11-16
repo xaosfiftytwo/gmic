@@ -85,7 +85,7 @@ CImgList<unsigned int> gmic_button_parameters; // The list of button parameters 
 CImg<gmic_pixel_type> computed_preview;        // The last computed preview image.
 CImg<unsigned char> latest_preview_buffer;     // The latest content of the preview buffer.
 CImg<char> gmic_additional_commands;           // The buffer of additional G'MIC command implementations.
-bool _create_dialog_gui;                       // Return value for 'create_gui_dialog()' (set by events handlers).
+bool _gmic_return_main;                        // Contains the return value for 'gmic_main()' (set by events handlers).
 bool is_block_preview = false;                 // Flag to block preview, when double-clicking on the filter tree.
 void **event_infos;                            // Infos that are passed to the GUI callback functions.
 int image_id = 0;                              // The image concerned by the plug-in execution.
@@ -114,8 +114,8 @@ GtkWidget *fave_stock = 0;                     // A temporary stock button for t
 GtkWidget *delete_stock = 0;                   // A temporary stock button for the fave button 2.
 GtkWidget *fave_add_button = 0;                // Fave button.
 GtkWidget *fave_delete_button = 0;             // Fave delete button.
-GtkWidget *right_frame = 0;                    // The right frame containing the filter parameters.
-GtkWidget *right_pane = 0;                     // The right scrolled window, containing the right frame.
+GtkWidget *param_frame = 0;                    // The right frame containing the filter parameters.
+GtkWidget *param_pane = 0;                     // The right scrolled window, containing the right frame.
 GtkWidget *markup2ascii = 0;                   // Used to convert markup to ascii strings.
 GimpPDBStatusType status = GIMP_PDB_SUCCESS;   // The plug-in return status.
 #if GIMP_MINOR_VERSION>8
@@ -127,6 +127,7 @@ const char *s_blendmode[] = { "alpha","dissolve","behind","multiply","screen","o
                               "divide","dodge","burn","hardlight","softlight","grainextract",
                               "grainmerge","colorerase" };
 
+void create_dialog_gui(const bool preview_on_right);
 
 // Set/get plug-in persistent variables, using GIMP {get,set}_data() features.
 //-----------------------------------------------------------------------------
@@ -140,19 +141,6 @@ unsigned int get_nbfilters() {
   unsigned int nb_filters = 0;
   gimp_get_data("gmic_nbfilters",&nb_filters);
   return nb_filters;
-}
-
-// Set/get the indice of the currently selected filter.
-void set_current_filter(const unsigned int current_filter) {
-  const unsigned int ncurrent_filter = current_filter>=gmic_entries.size()?0:current_filter;
-  gimp_set_data("gmic_current_filter",&ncurrent_filter,sizeof(unsigned int));
-}
-
-unsigned int get_current_filter() {
-  unsigned int current_filter = 0;
-  gimp_get_data("gmic_current_filter",&current_filter);
-  if (current_filter>=gmic_entries.size()) current_filter = 0;
-  return current_filter;
 }
 
 // Set/get the number of parameters of the specified filter.
@@ -214,6 +202,19 @@ void reset_filters_parameters() {
     }
 }
 
+// Set/get the indice of the currently selected filter.
+void set_current_filter(const unsigned int current_filter) {
+  const unsigned int ncurrent_filter = current_filter>=gmic_entries.size()?0:current_filter;
+  gimp_set_data("gmic_current_filter",&ncurrent_filter,sizeof(unsigned int));
+}
+
+unsigned int get_current_filter() {
+  unsigned int current_filter = 0;
+  gimp_get_data("gmic_current_filter",&current_filter);
+  if (current_filter>=gmic_entries.size()) current_filter = 0;
+  return current_filter;
+}
+
 // Set/get the filter input, output, preview, verbosity modes and log file.
 void set_input_mode(const unsigned int input_mode) {
   gimp_set_data("gmic_input_mode",&input_mode,sizeof(unsigned int));
@@ -253,6 +254,16 @@ unsigned int get_preview_size(const bool normalized=true) {
   unsigned int preview_size = 0;
   gimp_get_data("gmic_preview_size",&preview_size);
   return normalized?(preview_size<2?0:(preview_size - 2)):preview_size;
+}
+
+void set_preview_layout(const bool preview_layout) {
+  gimp_set_data("gmic_preview_layout",&preview_layout,sizeof(bool));
+}
+
+bool get_preview_layout() {
+  bool preview_layout = false;
+  gimp_get_data("gmic_preview_layout",&preview_layout);
+  return preview_layout;
 }
 
 void set_verbosity_mode(const unsigned int verbosity) {
@@ -327,6 +338,54 @@ CImg<char> get_locale() {
   *locale = 0;
   gimp_get_data("gmic_locale",locale);
   return locale;
+}
+
+// Load / save dialog configuration for persistence.
+//---------------------------------------------------
+void save_dialog_params() {
+  CImg<char> filename(1024);
+  cimg_snprintf(filename,filename.width(),"%sgimp_dialog_params",
+                gmic::path_rc());
+  CImg<unsigned int> params(1,9);
+  params[0] = get_current_filter();
+  params[1] = get_input_mode(false);
+  params[2] = get_output_mode(false);
+  params[3] = get_preview_mode(false);
+  params[4] = get_preview_size(false);
+  params[5] = get_preview_layout();
+  params[6] = get_verbosity_mode(false);
+  params[7] = get_tree_mode();
+  params[8] = get_net_update();
+  try {
+    const unsigned int omode = cimg::exception_mode();
+    cimg::exception_mode(0);
+    params.save_cimg(filename,true);
+    cimg::exception_mode(omode);
+  } catch (...) { }
+}
+
+void load_dialog_params() {
+  CImg<char> filename(1024);
+  cimg_snprintf(filename,filename.width(),"%sgimp_dialog_params",
+                gmic::path_rc());
+  CImg<unsigned int> params;
+  try {
+    const unsigned int omode = cimg::exception_mode();
+    cimg::exception_mode(0);
+    params.load_cimg(filename);
+    cimg::exception_mode(omode);
+  } catch (...) { params.assign(); }
+  if (params) {
+    set_current_filter(params[0]);
+    set_input_mode(params[1]);
+    set_output_mode(params[2]);
+    set_preview_mode(params[3]);
+    set_preview_size(params[4]);
+    set_preview_layout((bool)params[5]);
+    set_verbosity_mode(params[6]);
+    set_tree_mode((bool)params[7]);
+    set_net_update((bool)params[8]);
+  }
 }
 
 // Get layer blending mode from string.
@@ -1976,10 +2035,9 @@ struct st_process_thread {
                   "_output_mode=%u "
                   "_output_messages=%u "
                   "_preview_mode=%u "
-                  "_preview_size=%u "
                   "_preview_width=%d "
                   "_preview_height=%d",
-                  get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),get_preview_size(),
+                  get_input_mode(),get_output_mode(),get_verbosity_mode(),get_preview_mode(),
                   gimp_preview_width,gimp_preview_height);
   }
 };
@@ -2174,7 +2232,7 @@ void on_float_parameter_changed(GtkAdjustment *const adjustment, const void *con
   CImg<char> s_value(32);
   cimg_snprintf(s_value,s_value.width(),"%g",value);
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_value);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_int_parameter_changed(GtkAdjustment *const adjustment, const void *const event_infos) {
@@ -2184,7 +2242,7 @@ void on_int_parameter_changed(GtkAdjustment *const adjustment, const void *const
   CImg<char> s_value(32);
   cimg_snprintf(s_value,s_value.width(),"%d",value);
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_value);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_bool_parameter_changed(GtkCheckButton *const checkbutton, const void *const event_infos) {
@@ -2194,7 +2252,7 @@ void on_bool_parameter_changed(GtkCheckButton *const checkbutton, const void *co
   CImg<char> s_value(4);
   cimg_snprintf(s_value,s_value.width(),"%d",value?1:0);
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_value);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_button_parameter_clicked(GtkCheckButton *const button, const void *const event_infos) {
@@ -2202,7 +2260,7 @@ void on_button_parameter_clicked(GtkCheckButton *const button, const void *const
   cimg::unused(button);
   const unsigned int filter = get_current_filter();
   set_filter_parameter(filter,*(int*)event_infos,"1");
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_list_parameter_changed(GtkComboBox *const combobox, const void *const event_infos) {
@@ -2212,7 +2270,7 @@ void on_list_parameter_changed(GtkComboBox *const combobox, const void *const ev
   CImg<char> s_value(32);
   cimg_snprintf(s_value,s_value.width(),"%d",value);
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_value);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_text_parameter_changed(const void *const event_infos) {
@@ -2227,7 +2285,7 @@ void on_text_parameter_changed(const void *const event_infos) {
     cimg_snprintf(s_param,s_param.width(),"\"%s\"",_s_value.data());
   } else std::strcpy(s_param.assign(3),"\"\"");
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_param);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_multitext_parameter_changed(const void *const event_infos) {
@@ -2245,7 +2303,7 @@ void on_multitext_parameter_changed(const void *const event_infos) {
     cimg_snprintf(s_param,s_param.width(),"\"%s\"",_s_value.data());
   } else std::strcpy(s_param.assign(3),"\"\"");
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_param);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_file_parameter_changed(GtkFileChooser *const file_chooser, const void *const event_infos) {
@@ -2266,7 +2324,7 @@ void on_file_parameter_changed(GtkFileChooser *const file_chooser, const void *c
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_param);
   if (!is_same_file && !is_silent_argument)
     _gimp_preview_invalidate(); // Invalidate preview only if filename has changed.
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 void on_color_parameter_changed(GtkColorButton *const color_button, const void *const event_infos) {
@@ -2281,7 +2339,7 @@ void on_color_parameter_changed(GtkColorButton *const color_button, const void *
     cimg_snprintf(s_value,s_value.width(),"%d,%d,%d",
                   color.red/257,color.green/257,color.blue/257);
   set_filter_parameter(get_current_filter(),*(int*)event_infos,s_value);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
 }
 
 // Handle responses to the dialog window buttons.
@@ -2292,6 +2350,7 @@ void on_dialog_input_mode_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=3);
   set_input_mode((unsigned int)value);
   _gimp_preview_invalidate();
+  save_dialog_params();
 }
 
 void on_dialog_output_mode_changed(GtkComboBox *const combobox) {
@@ -2300,6 +2359,7 @@ void on_dialog_output_mode_changed(GtkComboBox *const combobox) {
   g_object_get(combobox,"active",&value,NULL);
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_output_mode((unsigned int)value);
+  save_dialog_params();
 }
 
 void on_dialog_verbosity_mode_changed(GtkComboBox *const combobox) {
@@ -2310,6 +2370,7 @@ void on_dialog_verbosity_mode_changed(GtkComboBox *const combobox) {
   set_verbosity_mode((unsigned int)value);
   set_logfile();
   if (value>3) _gimp_preview_invalidate();
+  save_dialog_params();
 }
 
 void on_dialog_preview_mode_changed(GtkComboBox *const combobox) {
@@ -2319,6 +2380,7 @@ void on_dialog_preview_mode_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_preview_mode((unsigned int)value);
   _gimp_preview_invalidate();
+  save_dialog_params();
 }
 
 void on_dialog_preview_size_changed(GtkComboBox *const combobox) {
@@ -2328,6 +2390,16 @@ void on_dialog_preview_size_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_preview_size((unsigned int)value);
   resize_preview(value - 2);
+  save_dialog_params();
+}
+
+void on_dialog_preview_layout_toggled(GtkToggleButton *const toggle_button) {
+  reset_button_parameters();
+  const bool value = gtk_toggle_button_get_active(toggle_button);
+  set_preview_layout(value);
+  gtk_widget_destroy(dialog_window);
+  create_dialog_gui(value);
+  save_dialog_params();
 }
 
 void on_dialog_maximize_button_clicked(GtkButton *const button) {
@@ -2360,7 +2432,7 @@ void on_dialog_maximize_button_clicked(GtkButton *const button) {
 
 void on_dialog_reset_clicked() {
   create_parameters_gui(true);
-  _create_dialog_gui = true;
+  _gmic_return_main = true;
   _gimp_preview_invalidate();
 }
 
@@ -2369,7 +2441,7 @@ void on_dialog_cancel_clicked() {
   if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
   cimg::mutex(25,0);
   reset_button_parameters();
-  _create_dialog_gui = false;
+  _gmic_return_main = false;
   gtk_main_quit();
 }
 
@@ -2378,7 +2450,7 @@ void on_dialog_apply_clicked() {
   while (gtk_events_pending()) gtk_main_iteration();
   process_image(0,true);
   gtk_widget_show(dialog_window);
-  _create_dialog_gui = false;
+  _gmic_return_main = false;
   _gimp_preview_invalidate();
   const CImg<char> command_line = get_command_line(false);
   if (command_line) { // Remember command line for the next use of the filter.
@@ -2391,12 +2463,14 @@ void on_dialog_apply_clicked() {
 void on_dialog_net_update_toggled(GtkToggleButton *const toggle_button) {
   reset_button_parameters();
   set_net_update(gtk_toggle_button_get_active(toggle_button));
+  save_dialog_params();
 }
 
 void on_dialog_tree_mode_clicked(GtkWidget *const tree_view) {
   reset_button_parameters();
   set_tree_mode(!get_tree_mode());
   flush_tree_view(tree_view);
+  save_dialog_params();
 }
 
 void on_dialog_add_fave_clicked(GtkWidget *const tree_view) {
@@ -2561,7 +2635,7 @@ void on_filter_selected(GtkWidget *const tree_view) {
     gtk_widget_hide(fave_delete_button);
     set_current_filter(filter);
     create_parameters_gui(false);
-    _create_dialog_gui = true;
+    _gmic_return_main = true;
     latest_preview_buffer.assign();
     _gimp_preview_invalidate();
   }
@@ -3415,8 +3489,8 @@ void create_parameters_gui(const bool reset_params) {
   gmic_button_parameters.assign();
 
   // Remove existing table in the parameters frame if necessary.
-  GtkWidget *const child = GTK_WIDGET(gtk_bin_get_child(GTK_BIN(right_frame)));
-  if (child) gtk_container_remove(GTK_CONTAINER(right_frame),child);
+  GtkWidget *const child = GTK_WIDGET(gtk_bin_get_child(GTK_BIN(param_frame)));
+  if (child) gtk_container_remove(GTK_CONTAINER(param_frame),child);
 
   // Create new table for the parameters frame.
   GtkWidget *table = 0;
@@ -3429,14 +3503,14 @@ void create_parameters_gui(const bool reset_params) {
     gtk_table_attach(GTK_TABLE(table),label,0,1,0,1,
                      (GtkAttachOptions)(GTK_EXPAND),(GtkAttachOptions)(GTK_EXPAND),0,0);
     gtk_misc_set_alignment (GTK_MISC(label),0,0.5);
-    gtk_frame_set_label(GTK_FRAME(right_frame),NULL);
+    gtk_frame_set_label(GTK_FRAME(param_frame),NULL);
   } else { // Filter selected -> Build the table for setting the parameters.
     CImg<char> s_label(256);
     cimg_snprintf(s_label,s_label.width(),"<b>  %s  </b>",gmic_entries[filter].data());
     GtkWidget *const frame_title = gtk_label_new(NULL);
     gtk_widget_show(frame_title);
     gtk_label_set_markup(GTK_LABEL(frame_title),s_label);
-    gtk_frame_set_label_widget(GTK_FRAME(right_frame),frame_title);
+    gtk_frame_set_label_widget(GTK_FRAME(param_frame),frame_title);
 
     // Count number of filter arguments.
     CImg<char> argument_name(256), _argument_type(32), argument_arg(65536);
@@ -3923,12 +3997,12 @@ void create_parameters_gui(const bool reset_params) {
                      (GtkAttachOptions)(GTK_EXPAND | GTK_FILL),GTK_SHRINK,0,0);
   }
 
-  gtk_container_add(GTK_CONTAINER(right_frame),table);
+  gtk_container_add(GTK_CONTAINER(param_frame),table);
 
   // Take care of the size of the parameter table.
   GtkRequisition requisition;
   gtk_widget_size_request(table,&requisition);
-  gtk_widget_set_size_request(right_pane,std::max(450,requisition.width),-1);
+  gtk_widget_set_size_request(param_pane,std::max(450,requisition.width),-1);
   set_preview_factor();
 
   // Set correct icon for fave button.
@@ -3941,14 +4015,9 @@ void create_parameters_gui(const bool reset_params) {
   else gtk_widget_hide(fave_delete_button);
 }
 
-// Create main plug-in dialog window and wait for events.
-//-------------------------------------------------------
-bool create_dialog_gui() {
-
-  // Init GUI_specific variables
-  _create_dialog_gui = true;
-  gimp_ui_init("gmic",true);
-  event_infos = 0;
+// Create main plug-in dialog window.
+//-----------------------------------
+void create_dialog_gui(const bool preview_on_right) {
 
   // Create main dialog window with buttons.
   CImg<char> dialog_title(64);
@@ -3996,22 +4065,23 @@ bool create_dialog_gui() {
   gtk_widget_show(dialog_hpaned);
   gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog_window)->vbox),dialog_hpaned);
 
-  // Create the left pane.
-  GtkWidget *const left_pane = gtk_vbox_new(false,4);
-  gtk_widget_show(left_pane);
-  gtk_paned_pack1(GTK_PANED(dialog_hpaned),left_pane,true,false);
+  // Create the first pane (containing the preview).
+  GtkWidget *const prev_pane = gtk_vbox_new(false,4);
+  gtk_widget_show(prev_pane);
+  (preview_on_right?gtk_paned_pack2:gtk_paned_pack1)(GTK_PANED(dialog_hpaned),prev_pane,true,false);
 
-  GtkWidget *const left_hbox = gtk_hbox_new(false,4);
-  gtk_widget_show(left_hbox);
-  gtk_box_pack_end(GTK_BOX(left_pane),left_hbox,false,false,0);
+  GtkWidget *const prev_hbox = gtk_hbox_new(false,4);
+  gtk_widget_show(prev_hbox);
+  gtk_box_pack_end(GTK_BOX(prev_pane),prev_hbox,false,false,0);
 
   GtkWidget *const image_align = gtk_alignment_new(0.5,0.5,0,0);
   gtk_widget_show(image_align);
-  gtk_box_pack_start(GTK_BOX(left_hbox),image_align,true,true,0);
-  CImg<unsigned char> gmic_logo =
-    CImgList<unsigned char>::get_unserialize(CImg<unsigned char>(data_gmic_logo,1,size_data_gmic_logo,1,1,true))[0];
-  const unsigned int logo_width = gmic_logo._width, logo_height = gmic_logo._height;
-  gmic_logo.permute_axes("cxyz");
+  (preview_on_right?gtk_box_pack_end:gtk_box_pack_start)(GTK_BOX(prev_hbox),image_align,true,true,0);
+
+  static const CImg<unsigned char> gmic_logo =
+    CImgList<unsigned char>::get_unserialize(CImg<unsigned char>(data_gmic_logo,1,size_data_gmic_logo,1,1,true))[0].
+    permute_axes("cxyz");
+  const unsigned int logo_width = gmic_logo._height, logo_height = gmic_logo._depth;
   GdkPixbuf *const pixbuf = gdk_pixbuf_new_from_data(gmic_logo,GDK_COLORSPACE_RGB,
                                                      true,8,logo_width,logo_height,4*logo_width,0,0);
 
@@ -4028,26 +4098,26 @@ bool create_dialog_gui() {
   gtk_widget_show(image);
   gtk_container_add(GTK_CONTAINER(image_align),image);
 
-  GtkWidget *const right_align = gtk_alignment_new(1,0,0,0);
-  gtk_widget_show(right_align);
-  gtk_box_pack_start(GTK_BOX(left_hbox),right_align,true,true,0);
+  GtkWidget *const prev_align = gtk_alignment_new(preview_on_right?0:1,0,0,0);
+  gtk_widget_show(prev_align);
+  (preview_on_right?gtk_box_pack_start:gtk_box_pack_end)(GTK_BOX(prev_hbox),prev_align,true,true,0);
 
-  GtkWidget *const left_frame = gtk_frame_new(NULL);
-  gtk_widget_show(left_frame);
-  gtk_container_set_border_width(GTK_CONTAINER(left_frame),4);
-  gtk_container_add(GTK_CONTAINER(right_align),left_frame);
+  GtkWidget *const prev_frame = gtk_frame_new(NULL);
+  gtk_widget_show(prev_frame);
+  gtk_container_set_border_width(GTK_CONTAINER(prev_frame),4);
+  gtk_container_add(GTK_CONTAINER(prev_align),prev_frame);
 
   GtkWidget *const frame_title = gtk_label_new(NULL);
   gtk_widget_show(frame_title);
   gtk_label_set_markup(GTK_LABEL(frame_title),t("<b> Input / Output </b>"));
-  gtk_frame_set_label_widget(GTK_FRAME(left_frame),frame_title);
+  gtk_frame_set_label_widget(GTK_FRAME(prev_frame),frame_title);
 
-  GtkWidget *const left_table = gtk_table_new(5,1,false);
-  gtk_widget_show(left_table);
-  gtk_table_set_row_spacings(GTK_TABLE(left_table),6);
-  gtk_table_set_col_spacings(GTK_TABLE(left_table),6);
-  gtk_container_set_border_width(GTK_CONTAINER(left_table),8);
-  gtk_container_add(GTK_CONTAINER(left_frame),left_table);
+  GtkWidget *const prev_table = gtk_table_new(6,1,false);
+  gtk_widget_show(prev_table);
+  gtk_table_set_row_spacings(GTK_TABLE(prev_table),6);
+  gtk_table_set_col_spacings(GTK_TABLE(prev_table),6);
+  gtk_container_set_border_width(GTK_CONTAINER(prev_table),8);
+  gtk_container_add(GTK_CONTAINER(prev_frame),prev_table);
 
   GtkWidget *const input_combobox = gtk_combo_box_new_text();
   gtk_widget_show(input_combobox);
@@ -4064,7 +4134,7 @@ bool create_dialog_gui() {
   gtk_combo_box_append_text(GTK_COMBO_BOX(input_combobox),t("All invisibles (decr.)"));
   gtk_combo_box_append_text(GTK_COMBO_BOX(input_combobox),t("All (decr.)"));
   gtk_combo_box_set_active(GTK_COMBO_BOX(input_combobox),get_input_mode(false));
-  gtk_table_attach_defaults(GTK_TABLE(left_table),input_combobox,0,1,0,1);
+  gtk_table_attach_defaults(GTK_TABLE(prev_table),input_combobox,0,1,0,1);
   g_signal_connect(input_combobox,"changed",G_CALLBACK(on_dialog_input_mode_changed),0);
 
   GtkWidget *const output_combobox = gtk_combo_box_new_text();
@@ -4076,7 +4146,7 @@ bool create_dialog_gui() {
   gtk_combo_box_append_text(GTK_COMBO_BOX(output_combobox),t("New active layer(s)"));
   gtk_combo_box_append_text(GTK_COMBO_BOX(output_combobox),t("New image"));
   gtk_combo_box_set_active(GTK_COMBO_BOX(output_combobox),get_output_mode(false));
-  gtk_table_attach_defaults(GTK_TABLE(left_table),output_combobox,0,1,1,2);
+  gtk_table_attach_defaults(GTK_TABLE(prev_table),output_combobox,0,1,1,2);
   g_signal_connect(output_combobox,"changed",G_CALLBACK(on_dialog_output_mode_changed),0);
 
   GtkWidget *const verbosity_combobox = gtk_combo_box_new_text();
@@ -4092,7 +4162,7 @@ bool create_dialog_gui() {
   gtk_combo_box_append_text(GTK_COMBO_BOX(verbosity_combobox),t("Debug mode (console)"));
   gtk_combo_box_append_text(GTK_COMBO_BOX(verbosity_combobox),t("Debug mode (logfile)"));
   gtk_combo_box_set_active(GTK_COMBO_BOX(verbosity_combobox),get_verbosity_mode(false));
-  gtk_table_attach_defaults(GTK_TABLE(left_table),verbosity_combobox,0,1,2,3);
+  gtk_table_attach_defaults(GTK_TABLE(prev_table),verbosity_combobox,0,1,2,3);
   g_signal_connect(verbosity_combobox,"changed",G_CALLBACK(on_dialog_verbosity_mode_changed),0);
 
   GtkWidget *const preview_mode_combobox = gtk_combo_box_new_text();
@@ -4108,7 +4178,7 @@ bool create_dialog_gui() {
   gtk_combo_box_append_text(GTK_COMBO_BOX(preview_mode_combobox),t("1st -> 4th"));
   gtk_combo_box_append_text(GTK_COMBO_BOX(preview_mode_combobox),t("All outputs"));
   gtk_combo_box_set_active(GTK_COMBO_BOX(preview_mode_combobox),get_preview_mode(false));
-  gtk_table_attach_defaults(GTK_TABLE(left_table),preview_mode_combobox,0,1,3,4);
+  gtk_table_attach_defaults(GTK_TABLE(prev_table),preview_mode_combobox,0,1,3,4);
   g_signal_connect(preview_mode_combobox,"changed",G_CALLBACK(on_dialog_preview_mode_changed),0);
 
   GtkWidget *preview_size_combobox = gtk_combo_box_new_text();
@@ -4120,12 +4190,18 @@ bool create_dialog_gui() {
   gtk_combo_box_append_text(GTK_COMBO_BOX(preview_size_combobox),t("Normal"));
   gtk_combo_box_append_text(GTK_COMBO_BOX(preview_size_combobox),t("Large"));
   gtk_combo_box_set_active(GTK_COMBO_BOX(preview_size_combobox),get_preview_size(false));
-  gtk_table_attach_defaults(GTK_TABLE(left_table),preview_size_combobox,0,1,4,5);
+  gtk_table_attach_defaults(GTK_TABLE(prev_table),preview_size_combobox,0,1,4,5);
   g_signal_connect(preview_size_combobox,"changed",G_CALLBACK(on_dialog_preview_size_changed),0);
+
+  GtkWidget *const preview_layout_checkbutton = gtk_check_button_new_with_mnemonic(t("Preview on right"));
+  gtk_widget_show(preview_layout_checkbutton);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(preview_layout_checkbutton),get_preview_layout());
+  gtk_table_attach_defaults(GTK_TABLE(prev_table),preview_layout_checkbutton,0,1,5,6);
+  g_signal_connect(preview_layout_checkbutton,"toggled",G_CALLBACK(on_dialog_preview_layout_toggled),0);
 
   gui_preview_align = gtk_alignment_new(0.5,0.5,0,0);
   gtk_widget_show(gui_preview_align);
-  gtk_box_pack_end(GTK_BOX(left_pane),gui_preview_align,true,true,0);
+  gtk_box_pack_end(GTK_BOX(prev_pane),gui_preview_align,true,true,0);
 
   gui_preview = 0;
   _gimp_preview_invalidate();
@@ -4134,7 +4210,7 @@ bool create_dialog_gui() {
   // Create the middle pane.
   GtkWidget *const mr_hpaned = gtk_hpaned_new();
   gtk_widget_show(mr_hpaned);
-  gtk_paned_pack2(GTK_PANED(dialog_hpaned),mr_hpaned,true,true);
+  (preview_on_right?gtk_paned_pack1:gtk_paned_pack2)(GTK_PANED(dialog_hpaned),mr_hpaned,true,true);
 
   GtkWidget *const middle_frame = gtk_frame_new(NULL);
   gtk_widget_show(middle_frame);
@@ -4208,16 +4284,16 @@ bool create_dialog_gui() {
   g_signal_connect(tree_view,"row-activated",G_CALLBACK(on_filter_doubleclicked),0);
 
   // Create the right pane.
-  right_pane = gtk_scrolled_window_new(NULL,NULL);
-  gtk_widget_show(right_pane);
-  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(right_pane),
+  param_pane = gtk_scrolled_window_new(NULL,NULL);
+  gtk_widget_show(param_pane);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(param_pane),
                                  GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
-  gtk_paned_add2(GTK_PANED(mr_hpaned),right_pane);
+  gtk_paned_add2(GTK_PANED(mr_hpaned),param_pane);
 
-  right_frame = gtk_frame_new(NULL);
-  gtk_widget_show(right_frame);
-  gtk_container_set_border_width(GTK_CONTAINER(right_frame),4);
-  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(right_pane),right_frame);
+  param_frame = gtk_frame_new(NULL);
+  gtk_widget_show(param_frame);
+  gtk_container_set_border_width(GTK_CONTAINER(param_frame),4);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(param_pane),param_frame);
 
   // Define tooltips.
   gtk_widget_set_tooltip_text(fave_add_button,t("Add filter to faves"));
@@ -4242,7 +4318,19 @@ bool create_dialog_gui() {
     if (window_width>screen_width || window_height>screen_height) resize_preview(--preview_size - 2);
     else { resize_preview(preview_size - 2); is_entirely_visible = true; }
   }
+
   gtk_widget_show(dialog_window);
+}
+
+// Display main plug-in dialog window and wait for events.
+//---------------------------------------------------------
+bool gmic_main() {
+  _gmic_return_main = true;
+  gimp_ui_init("gmic",true);
+  event_infos = 0;
+
+  load_dialog_params();
+  create_dialog_gui(get_preview_layout());
   gtk_main();
 
   // Destroy dialog box widget and free resources.
@@ -4252,7 +4340,7 @@ bool create_dialog_gui() {
   if (delete_stock) gtk_widget_destroy(delete_stock);
   if (refresh_stock) gtk_widget_destroy(refresh_stock);
   if (event_infos) delete[] event_infos;
-  return _create_dialog_gui;
+  return _gmic_return_main;
 }
 
 // 'Run' function, required by the GIMP plug-in API.
@@ -4332,7 +4420,7 @@ void gmic_run(const gchar *name, gint nparams, const GimpParam *param,
       }
 
       // Display dialog window.
-      if (create_dialog_gui()) {
+      if (gmic_main()) {
         cimg::mutex(25);
         if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
         cimg::mutex(25,0);
