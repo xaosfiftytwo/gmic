@@ -110,6 +110,7 @@ GtkWidget *tree_mode_stock = 0;                // A temporary stock button for t
 GtkWidget *tree_mode_button = 0;               // Expand/Collapse button for the treeview.
 GtkWidget *refresh_stock = 0;                  // A temporary stock button for the refresh button.
 GtkWidget *reset_zoom_stock = 0;               // A temporary stock button for the reset zoom button.
+GtkWidget *preview_side_stock = 0;             // A temporary stock button for the preview side button (forward)
 GtkWidget *fave_stock = 0;                     // A temporary stock button for the fave button.
 GtkWidget *delete_stock = 0;                   // A temporary stock button for the fave button 2.
 GtkWidget *fave_add_button = 0;                // Fave button.
@@ -256,14 +257,14 @@ unsigned int get_preview_size(const bool normalized=true) {
   return normalized?(preview_size<2?0:(preview_size - 2)):preview_size;
 }
 
-void set_preview_layout(const bool preview_layout) {
-  gimp_set_data("gmic_preview_layout",&preview_layout,sizeof(bool));
+void set_preview_side(const bool preview_side) {
+  gimp_set_data("gmic_preview_side",&preview_side,sizeof(bool));
 }
 
-bool get_preview_layout() {
-  bool preview_layout = false;
-  gimp_get_data("gmic_preview_layout",&preview_layout);
-  return preview_layout;
+bool get_preview_side() {
+  bool preview_side = false;
+  gimp_get_data("gmic_preview_side",&preview_side);
+  return preview_side;
 }
 
 void set_verbosity_mode(const unsigned int verbosity) {
@@ -351,7 +352,7 @@ void save_dialog_params() {
   params[1] = get_output_mode(false);
   params[2] = get_preview_mode(false);
   params[3] = get_preview_size(false);
-  params[4] = get_preview_layout();
+  params[4] = get_preview_side();
   params[5] = get_verbosity_mode(false);
   params[6] = get_tree_mode();
   params[7] = get_net_update();
@@ -379,7 +380,7 @@ void load_dialog_params() {
     set_output_mode(params[1]);
     set_preview_mode(params[2]);
     set_preview_size(params[3]);
-    set_preview_layout((bool)params[4]);
+    set_preview_side((bool)params[4]);
     set_verbosity_mode(params[5]);
     set_tree_mode((bool)params[6]);
     set_net_update((bool)params[7]);
@@ -2095,6 +2096,12 @@ void create_parameters_gui(const bool);
 void process_image(const char *const, const bool is_apply);
 void process_preview();
 
+// Reset value of all button parameters for current filter.
+void reset_button_parameters() {
+  const unsigned int filter = get_current_filter();
+  cimglist_for(gmic_button_parameters,l) set_filter_parameter(filter,gmic_button_parameters(l,0),"0");
+}
+
 void on_preview_button_changed(GtkToggleButton *const toggle_button) {
   cimg::mutex(25);
   if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
@@ -2106,6 +2113,20 @@ void on_preview_button_changed(GtkToggleButton *const toggle_button) {
 }
 
 void on_dialog_reset_zoom_button_clicked(GtkCheckButton *const) {
+  set_preview_factor();
+}
+
+void on_dialog_preview_side_button_clicked(GtkCheckButton *const) {
+  cimg::mutex(25);
+  if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
+  cimg::mutex(25,0);
+  reset_button_parameters();
+  const bool value = !get_preview_side();
+  set_preview_side(value);
+  gui_preview = 0;
+  GtkWidget *old_dialog_window = dialog_window;
+  create_dialog_gui(value);
+  gtk_widget_destroy(old_dialog_window);
   set_preview_factor();
 }
 
@@ -2181,6 +2202,18 @@ void _gimp_preview_invalidate() {
     gtk_box_pack_start(GTK_BOX(zoom_buttons),reset_zoom_button,false,false,0);
     gtk_widget_set_tooltip_text(reset_zoom_button,t("Reset zoom"));
     g_signal_connect(reset_zoom_button,"clicked",G_CALLBACK(on_dialog_reset_zoom_button_clicked),0);
+
+    // Add 'preview side' button.
+    GtkWidget
+      *const preview_side_button = gtk_button_new();
+    preview_side_stock = gtk_button_new_from_stock(get_preview_side()?GTK_STOCK_GO_BACK:GTK_STOCK_GO_FORWARD);
+    GtkWidget *const preview_side_image = gtk_button_get_image(GTK_BUTTON(preview_side_stock));
+    gtk_button_set_image(GTK_BUTTON(preview_side_button),preview_side_image);
+    gtk_widget_show(preview_side_button);
+    gtk_box_pack_start(GTK_BOX(zoom_buttons),preview_side_button,false,false,0);
+    gtk_widget_set_tooltip_text(reset_zoom_button,t("Swap preview side"));
+    g_signal_connect(preview_side_button,"clicked",G_CALLBACK(on_dialog_preview_side_button_clicked),0);
+
     gtk_widget_show(gui_preview);
     gtk_container_add(GTK_CONTAINER(gui_preview_align),gui_preview);
     GtkRequisition requisition;
@@ -2208,12 +2241,6 @@ void resize_preview(const unsigned int size) {
     gui_preview = 0;
     _gimp_preview_invalidate();
   }
-}
-
-// Reset value of all button parameters for current filter.
-void reset_button_parameters() {
-  const unsigned int filter = get_current_filter();
-  cimglist_for(gmic_button_parameters,l) set_filter_parameter(filter,gmic_button_parameters(l,0),"0");
 }
 
 // Handle preview resize event.
@@ -2394,20 +2421,6 @@ void on_dialog_preview_size_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_preview_size((unsigned int)value);
   resize_preview(value - 2);
-}
-
-void on_dialog_preview_layout_toggled(GtkToggleButton *const toggle_button) {
-  cimg::mutex(25);
-  if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
-  cimg::mutex(25,0);
-  reset_button_parameters();
-  const bool value = gtk_toggle_button_get_active(toggle_button);
-  set_preview_layout(value);
-  gui_preview = 0;
-  GtkWidget *old_dialog_window = dialog_window;
-  create_dialog_gui(value);
-  gtk_widget_destroy(old_dialog_window);
-  set_preview_factor();
 }
 
 void on_dialog_maximize_button_clicked(GtkButton *const button) {
@@ -4118,7 +4131,7 @@ void create_dialog_gui(const bool preview_on_right) {
   gtk_label_set_markup(GTK_LABEL(frame_title),t("<b> Input / Output </b>"));
   gtk_frame_set_label_widget(GTK_FRAME(prev_frame),frame_title);
 
-  GtkWidget *const prev_table = gtk_table_new(6,1,false);
+  GtkWidget *const prev_table = gtk_table_new(5,1,false);
   gtk_widget_show(prev_table);
   gtk_table_set_row_spacings(GTK_TABLE(prev_table),6);
   gtk_table_set_col_spacings(GTK_TABLE(prev_table),6);
@@ -4198,12 +4211,6 @@ void create_dialog_gui(const bool preview_on_right) {
   gtk_combo_box_set_active(GTK_COMBO_BOX(preview_size_combobox),get_preview_size(false));
   gtk_table_attach_defaults(GTK_TABLE(prev_table),preview_size_combobox,0,1,4,5);
   g_signal_connect(preview_size_combobox,"changed",G_CALLBACK(on_dialog_preview_size_changed),0);
-
-  GtkWidget *const preview_layout_checkbutton = gtk_check_button_new_with_mnemonic(t("Preview on right"));
-  gtk_widget_show(preview_layout_checkbutton);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(preview_layout_checkbutton),get_preview_layout());
-  gtk_table_attach_defaults(GTK_TABLE(prev_table),preview_layout_checkbutton,0,1,5,6);
-  g_signal_connect(preview_layout_checkbutton,"toggled",G_CALLBACK(on_dialog_preview_layout_toggled),0);
 
   gui_preview_align = gtk_alignment_new(0.5,0.5,0,0);
   gtk_widget_show(gui_preview_align);
@@ -4336,7 +4343,7 @@ bool gmic_main() {
   event_infos = 0;
 
   load_dialog_params();
-  create_dialog_gui(get_preview_layout());
+  create_dialog_gui(get_preview_side());
   gtk_main();
   save_dialog_params();
 
