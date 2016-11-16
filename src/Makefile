@@ -482,7 +482,7 @@ endif
 	@if [ ! -f use_libcgmic.c ]; then ln -fs ../../gmic-community/libcgmic/use_libcgmic.c .; fi
 	$(CC) -std=c99 -o use_libcgmic use_libcgmic.c -L. -lcgmic
 
-# libgmicstatic
+# libcgmicstatic
 libcgmicstatic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
 	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
