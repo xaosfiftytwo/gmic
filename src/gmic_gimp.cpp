@@ -346,16 +346,15 @@ void save_dialog_params() {
   CImg<char> filename(1024);
   cimg_snprintf(filename,filename.width(),"%sgimp_dialog_params",
                 gmic::path_rc());
-  CImg<unsigned int> params(1,9);
-  params[0] = get_current_filter();
-  params[1] = get_input_mode(false);
-  params[2] = get_output_mode(false);
-  params[3] = get_preview_mode(false);
-  params[4] = get_preview_size(false);
-  params[5] = get_preview_layout();
-  params[6] = get_verbosity_mode(false);
-  params[7] = get_tree_mode();
-  params[8] = get_net_update();
+  CImg<unsigned int> params(1,8);
+  params[0] = get_input_mode(false);
+  params[1] = get_output_mode(false);
+  params[2] = get_preview_mode(false);
+  params[3] = get_preview_size(false);
+  params[4] = get_preview_layout();
+  params[5] = get_verbosity_mode(false);
+  params[6] = get_tree_mode();
+  params[7] = get_net_update();
   try {
     const unsigned int omode = cimg::exception_mode();
     cimg::exception_mode(0);
@@ -376,15 +375,14 @@ void load_dialog_params() {
     cimg::exception_mode(omode);
   } catch (...) { params.assign(); }
   if (params) {
-    set_current_filter(params[0]);
-    set_input_mode(params[1]);
-    set_output_mode(params[2]);
-    set_preview_mode(params[3]);
-    set_preview_size(params[4]);
-    set_preview_layout((bool)params[5]);
-    set_verbosity_mode(params[6]);
-    set_tree_mode((bool)params[7]);
-    set_net_update((bool)params[8]);
+    set_input_mode(params[0]);
+    set_output_mode(params[1]);
+    set_preview_mode(params[2]);
+    set_preview_size(params[3]);
+    set_preview_layout((bool)params[4]);
+    set_verbosity_mode(params[5]);
+    set_tree_mode((bool)params[6]);
+    set_net_update((bool)params[7]);
   }
 }
 
@@ -525,6 +523,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Habilitar actualitzacions d'Internet");
     _t("Expand/collapse","Expand/collapse");
     _t("Reset zoom","Restablir zoom");
+    _t("Preview on right","Vista pr\303\250via a la dreta");
   }
 
   // Dutch translation.
@@ -590,6 +589,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Enable Internet updates");
     _t("Expand/collapse","Expand/collapse");
     _t("Reset zoom","Reset zoom");
+    _t("Preview on right","Voorbeeld op rechts");
   }
 
   // French translation.
@@ -655,6 +655,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Autoriser les mises \303\240 jour Internet");
     _t("Expand/collapse","D\303\251plier/Replier");
     _t("Reset zoom","R\303\251initialize le zoom");
+    _t("Preview on right","Aper\303\247u \xC3\xA0 droite");
   }
 
   // German translation.
@@ -720,6 +721,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Internet-Updates aktivieren");
     _t("Expand/collapse","Ein-/Ausklappen﻿");
     _t("Reset zoom","Reset Zoom");
+    _t("Preview on right","Vorschau auf rechts");
   }
 
   // Italian translation.
@@ -785,6 +787,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Abilita aggiornamenti Internet");
     _t("Expand/collapse","Espandi/comprimi");
     _t("Reset zoom","Reimpostare lo zoom");
+    _t("Preview on right","Anteprima a destra");
   }
 
   // Japanese translation.
@@ -894,6 +897,7 @@ const char *t(const char *const s) {
        "\xE5\x8C\x96");
     _t("Expand/collapse","\xE5\xB1\x95\xE9\x96\x8B\x2F\xE6\x8A\x98\xE3\x82\x8A\xE3\x81\x9F\xE3\x81\x9F\xE3\x82\x80");
     _t("Reset zoom","\xE3\x82\xBA\xE3\x83\xBC\xE3\x83\xA0\xE3\x82\x92\xE3\x83\xAA\xE3\x82\xBB\xE3\x83\x83\xE3\x83\x88");
+    _t("Preview on right","\xE5\x8F\xB3\xE3\x81\xAE\xE3\x83\x97\xE3\x83\xAC\xE3\x83\x93\xE3\x83\xA5\xE3\x83\xBC");
   }
 
   // Polish translation.
@@ -961,6 +965,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Wlacz aktualizacje internetowe");
     _t("Expand/collapse","Rozwin/Zwin");
     _t("Reset zoom","Zresetowa\304\207 zoomu");
+    _t("Preview on right","Podgl\304\205d na prawo");
   }
 
   // Portuguese translation.
@@ -1027,6 +1032,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Ativar atualizacoes Internet");
     _t("Expand/collapse","Expandir/recolher");
     _t("Reset zoom","Redefinir zoom");
+    _t("Preview on right","Pr\303\251-visualizar \303\240 direita");
   }
 
   // Serbian translation.
@@ -1092,6 +1098,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Omoguci Internet ispravke");
     _t("Expand/collapse","Razvij/skupi");
     _t("Reset zoom","Reset zum");
+    _t("Preview on right","Pregled na desnoj strani");
   }
 
   // Spanish translation (Castillan).
@@ -1157,6 +1164,7 @@ const char *t(const char *const s) {
     _t("Enable Internet updates","Permite actualizaciones de Internet");
     _t("Expand/collapse","Expande/Colapsa");
     _t("Reset zoom","Restablecer zoom");
+    _t("Preview on right","Vista previa a la derecha");
   }
 
   // English translation (default).
