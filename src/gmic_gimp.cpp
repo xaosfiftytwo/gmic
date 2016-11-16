@@ -2358,7 +2358,6 @@ void on_dialog_input_mode_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=3);
   set_input_mode((unsigned int)value);
   _gimp_preview_invalidate();
-  save_dialog_params();
 }
 
 void on_dialog_output_mode_changed(GtkComboBox *const combobox) {
@@ -2367,7 +2366,6 @@ void on_dialog_output_mode_changed(GtkComboBox *const combobox) {
   g_object_get(combobox,"active",&value,NULL);
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_output_mode((unsigned int)value);
-  save_dialog_params();
 }
 
 void on_dialog_verbosity_mode_changed(GtkComboBox *const combobox) {
@@ -2378,7 +2376,6 @@ void on_dialog_verbosity_mode_changed(GtkComboBox *const combobox) {
   set_verbosity_mode((unsigned int)value);
   set_logfile();
   if (value>3) _gimp_preview_invalidate();
-  save_dialog_params();
 }
 
 void on_dialog_preview_mode_changed(GtkComboBox *const combobox) {
@@ -2388,7 +2385,6 @@ void on_dialog_preview_mode_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_preview_mode((unsigned int)value);
   _gimp_preview_invalidate();
-  save_dialog_params();
 }
 
 void on_dialog_preview_size_changed(GtkComboBox *const combobox) {
@@ -2398,7 +2394,6 @@ void on_dialog_preview_size_changed(GtkComboBox *const combobox) {
   if (value<2) gtk_combo_box_set_active(combobox,value=2);
   set_preview_size((unsigned int)value);
   resize_preview(value - 2);
-  save_dialog_params();
 }
 
 void on_dialog_preview_layout_toggled(GtkToggleButton *const toggle_button) {
@@ -2413,7 +2408,6 @@ void on_dialog_preview_layout_toggled(GtkToggleButton *const toggle_button) {
   create_dialog_gui(value);
   gtk_widget_destroy(old_dialog_window);
   set_preview_factor();
-  save_dialog_params();
 }
 
 void on_dialog_maximize_button_clicked(GtkButton *const button) {
@@ -2477,14 +2471,12 @@ void on_dialog_apply_clicked() {
 void on_dialog_net_update_toggled(GtkToggleButton *const toggle_button) {
   reset_button_parameters();
   set_net_update(gtk_toggle_button_get_active(toggle_button));
-  save_dialog_params();
 }
 
 void on_dialog_tree_mode_clicked(GtkWidget *const tree_view) {
   reset_button_parameters();
   set_tree_mode(!get_tree_mode());
   flush_tree_view(tree_view);
-  save_dialog_params();
 }
 
 void on_dialog_add_fave_clicked(GtkWidget *const tree_view) {
@@ -4346,8 +4338,8 @@ bool gmic_main() {
   load_dialog_params();
   create_dialog_gui(get_preview_layout());
   gtk_main();
+  save_dialog_params();
 
-  // Destroy dialog box widget and free resources.
   gtk_widget_destroy(dialog_window);
   if (tree_mode_stock) gtk_widget_destroy(tree_mode_stock);
   if (fave_stock) gtk_widget_destroy(fave_stock);
