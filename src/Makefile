@@ -449,8 +449,10 @@ endif
 
 # Internal rules to build compilation modules.
 
+# libgmic
 libgmic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	$(CXX) -o libgmic.o -c gmic.cpp $(PIC) $(CFLAGS)
+
 libgmic: libgmic.o use_libgmic.cpp
 	ar rcs libgmic.a libgmic.o
 ifeq ($(OS),Darwin)
@@ -460,14 +462,15 @@ else
 	$(CXX) -o use_libgmic use_libgmic.cpp -L. -lgmic $(LIBS)
 endif
 
+# libgmic
 libcgmic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
 	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
 	$(CXX) -o libcgmic.o -c gmic_libc.cpp $(PIC) $(CFLAGS)
 
 libcgmic: libgmic.o libcgmic.o
-ifeq ($(OS),Darwin)
 	ar rcs libcgmic.a libcgmic.o
+ifeq ($(OS),Darwin)
 	$(CXX) -shared -o libcgmic.so libcgmic.o libgmic.o $(LIBS)
 else
 ifeq ($(OS),Windows)
@@ -479,22 +482,27 @@ endif
 	@if [ ! -f use_libcgmic.c ]; then ln -fs ../../gmic-community/libcgmic/use_libcgmic.c .; fi
 	$(CC) -std=c99 -o use_libcgmic use_libcgmic.c -L. -lcgmic
 
+# libgmicstatic
 libcgmicstatic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
+	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
+	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
 	$(CXX) -o libcgmicstatic.o -c gmic_libc.cpp $(PIC) $(CFLAGS)
 
-libcgmicstatic: libcgmicstatic.o libgmic.o
-ifeq ($(OS),Darwin)
+libcgmicstatic: libgmic.o libcgmicstatic.o
 	ar rcs libcgmicstatic.a libcgmicstatic.o
+ifeq ($(OS),Darwin)
 	$(CXX) -shared -static -o libcgmicstatic.so libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
 else
 ifeq ($(OS),Windows)
 	$(CXX) -shared -static -Wl,-soname,libcgmicstatic.so.1 -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) -Wl,--output-def,libcgmicstatic.def,--out-implib,libcgmicstatic.a $(CFLAGS) $(LIBS)
 else
-	$(CXX) -shared -Wl,-soname,libcgmicstatic.so.1 -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
+	$(CXX) -shared -static -Wl,-soname,libcgmicstatic.so.1 -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
 endif
 endif
-	$(CC) -std=c99 -o use_libcgmic_static use_libcgmic.c -L. -lcgmicstatic
+	@if [ ! -f use_libcgmic.c ]; then ln -fs ../../gmic-community/libcgmic/use_libcgmic.c .; fi
+	$(CC) -std=c99 -o use_libcgmic_static use_libcgmic.c libcgmicstatic.a
 
+# gmic_gimp
 gmic_gimp.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	$(CXX) -o gmic_gimp.o -c gmic.cpp -Dgmic_gimp $(CFLAGS)
 
@@ -510,14 +518,17 @@ else
 endif
 	$(STRIP) gmic_gimp$(EXE)
 
+# gmic
 gmic: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	$(CXX) -o gmic gmic.cpp -Dgmic_main $(CFLAGS) $(LIBS)
 
+# header files
 gmic_stdlib.h:
 	@echo -n "> Retrieve G'MIC Standard Library..."
 	@$(WGET) gmic_stdlib.h http://gmic.eu/gmic_stdlib.h
 	@touch gmic_stdlib.h
 	@echo " done!"
+
 CImg.h:
 	@echo -n "> Retrieve CImg Library..."
 	@if [ -f ../../CImg/CImg.h ]; then \
