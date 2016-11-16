@@ -1995,7 +1995,7 @@ CImg<char> get_command_line(const bool is_preview) {
 //----------------------------------------------------------
 void set_preview_factor() {
   const unsigned int filter = get_current_filter();
-  if (filter && gmic_preview_factors[filter] && GIMP_IS_PREVIEW(gui_preview)) {
+  if (filter && gmic_preview_factors[filter] && gui_preview && GIMP_IS_PREVIEW(gui_preview)) {
     double factor = gmic_preview_factors(filter,0);
     if (factor>=0) {
       if (!factor) { // Compute factor so that 1:1 preview of the image is displayed.
@@ -2203,7 +2203,7 @@ void resize_preview(const unsigned int size) {
                "class \"GimpPreview\" style \"gimp-large-preview\"",
                200 + size*120);
   gtk_rc_parse_string(tmp);
-  if (GIMP_IS_PREVIEW(gui_preview)) {
+  if (gui_preview && GIMP_IS_PREVIEW(gui_preview)) {
     gtk_widget_destroy(gui_preview);
     gui_preview = 0;
     _gimp_preview_invalidate();
@@ -2220,7 +2220,7 @@ void reset_button_parameters() {
 void on_dialog_resized() {
   reset_button_parameters();
   static int old_pw = 0, old_ph = 0;
-  if (GIMP_IS_PREVIEW(gui_preview)) {
+  if (gui_preview && GIMP_IS_PREVIEW(gui_preview)) {
     if (!old_pw || !old_ph) computed_preview.assign();
     else if (gimp_preview_width!=old_pw || gimp_preview_height!=old_ph) {
       set_preview_factor();
@@ -2402,11 +2402,17 @@ void on_dialog_preview_size_changed(GtkComboBox *const combobox) {
 }
 
 void on_dialog_preview_layout_toggled(GtkToggleButton *const toggle_button) {
+  cimg::mutex(25);
+  if (p_spt) { st_process_thread &spt = *(st_process_thread*)p_spt; spt.is_abort = true; }
+  cimg::mutex(25,0);
   reset_button_parameters();
   const bool value = gtk_toggle_button_get_active(toggle_button);
   set_preview_layout(value);
-  gtk_widget_destroy(dialog_window);
+  gui_preview = 0;
+  GtkWidget *old_dialog_window = dialog_window;
   create_dialog_gui(value);
+  gtk_widget_destroy(old_dialog_window);
+  set_preview_factor();
   save_dialog_params();
 }
 
