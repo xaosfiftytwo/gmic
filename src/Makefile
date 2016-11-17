@@ -7,7 +7,7 @@
 #                 . the G'MIC command line tool (type 'make cli').
 #                 . the G'MIC plug-in for GIMP (type 'make gimp').
 #                 . the G'MIC interpreter, as a C++ library (type 'make lib').
-#                 . the G'MIC C library (type 'make libc' or 'make staticlibc').
+#                 . the G'MIC C library (type 'make libc' or 'make libcstatic').
 #                 . the ZArt software (type 'make zart').
 #                 . To compile all of them, just type 'make', or 'make all').
 #
@@ -353,7 +353,7 @@ endif
 #---------------------------------
 GMIC_LIBC_STATIC_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) # $(CURL_CFLAGS) $(TIFF_CFLAGS)
 ifeq ($(OS),Window)
-GMIC_LIBC_STATIC_LIBS = -static -lpthread
+GMIC_LIBC_STATIC_LIBS = -Bstatic -lpthread
 endif
 GMIC_LIBC_STATIC_LIBS += $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(PNG_LIBS) $(JPEG_LIBS) # $(CURL_LIBS) $(TIFF_LIBS)
 ifeq ($(OS),Unix) # Unix.
@@ -496,7 +496,7 @@ else
 ifeq ($(OS),Windows)
 	$(CXX) -shared -static -Wl,-soname,libcgmicstatic.so.1 -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) -Wl,--output-def,libcgmicstatic.def,--out-implib,libcgmicstatic.a $(CFLAGS) $(LIBS)
 else
-	$(CXX) -shared -static -Wl,-soname,libcgmicstatic.so.1 -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
+	$(CXX) -shared -Bstatic -Wl,-soname,libcgmicstatic.so.1 -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
 endif
 endif
 	@if [ ! -f use_libcgmic.c ]; then ln -fs ../../gmic-community/libcgmic/use_libcgmic.c .; fi
