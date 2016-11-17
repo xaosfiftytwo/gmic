@@ -2113,7 +2113,6 @@ void on_dialog_preview_side_button_clicked(GtkCheckButton *const) {
   reset_button_parameters();
   const bool value = !get_preview_side();
   set_preview_side(value);
-  gui_preview = 0;
   GtkWidget *old_dialog_window = dialog_window;
   create_dialog_gui(value);
   gtk_widget_destroy(old_dialog_window);
