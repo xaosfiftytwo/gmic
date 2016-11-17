@@ -20342,7 +20342,7 @@ x_segment : -check "${1=1024}==0 || $1>=128"
       -elif {($is_shift" && "$o<0)" || "{*,ARROWLEFT}} # Go left.
         dx={($x1-$x0)/6} x0-=$dx x1-=$dx
       -elif {($is_shift" && "$o>0)" || "{*,ARROWRIGHT}} # Go right.
-        dx={($x1-$x0)/6} x0+=$dx x1=+$dx
+        dx={($x1-$x0)/6} x0+=$dx x1+=$dx
       -elif {($is_ctrl" && "$o>0)" || "({*,ARROWUP}" && "!$is_ctrl)} # Go up.
         dy={($y1-$y0)/6} y0-=$dy y1-=$dy
       -elif {($is_ctrl" && "$o<0)" || "({*,ARROWDOWN}" && "!$is_ctrl)} # Go down.
