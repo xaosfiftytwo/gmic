@@ -273,7 +273,7 @@ _help_usage :
   -_help_section "Overall context"
 
   -_help_paragraph "  - At any time, "${-GMIC}" manages one list of numbered (and optionally named) pixel-based images,
-\n     entirely stored uncompressed in computer memory.
+\n     entirely stored (not compressed) in computer memory.
 \n
 \n  - The first image of the list has indice '"${g}"0"$n"' and is denoted by '"$c"[0]"$n"'. The second image of the
 \n     list is denoted by '"$c"[1]"$n"', the third by '"$c"[2]"$n"' and so on.

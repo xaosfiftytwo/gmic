@@ -232,7 +232,7 @@ struct gmic {
   static char *strreplace_fw(char *const str);
   static char *strreplace_bw(char *const str);
   static unsigned int strescape(const char *const str, char *const res);
-  static const gmic_image<char>& uncompress_stdlib();
+  static const gmic_image<char>& decompress_stdlib();
 
   template<typename T>
   void _gmic(const char *const commands_line,

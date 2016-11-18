@@ -1301,14 +1301,14 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
       cimg::load_network(sources[l],filename_tmp,is_silent?4:60);
       std::FILE *file = std::fopen(filename_tmp,"rb");
 
-      // Eventually, uncompress .cimgz file.
+      // Eventually, decompress .cimgz file.
       if (file && (std::fscanf(file," #@gmi%c",&sep)!=1 || sep!='c')) {
         std::rewind(file);
         try {
           CImg<unsigned char> buffer; buffer.load_cimg(file); std::fclose(file);
           if (get_verbosity_mode()>1)
             std::fprintf(cimg::output(),
-                         "\n[gmic_gimp]./update/ Uncompress file '%s' (was '%s').\n",
+                         "\n[gmic_gimp]./update/ Decompress file '%s' (was '%s').\n",
                          filename_tmp.data(),sources[l].data());
           buffer.save_raw(filename_tmp); file = std::fopen(filename_tmp,"rb"); }
         catch (...) { }
@@ -1388,7 +1388,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   }
 
   if (!is_default_update) { // Add hardcoded default filters if no updates of the default commands.
-    _gmic_additional_commands.insert(gmic::uncompress_stdlib());
+    _gmic_additional_commands.insert(gmic::decompress_stdlib());
     CImg<char>::string("\n#@gimp ________\n",false).unroll('y').move_to(_gmic_additional_commands);
   }
 

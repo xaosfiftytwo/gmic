@@ -2351,16 +2351,16 @@ gmic::~gmic() {
   delete[] variables_names;
 }
 
-// Uncompress G'MIC standard library commands.
+// Decompress G'MIC standard library commands.
 //---------------------------------------------
-const CImg<char>& gmic::uncompress_stdlib() {
+const CImg<char>& gmic::decompress_stdlib() {
   if (!stdlib) try {
       CImgList<char>::get_unserialize(CImg<unsigned char>(data_gmic_stdlib,1,size_data_gmic_stdlib,1,1,true))[0].
         move_to(stdlib);
     } catch (...) {
       cimg::mutex(29);
       std::fprintf(cimg::output(),
-                   "[gmic] %s*** Warning *** Could not uncompress G'MIC standard library, ignoring it.%s\n",
+                   "[gmic] %s*** Warning *** Could not decompress G'MIC standard library, ignoring it.%s\n",
                    cimg::t_red,cimg::t_normal);
       std::fflush(cimg::output());
       cimg::mutex(29,0);
@@ -3364,7 +3364,7 @@ void gmic::_gmic(const char *const commands_line,
     _variables_names[l].assign();
     variables_names[l] = &_variables_names[l];
   }
-  if (include_stdlib) add_commands(gmic::uncompress_stdlib().data());
+  if (include_stdlib) add_commands(gmic::decompress_stdlib().data());
   add_commands(custom_commands);
 
   // Set pre-defined global variables.
