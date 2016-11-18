@@ -5638,9 +5638,9 @@ mix_channels :
 #@gmic : Default value: 'base_value=(undefined)'.
 #@gmic : $ image.jpg --negate
 negate : -skip "${1=,}"
-  -if {isval("$1")}
-    -e[0--3] "Negate values of image$?, according to base value $1."
-    -v - -- {"$1"} -* -1 -v +
+  -if {isval("$*")}
+    -e[0--3] "Negate values of image$?, according to base value $*."
+    -v - -- {"$*"} -* -1 -v +
   -else
     -e[0--3] "Negate values of image$?."
     -v - -repeat $! --[$>] {$>,iM} -done -* -1
