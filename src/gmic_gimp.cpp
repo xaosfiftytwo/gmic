@@ -1176,10 +1176,11 @@ gint tree_view_sort_func(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gp
   return cimg::strcasecmp(name1,name2);
 }
 
-const char *tree_view_sort_str(const char *str) {
-  if (!str || !*str) return str;
+CImg<char> tree_view_sort_str(const char *str, const bool is_folder) {
+  CImg<char> res;
+  if (!str || !*str || !is_folder) return CImg<char>::string(str,true,true);
   while (str[0]=='<' && str[1] && str[2]=='>') str+=3;
-  return str;
+  return CImg<char>(1,1,1,1,' ').append(CImg<char>::string(str,true,true),'x');
 }
 
 // Flush filter tree view
@@ -1458,7 +1459,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
           if (level) {
             gtk_tree_store_append(tree_view_store,&parent[level],level?&parent[level - 1]:0);
             gtk_tree_store_set(tree_view_store,&parent[level],0,0,1,nentry,
-                               2,tree_view_sort_str(nentry),-1);
+                               2,tree_view_sort_str(nentry,true).data(),-1);
           } else { // 1st-level folder.
             bool is_duplicate = false;
             cimglist_for(gmic_1stlevel_names,l)
@@ -1478,7 +1479,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
             if (!is_duplicate) {
               gtk_tree_store_append(tree_view_store,&parent[level],level?&parent[level - 1]:0);
               gtk_tree_store_set(tree_view_store,&parent[level],0,0,1,nentry,
-                                 2,tree_view_sort_str(nentry),-1);
+                                 2,tree_view_sort_str(nentry,true).data(),-1);
               const char *treepath = gtk_tree_model_get_string_from_iter(GTK_TREE_MODEL(tree_view_store),
                                                                          &parent[level]);
               CImg<char>::string(nentry).move_to(gmic_1stlevel_names);
@@ -1525,7 +1526,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
           }
           gtk_tree_store_append(tree_view_store,&iter,level?&parent[level - 1]:0);
           gtk_tree_store_set(tree_view_store,&iter,0,gmic_entries.size() - 1,1,nentry,
-                             2,tree_view_sort_str(nentry),-1);
+                             2,tree_view_sort_str(nentry,false).data(),-1);
           if (!level) {
             gtk_label_set_markup(GTK_LABEL(markup2ascii),nentry);
             const char *_nentry = gtk_label_get_text(GTK_LABEL(markup2ascii));
@@ -1632,7 +1633,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
         }
         gtk_tree_store_append(tree_view_store,&iter,&fave_iter);
         gtk_tree_store_set(tree_view_store,&iter,0,gmic_entries.size() - 1,1,label.data(),
-                           2,tree_view_sort_str(label),-1);
+                           2,tree_view_sort_str(label,false).data(),-1);
       } else if (get_verbosity_mode()>1)
         std::fprintf(cimg::output(),
                      "\n[gmic_gimp]./update/ Malformed line %u in fave file '%s': '%s'.\n",
