@@ -10905,7 +10905,7 @@ quiver : -check ${"-is_image_arg $1"}" && ${2=5%}>0 && ${3=1}>=0 && isbool(${4=1
           X = round(x*w/w#0); Y = round(y*h/h#0);
           u = i(X,Y,0,0)*fact; v = i(X,Y,0,1)*fact;
           if ($4,
-            draw_arrow(#0,[x,y],[x + u,y + v],45,sampling/4,$5,[${6--1}]);
+            draw_arrow(#0,[x,y],[x + u,y + v],45,sampling/4,$5,[${6--1}]),
             draw_line(#0,[x - 0.5*u,y - 0.5*v],[x + 0.5*u,y + 0.5*v],$5,[${6--1}]);
           );
         );
