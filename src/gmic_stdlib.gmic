@@ -16884,8 +16884,9 @@ math_lib :
     _dl_color = resize(color,s#ind)*=abs(_opacity);
     _omopacity = 1 - max(_opacity,0);
     _tmax = max(abs(_P0P1));
+    __tmax = max(1,_tmax);
     for (_t = 0, _t<=_tmax, ++_t,
-      _P = round(_P0 + _t*_P0P1/_tmax);
+      _P = round(_P0 + _t*_P0P1/__tmax);
       I(#ind,_P) = _dl_color + _omopacity*I(#ind,_P);
     );
     nan;
