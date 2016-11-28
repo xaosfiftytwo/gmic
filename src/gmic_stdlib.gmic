@@ -15199,6 +15199,10 @@ _blend_reflect :
   --[1] 255.1 -*[1] -1 --sqr[0] -/[2] [1] -rm[1] -c[1] 0,255
 _blend_red :
   -sh[0] 1,100% -j[1] [2],0,0,0,1 -rm[2]
+_blend_seamless :
+  --blend_seamless 0 -rm[1]
+_blend_seamless_mixed :
+  --blend_seamless 1 -rm[1]
 _blend_saturation :
   -to_color -sh 0,2 -rgb2hsv[2,3] -shift[2,3] 0,0,0,-1,2 -sh[2] 1,2 -j[1] [4],0,0,0,1 -rm[4] -shift[2,3] 0,0,0,1,2 -hsv2rgb[2,3] -rm[2,3]
 _blend_screen :
@@ -21925,6 +21929,7 @@ _gimp_download_all_data :
 #@gimp : note = note{"\n<span foreground="purple" underline="single">Supporters:</span>"}
 #@gimp : note = note{" <b>-</b> A big hug goes to these friends who supported the project:"}
 #@gimp : note = note{"<i>
+#@gimp : Andrea Correani,
 #@gimp : Mads Thomsen,
 #@gimp : Djek Eykhout,
 #@gimp : Michael Calabrese,
