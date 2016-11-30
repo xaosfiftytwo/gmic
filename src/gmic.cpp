@@ -11976,9 +11976,10 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
         }
 
         // Display images in display window.
+        wind = 0;
         if (!is_double_hyphen &&
             (!std::strcmp("-window",command) ||
-             cimg_sscanf(command,"-window%u%c",&(wind=0),&end)==1 ||
+             cimg_sscanf(command,"-window%u%c",&wind,&end)==1 ||
              cimg_sscanf(command,"-w%u%c",&wind,&end)==1) &&
             wind<10) {
           gmic_substitute_args(false);

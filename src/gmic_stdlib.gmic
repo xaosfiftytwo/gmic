@@ -8207,8 +8207,8 @@ curvature :
   -v - -repeat $! -l[$>]
     -if {d==1}
       --g xy,0 -hessian... xxxyyy                             # ixx ixy iyy ix iy
-      -*... .. -*[-4] . -*[-4] -2                           # ixx -2iyixy ixiyy ix iy
-      -+[-4,-3] -*... ..                                    # ixx -2ixiyixy+ix^2iyy ix iy
+      -*... .. -*[-4] . -*[-4] -2                             # ixx -2iyixy ixiyy ix iy
+      -+[-4,-3] -*... ..                                      # ixx -2ixiyixy+ix^2iyy ix iy
       -sqr[-2,-1] -*[-4] . -+[-4,-3]                          # iy^2ixx-2ixiyixy+ix^2iyy ix^2 iy^2
       -+[-2,-1] -+. 0.1 -^. 1.5 -/                            # (iy^2ixx+2ixiyixy+ix^2iyy)/(ix^2+iy^2)
     -else
@@ -8955,7 +8955,7 @@ inpaint_patchmatch : -check ${-is_image_arg\ $1}"&& ${2=0}>=0 && isint(${3=9}) &
           -_inpaint_patchmatch[scaled_img] [correspondence],[scaled_mask],$blend_size,$6
           --patchmatch[scaled_img] [scaled_reference],$patch_size,$patch_size,1,4,4,0,[correspondence]
           -j[correspondence] . -rm.
-          -if {*} -w1[scaled_img] $visu_size,0 -endif
+          -if {*1} -w1[scaled_img] $visu_size,0 -endif
           -if {*2} -w2[correspondence] $visu_size,1 -endif
         -done
         -rm[scaled_img,scaled_mask,scaled_reference] -channels[correspondence] 0,1
