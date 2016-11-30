@@ -6533,7 +6533,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
         if (!std::strcmp("-ellipse",command)) {
           gmic_substitute_args(false);
           float x = 0, y = 0, R = 0, r = 0, angle = 0;
-          sep0 = sep1 = sepx = sepy = *argx = *argy = *argz = *argc = *color = 0;
+          sep = sepx = sepy = sepz = sepc = *argx = *argy = *argz = *argc = *color = 0;
           pattern = ~0U; opacity = 1;
           if ((cimg_sscanf(argument,"%255[0-9.eE%+-],%255[0-9.eE%+-],%255[0-9.eE%+-]%c",
                            argx,argy,argz,&end)==3 ||
@@ -6548,35 +6548,34 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                            argx,argy,argz,argc,&angle,&opacity,&end)==6 ||
                (cimg_sscanf(argument,"%255[0-9.eE%+-],%255[0-9.eE%+-],%255[0-9.eE%+-],"
                             "%255[0-9.eE%+-],%f,%f,0%c%x%c",
-                            argx,argy,argz,argc,&angle,&opacity,&sep1,&pattern,
+                            argx,argy,argz,argc,&angle,&opacity,&sep,&pattern,
                             &end)==8 &&
-                sep1=='x') ||
+                sep=='x') ||
+               (cimg_sscanf(argument,"%255[0-9.eE%+-],%255[0-9.eE%+-],%255[0-9.eE%+-],"
+                            "%255[0-9.eE%+-],%f,%f,0%c%x,%4095[0-9.eEinfa,+-]%c",
+                            argx,argy,argz,argc,&angle,&opacity,&sep,
+                            &pattern,color,&end)==9 &&
+                sep=='x') ||
                (cimg_sscanf(argument,"%255[0-9.eE%+-],%255[0-9.eE%+-],%255[0-9.eE%+-],"
                             "%255[0-9.eE%+-],%f,%f,%4095[0-9.eEinfa,+-]%c",
-                            argx,argy,argz,argc,&angle,&opacity,color,&end)==7 &&
-                (bool)(pattern=~0U))||
-               (*color=0,cimg_sscanf(argument,"%255[0-9.eE%+-],%255[0-9.eE%+-],%255[0-9.eE%+-],"
-                                     "%255[0-9.eE%+-],%f,%f,0%c%x,%4095[0-9.eEinfa,+-]%c",
-                                     argx,argy,argz,argc,&angle,&opacity,&sep1,
-                                     &pattern,color,&end)==9 &&
-                sep1=='x')) &&
+                            argx,argy,argz,argc,&angle,&opacity,color,&end)==7)) &&
               (cimg_sscanf(argx,"%f%c",&x,&end)==1 ||
                (cimg_sscanf(argx,"%f%c%c",&x,&sepx,&end)==2 && sepx=='%')) &&
               (cimg_sscanf(argy,"%f%c",&y,&end)==1 ||
                (cimg_sscanf(argy,"%f%c%c",&y,&sepy,&end)==2 && sepy=='%')) &&
               (cimg_sscanf(argz,"%f%c",&R,&end)==1 ||
-               (cimg_sscanf(argz,"%f%c%c",&R,&sep1,&end)==2 && sep1=='%')) &&
+               (cimg_sscanf(argz,"%f%c%c",&R,&sepz,&end)==2 && sepz=='%')) &&
               (!*argc ||
                cimg_sscanf(argc,"%f%c",&r,&end)==1 ||
-               (cimg_sscanf(argc,"%f%c%c",&r,&sep0,&end)==2 && sep0=='%'))) {
+               (cimg_sscanf(argc,"%f%c%c",&r,&sepc,&end)==2 && sepc=='%'))) {
             if (!*argc) r = R;
             print(images,0,"Draw %s ellipse at (%g%s,%g%s) with radii (%g%s,%g%s) on image%s, "
                   "with orientation %g deg., opacity %g and color (%s).",
-                  sep1=='x'?"outlined":"filled",
+                  sep=='x'?"outlined":"filled",
                   x,sepx=='%'?"%":"",
                   y,sepy=='%'?"%":"",
-                  R,sep1=='%'?"%":"",
-                  r,sep0=='%'?"%":"",
+                  R,sepz=='%'?"%":"",
+                  r,sepc=='%'?"%":"",
                   gmic_selection.data(),
                   angle,
                   opacity,
@@ -6590,9 +6589,9 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                 nx = (int)cimg::round(sepx=='%'?x*(img.width() - 1)/100:x),
                 ny = (int)cimg::round(sepy=='%'?y*(img.height() - 1)/100:y);
               const float
-                nR = cimg::round(sep1=='%'?R*rmax/100:R),
-                nr = cimg::round(sep0=='%'?r*rmax/100:r);
-              if (sep1=='x') {
+                nR = cimg::round(sepz=='%'?R*rmax/100:R),
+                nr = cimg::round(sepc=='%'?r*rmax/100:r);
+              if (sep=='x') {
                 if (nR==nr) { gmic_apply(draw_circle(nx,ny,(int)nR,g_img.data(),opacity,~0U)); }
                 else gmic_apply(draw_ellipse(nx,ny,nR,nr,angle,g_img.data(),opacity,~0U));
               } else {
