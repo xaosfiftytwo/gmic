@@ -429,7 +429,7 @@ libc:
 	$(MAKE) "CFLAGS+=$(GMIC_LIBC_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_LIBC_LIBS)" libcgmic
 
 libcstatic:
-	rm libgmic.o
+	rm -f libgmic.o
 	$(MAKE) "CFLAGS+=$(GMIC_LIBC_STATIC_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_LIBC_STATIC_LIBS)" libcgmicstatic
 
 native:
