@@ -467,7 +467,7 @@ endif
 libcgmic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
 	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
-	$(CXX) -o libcgmic.o -c gmic_libc.cpp $(PIC) $(CFLAGS)
+	$(CXX) -o libcgmic.o -c gmic_libc.cpp -Dgmic_gimp $(PIC) $(CFLAGS)
 
 libcgmic: libgmic.o libcgmic.o
 	ar rcs libcgmic.a libcgmic.o
@@ -487,7 +487,7 @@ endif
 libcgmicstatic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
 	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
-	$(CXX) -o libcgmicstatic.o -c gmic_libc.cpp $(PIC) $(CFLAGS)
+	$(CXX) -o libcgmicstatic.o -c gmic_libc.cpp -Dgmic_gimp $(PIC) $(CFLAGS)
 
 libcgmicstatic: libgmic.o libcgmicstatic.o
 	ar rcs libcgmicstatic.a libcgmicstatic.o
