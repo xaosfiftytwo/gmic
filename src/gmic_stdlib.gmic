@@ -16889,8 +16889,8 @@ math_lib :
     _omopacity = 1 - max(_opacity,0);
     _tmax = max(abs(_P0P1));
     __tmax = max(1,_tmax);
-    for (_t = 0, _t<=_tmax, ++_t,
-      _P = round(_P0 + _t*_P0P1/__tmax);
+    for (_tl = 0, _tl<=_tmax, ++_tl,
+      _P = round(_P0 + _tl*_P0P1/__tmax);
       I(#ind,_P) = _dl_color + _omopacity*I(#ind,_P);
     );
     nan;
@@ -17026,12 +17026,16 @@ math_lib :
     _P0 = P0;
     _P1 = P1;
     _opacity = opacity;
-    _ds_color = color;
+    _ds_color = resize(color,s#ind)*=abs(_opacity);
+    _omopacity = 1 - max(_opacity,0);
     _C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ _P0,P1,T0,T1 ],2);
     _dt = 10/max(abs(_P1 - _P0));
-    for (_t = 0, _t<=1, _t+=_dt,
-      _P = mul([_t^3,_t^2,_t,1],_C,2);
-      draw_line(#ind,_P0,_P,_opacity,_ds_color);
+    _P0 = inf;
+    for (_t = 0, print(_t)<=1, _t+=_dt,
+      _P = round(mul([_t^3,_t^2,_t,1],_C,2));
+      _dP = abs(mul([3*_t^2,2*_t,1,0],_C,2))+1e-8;
+      _dt = min(0.9/_dP[0],0.9/_dP[1]);
+      if (_P0!=_P, I(#ind,_P) = _ds_color + _omopacity*I(#ind,_P));
       _P0 = _P;
     );
     nan;
