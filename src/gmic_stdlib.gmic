@@ -15204,10 +15204,12 @@ _blend_saturation :
 _blend_screen :
   ---[0] 255 --[1] 255 -*[1,2] -/[1] 255 -*[1] -1 -+[1] 255
 _blend_shapeaverage :
+  -repeat {s} -sh. $> -+. {1,$>/s} -rm. -done
   -norm[1] -label[1] 0 {iM+1},1,1,{0,s}
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c)+=i;i"
   --histogram[1] {w},0,{w-1} -/[-2,-1] -map[1] . -rm.
 _blend_shapeaverage0 : # Same as shapeaverage except that zero pixels in foreground layer are kept to black.
+  -repeat {s} -sh. $> -+. {1,$>/s} -rm. -done
   -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s}
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c)+=i;i"
   --histogram[1] {w},0,{w-1} -/[-2,-1] -point. 0,0,0,1,0 -map[1] . -rm.
