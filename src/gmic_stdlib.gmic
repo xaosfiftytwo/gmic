@@ -17025,11 +17025,12 @@ math_lib :
     _ds_color = resize(color,s#ind)*=abs(_opacity);
     _omopacity = 1 - max(_opacity,0);
     _C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ _P0,P1,T0,T1 ],2);
+    _dt = _dtmin = 1/max(abs(_P1 - _P0));
     _P0 = inf;
     for (_t = 0, _t<=1, _t+=_dt,
       _P = round(mul([_t^3,_t^2,_t,1],_C,2));
-      _dP = abs(mul([3*_t^2,2*_t,1,0],_C,2)) + 1e-8;
-      _dt = min(0.95/_dP[0],0.95/_dP[1]);
+      _dP = abs(mul([3*_t^2,2*_t,1,0],_C,2));
+      _dt = min(_dtmin,0.75/max(_dP));
       if (_P0!=_P, I(#ind,_P) = _ds_color + _omopacity*I(#ind,_P));
       _P0 = _P;
     );
