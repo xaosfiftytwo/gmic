@@ -17117,8 +17117,8 @@ math_lib :
   );
 
   map(V,x,fnx) = ( # Apply a function x->fnx on a vector variable V
-    unref(x#,_k);
-    for (_k = 0, _k<size(V#), ++_k, x# = V#[_k]; V#[_k] = fnx#);
+    unref(x#,_#x);
+    for (_#x = 0, _#x<size(V#), ++_#x, x# = V#[_#x]; V#[_#x] = fnx#);
     V#;
   );
 
