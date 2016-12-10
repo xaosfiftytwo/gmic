@@ -10496,7 +10496,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
   connections_max={round($5)}
   allow_self_intersections={!!$6} # 0 or 1.
 
-  -repeat $! -l[$>] nm={$>,n}
+  -repeat $! -l[$>] nm={n}
 
     # Remove small glitches in input stroke image.
     -slices 50% -channels 0 -gt 0
