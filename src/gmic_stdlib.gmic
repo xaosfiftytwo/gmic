@@ -10562,8 +10562,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
         du = (nu - pu)/2;
         cr = cross([pu,0],[nu,0]);
         if (cr[2]>=0, kappa = norm(du));
-      );
-      kappa"
+      ); kappa"
     -nm. e_curvatures
 
     # Compute averaged normals to points.
@@ -10583,8 +10582,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
         );
         U/=n;
         ang = (atan2(U[1],U[0])*180/pi)%360;
-      );
-      ang"
+      ); ang"
     -rm[e_normals]
 
     # Detect extremity points.
@@ -10603,8 +10601,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
           i(#"$keypoints",old_max[0],old_max[1]) = 0;
           ret = 1;
         );
-      );
-      ret"
+      ); ret"
     -sh[keycoords] 100% -f. 0 -rm. # Last channel will be used to store the number of connexions for each keypoint
     -rm[e_curvatures,curvatures,keypoints]
 
@@ -10631,8 +10628,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
           "$code_pairing"
           if (is_cond, ++nb);
         );
-      );
-      nb"}
+      ); nb"}
 
     -if $N  # Pairs found !
       -i[keypairs] $N,1,1,3
@@ -10641,8 +10637,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
         for (nx = x + 1, nx<w#"$keycoords", ++nx,
           "$code_pairing"
           if (is_cond, I[#"$keypairs",ind++] = [ dist,x,nx ]);
-        );
-        I"
+        ); I"
       -sort[keypairs] +,x
     -endif
 
@@ -10682,8 +10677,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
             ++i(#"$keycoords",indS,0,0,2);
             ++i(#"$keycoords",indT,0,0,2);
           );
-        );
-        I"
+        ); I"
     -endif
     -rm[keypairs]
 
@@ -10705,8 +10699,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
           draw_line(#"$new_strokes",S,P,1,1);
           ++i(#"$keycoords",x,0,0,2);
         );
-      );
-      I"
+      ); I"
     -k. -nm $nm
   -endl -done -v +
 
