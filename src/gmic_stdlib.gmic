@@ -10606,7 +10606,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
       );
       ret"
     -sh[keycoords] 100% -f. 0 -rm. # Last channel will be used to store the number of connexions for each keypoint
-    -rm[e_curvatures]
+    -rm[e_curvatures,curvatures,keypoints]
 
     # Detect pairs of keypoints preserving the spline constraints.
     code_pairing="
@@ -10685,6 +10685,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
         );
         I"
     -endif
+    -rm[keypairs]
 
     # Find and connect segments.
     -f[keycoords] ">"${-math_lib}"
