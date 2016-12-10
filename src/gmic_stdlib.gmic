@@ -10606,7 +10606,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
       -sh[keycoords] 100% -f. 0 -rm. # Last channel will be used to store the number of connexions for each keypoint
     -endif
     -rm[e_curvatures,curvatures]
-    -if {!narg($_keep_keypoints)} -rm[keypoints] -endif # Small hack used by the plug-in preview.
+    -if {!0$_keep_keypoints} -rm[keypoints] -endif # Small hack used by the plug-in preview.
 
     # Detect pairs of keypoints preserving the spline constraints.
     -if {!narg($keycoords)}
