@@ -10480,21 +10480,21 @@ circle : -skip ${4=1},${5=0},${6=0}
   -endif
   -v - -ellipse $1,$2,$3,$3,0,${4--1} -v +
 
-#@gmic close_binary : 0<=_extremity_threshold<=100,_spline_distmax>=0,_segment_distmax>=0,0<=_spline_anglemax<=180,_connections_max>=0,_allow_self_intersection={ 0 | 1 }
+#@gmic close_binary : 0<=_endpoint_rate<=100,_endpoint_connectivity>=0,_spline_distmax>=0,_segment_distmax>=0,0<=_spline_anglemax<=180,_allow_self_intersection={ 0 | 1 }
 #@gmic : Automatically close open shapes in binary images (defining white strokes on black background).
-#@gmic : Default values: 'stroke_threshold=20', 'stroke_erosion=-1', 'extremity_threshold=25', 'spline_distmax=80', 'segment_distmax=20', 'spline_anglemax=90', 'connections_max=2' and 'allow_self_intersection=0'.
-close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=90}>=0 && $4<=180 && ${5=2}>=0 && isval(${6=0})"
-  -e[^-1] "Close open shapes in binary image$?, with extremity threshold $1, spline max distance $2, segment max distance $3, spline max angle $4, "\
-          "connections max $5 and self intersections "${"-arg 1+!$6,allowed,\"not allowed\""}"."
+#@gmic : Default values: 'endpoint_rate=75', 'endpoint_connectivity=2', 'spline_distmax=80', 'segment_distmax=20', 'spline_anglemax=90' and 'allow_self_intersection=0'.
+close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=20}>=0 && ${5=90}>=0 && $5<=180 && isval(${6=0})"
+  -e[^-1] "Close open shapes in binary image$?, with endpoint rate $1, endpoint connectivity $2, spline max distance $3, segment max distance $4, spline max angle $5, "\
+          "and self intersections "${"-arg 1+!$6,allowed,\"not allowed\""}"."
 
   # Set algorithm parameters.
   -v -
-  extremity_threshold=$1          # in [0,100]
-  spline_distmax=$2               # in px.
-  segment_distmax=$3              # in px.
-  spline_anglemax=$4              # in deg.
-  connections_max={round($5)}
-  allow_self_intersections={!!$6} # 0 or 1.
+  endpoint_threshold={100-$1}       # in [0,100]
+  endpoint_connectivity={round($2)}
+  spline_distmax=$3                 # in px.
+  segment_distmax=$4                # in px.
+  spline_anglemax=$5                # in deg.
+  allow_self_intersections={!!$6}   # 0 or 1.
 
   -repeat $! -l[$>] nm={n}
 
@@ -10585,9 +10585,9 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
       ); ang"
     -rm[e_normals]
 
-    # Detect extremity points.
+    # Detect end points.
     --compose_channels[e_curvatures] max -nm. curvatures
-    --ge[curvatures] {$extremity_threshold%}
+    --ge[curvatures] {$endpoint_threshold%}
     -label_fg. 0,1 -nm. keypoints
     -if {iM>0}
       {iM},1,1,3,-1 -nm. keycoords
@@ -10608,8 +10608,10 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
     -rm[e_curvatures,curvatures,keypoints]
 
     # Detect pairs of keypoints preserving the spline constraints.
-    -if {narg($keycoords)}
+    -if {!narg($keycoords)}
+      -k[strokes]
 
+    -else
       code_pairing="
         Ic = I[#"$keycoords",x];
         In = I[#"$keycoords",nx];
@@ -10654,7 +10656,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
           Ic = I;
           indS = Ic[1];
           indT = Ic[2];
-          if (i(#"$keycoords",indS,0,0,2)<"$connections_max" && i(#"$keycoords",indT,0,0,2)<"$connections_max",
+          if (i(#"$keycoords",indS,0,0,2)<"$endpoint_connectivity" && i(#"$keycoords",indT,0,0,2)<"$endpoint_connectivity",
             S = I(#"$keycoords",indS)[0,2];
             T = I(#"$keycoords",indT)[0,2];
             angS = i(#"$normals",S)*pi/180;
@@ -10687,7 +10689,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
 
       # Find and connect segments.
       -f[keycoords] ">"${-math_lib}"
-        if (i(#"$keycoords",x,0,0,2)<"$connections_max",
+        if (i(#"$keycoords",x,0,0,2)<"$endpoint_connectivity",
           S = I(#"$keycoords",x)[0,2];
           angS = i(#"$normals",S)*pi/180;
           NS = [ cos(angS),sin(angS) ];
@@ -10696,7 +10698,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
           nb_switches = 0;
           for (t = 0, t<="$segment_distmax", t+=1,
             P = round(S + t*NS);
-            if (i(#"$ind_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
+            if (i(#"$new_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
             if (nb_switches==2,is_cond = 1; break(););
           );
           if (is_cond,
