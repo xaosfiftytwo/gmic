@@ -10589,117 +10589,123 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=80}>=0 && ${3=20}>=0 && ${4=
     --compose_channels[e_curvatures] max -nm. curvatures
     --ge[curvatures] {$extremity_threshold%}
     -label_fg. 0,1 -nm. keypoints
-    {iM},1,1,3,-1 -nm. keycoords
-    -f[keypoints] "> # Keep only a single point on connected regions of high curvatures.
-      ret = 0;
-      if (i,
-        j = i - 1;
-        old_max = I[#"$keycoords",j];
-        kappa = i(#"$curvatures");
-        if (kappa>old_max[2],
-          I[#"$keycoords",j] = [ x,y,kappa ];
-          i(#"$keypoints",old_max[0],old_max[1]) = 0;
-          ret = 1;
-        );
-      ); ret"
-    -sh[keycoords] 100% -f. 0 -rm. # Last channel will be used to store the number of connexions for each keypoint
+    -if {iM>0}
+      {iM},1,1,3,-1 -nm. keycoords
+      -f[keypoints] "> # Keep only a single point on connected regions of high curvatures.
+        ret = 0;
+        if (i,
+          j = i - 1;
+          old_max = I[#"$keycoords",j];
+          kappa = i(#"$curvatures");
+          if (kappa>old_max[2],
+            I[#"$keycoords",j] = [ x,y,kappa ];
+            i(#"$keypoints",old_max[0],old_max[1]) = 0;
+            ret = 1;
+          );
+        ); ret"
+      -sh[keycoords] 100% -f. 0 -rm. # Last channel will be used to store the number of connexions for each keypoint
+    -endif
     -rm[e_curvatures,curvatures,keypoints]
 
     # Detect pairs of keypoints preserving the spline constraints.
-    code_pairing="
-      Ic = I[#"$keycoords",x];
-      In = I[#"$keycoords",nx];
-      S = Ic[0,2];
-      T = In[0,2];
-      angS = i(#"$normals",S)*pi/180;
-      angT = i(#"$normals",T)*pi/180;
-      NS = [ cos(angS),sin(angS) ];
-      NT = [ cos(angT),sin(angT) ];
-      ST = T - S;
-      dist = norm(ST);
-      cosN = dot(NS,-NT);
-      angN = acos(cosN)*180/pi;
-      is_cond = dist<"$spline_distmax" && (dot(NS,ST)>0 || dot(NT,ST)<0) && angN<"$spline_anglemax";"
+    -if {narg($keycoords)}
 
-    N={"
-      nb = 0;
-      for (x = 0, x<w#"$keycoords", ++x,
-        for (nx = x + 1, nx<w#"$keycoords", ++nx,
-          "$code_pairing"
-          if (is_cond, ++nb);
-        );
-      ); nb"}
+      code_pairing="
+        Ic = I[#"$keycoords",x];
+        In = I[#"$keycoords",nx];
+        S = Ic[0,2];
+        T = In[0,2];
+        angS = i(#"$normals",S)*pi/180;
+        angT = i(#"$normals",T)*pi/180;
+        NS = [ cos(angS),sin(angS) ];
+        NT = [ cos(angT),sin(angT) ];
+        ST = T - S;
+        dist = norm(ST);
+        cosN = dot(NS,-NT);
+        angN = acos(cosN)*180/pi;
+        is_cond = dist<"$spline_distmax" && (dot(NS,ST)>0 || dot(NT,ST)<0) && angN<"$spline_anglemax";"
 
-    -if $N  # Pairs found !
-      -i[keypairs] $N,1,1,3
-      -f[keycoords] ">
-        init(ind = 0);
-        for (nx = x + 1, nx<w#"$keycoords", ++nx,
-          "$code_pairing"
-          if (is_cond, I[#"$keypairs",ind++] = [ dist,x,nx ]);
-        ); I"
-      -sort[keypairs] +,x
-    -endif
+      N={"
+        nb = 0;
+        for (x = 0, x<w#"$keycoords", ++x,
+          for (nx = x + 1, nx<w#"$keycoords", ++nx,
+            "$code_pairing"
+            if (is_cond, ++nb);
+          );
+        ); nb"}
 
-    # Find and connect splines.
-    -i[new_strokes] [strokes]
-    ind_strokes={$allow_self_intersections?$strokes:$new_strokes}
+      -if $N  # Pairs found !
+        -i[keypairs] $N,1,1,3
+        -f[keycoords] ">
+          init(ind = 0);
+          for (nx = x + 1, nx<w#"$keycoords", ++nx,
+            "$code_pairing"
+            if (is_cond, I[#"$keypairs",ind++] = [ dist,x,nx ]);
+          ); I"
+        -sort[keypairs] +,x
+      -endif
 
-    -if {narg($keypairs)}
-      -f[keypairs] ">"${-math_lib}"
-        Ic = I;
-        indS = Ic[1];
-        indT = Ic[2];
-        if (i(#"$keycoords",indS,0,0,2)<"$connections_max" && i(#"$keycoords",indT,0,0,2)<"$connections_max",
-          S = I(#"$keycoords",indS)[0,2];
-          T = I(#"$keycoords",indT)[0,2];
+      # Find and connect splines.
+      -i[new_strokes] [strokes]
+      ind_strokes={$allow_self_intersections?$strokes:$new_strokes}
+
+      -if {narg($keypairs)}
+        -f[keypairs] ">"${-math_lib}"
+          Ic = I;
+          indS = Ic[1];
+          indT = Ic[2];
+          if (i(#"$keycoords",indS,0,0,2)<"$connections_max" && i(#"$keycoords",indT,0,0,2)<"$connections_max",
+            S = I(#"$keycoords",indS)[0,2];
+            T = I(#"$keycoords",indT)[0,2];
+            angS = i(#"$normals",S)*pi/180;
+            angT = i(#"$normals",T)*pi/180;
+            ST = T - S;
+            dist = norm(ST);
+            NS = [ cos(angS),sin(angS) ];
+            NT = [ cos(angT),sin(angT) ];
+            tmax = max(abs(ST));
+            is_cond = 1;
+            C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ S,T,dist*NS,-dist*NT ],2);
+            dt = dtmin = 1/max(abs(T - S));
+            current_val = 1;
+            nb_switches = 0;
+            for (t = 0, t<=1, t+=dt,
+              P = round(mul([t^3,t^2,t,1],C,2));
+              if (i(#"$ind_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
+              if (nb_switches>2, is_cond = 0; break());
+              dP = abs(mul([3*t^2,2*t,1,0],C,2)) + 1e-8;
+              dt = min(dtmin,0.75/max(dP));
+            );
+            if (is_cond,
+              draw_spline(#"$new_strokes",S,dist*NS,T,-dist*NT,1,1);
+              ++i(#"$keycoords",indS,0,0,2);
+              ++i(#"$keycoords",indT,0,0,2);
+            );
+          ); I"
+      -endif
+      -rm[keypairs]
+
+      # Find and connect segments.
+      -f[keycoords] ">"${-math_lib}"
+        if (i(#"$keycoords",x,0,0,2)<"$connections_max",
+          S = I(#"$keycoords",x)[0,2];
           angS = i(#"$normals",S)*pi/180;
-          angT = i(#"$normals",T)*pi/180;
-          ST = T - S;
-          dist = norm(ST);
           NS = [ cos(angS),sin(angS) ];
-          NT = [ cos(angT),sin(angT) ];
-          tmax = max(abs(ST));
-          is_cond = 1;
-          C = solve([ 0,0,0,1,1,1,1,1,0,0,1,0,3,2,1,0 ],[ S,T,dist*NS,-dist*NT ],2);
-          dt = dtmin = 1/max(abs(T - S));
+          is_cond = 0;
           current_val = 1;
           nb_switches = 0;
-          for (t = 0, t<=1, t+=dt,
-            P = round(mul([t^3,t^2,t,1],C,2));
+          for (t = 0, t<="$segment_distmax", t+=1,
+            P = round(S + t*NS);
             if (i(#"$ind_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
-            if (nb_switches>2, is_cond = 0; break());
-            dP = abs(mul([3*t^2,2*t,1,0],C,2)) + 1e-8;
-            dt = min(dtmin,0.75/max(dP));
+            if (nb_switches==2,is_cond = 1; break(););
           );
           if (is_cond,
-            draw_spline(#"$new_strokes",S,dist*NS,T,-dist*NT,1,1);
-            ++i(#"$keycoords",indS,0,0,2);
-            ++i(#"$keycoords",indT,0,0,2);
+            draw_line(#"$new_strokes",S,P,1,1);
+            ++i(#"$keycoords",x,0,0,2);
           );
         ); I"
-    -endif
-    -rm[keypairs]
 
-    # Find and connect segments.
-    -f[keycoords] ">"${-math_lib}"
-      if (i(#"$keycoords",x,0,0,2)<"$connections_max",
-        S = I(#"$keycoords",x)[0,2];
-        angS = i(#"$normals",S)*pi/180;
-        NS = [ cos(angS),sin(angS) ];
-        is_cond = 0;
-        current_val = 1;
-        nb_switches = 0;
-        for (t = 0, t<="$segment_distmax", t+=1,
-          P = round(S + t*NS);
-          if (i(#"$ind_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
-          if (nb_switches==2,is_cond = 1; break(););
-        );
-        if (is_cond,
-          draw_line(#"$new_strokes",S,P,1,1);
-          ++i(#"$keycoords",x,0,0,2);
-        );
-      ); I"
+    -endif
     -k. -nm $nm
   -endl -done -v +
 
