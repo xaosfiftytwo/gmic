@@ -24326,7 +24326,7 @@ gimp_autofill_lineart_preview :
 #@gimp : Spline max length (px) = float(60,0,256)
 #@gimp : Segment max length (px) = float(20,0,256)
 #@gimp : Spline max angle (deg.) = float(160,0,180)
-#@gimp : Allow self intersections = bool(0)
+#@gimp : Allow self intersections = bool(1)
 #@gimp : sep = separator(), Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
 #@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/12/2016</i>.</small>")
 gimp_colorize_lineart_smartpaint :
@@ -24382,7 +24382,7 @@ _gimp_colorize_lineart_smartpaint :
     # Label color regions and inpaint strokes.
     -if {narg($colors)} # Guided colorization
       -rm[strokes] -to_rgba[$colors] [colors],[colors]
-      -f[colors] "i(#-1) = A<64?0:norm(R,G+0.3,B+0.6);I"
+      -f[colors] "i(#-1) = A<255?0:norm(R,G+0.3,B+0.6);I"
       -label_fg. 0 {1+iM},1,1,{colors,s+1}
       -f.. ">I[#-1,i]+=[ I(#"$colors"),1 ];I"
       -s. c,{-s+1} -/[-2,-1]
