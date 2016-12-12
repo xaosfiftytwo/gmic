@@ -24102,138 +24102,6 @@ gimp_charcoal :
 gimp_charcoal_preview :
   -gimp_split_preview "-gimp_charcoal $*",$-1
 
-#@gimp Colorize [auto-fill lineart] : gimp_autofill_lineart, gimp_autofill_lineart_preview(0)
-#@gimp : Contour threshold (%) = float(90,0,100)
-#@gimp : Contour normalization = bool(1)
-#@gimp : Minimal region area = int(8,0,256)
-#@gimp : Tolerance to gaps = int(0,0,10)
-#@gimp : Preview type = choice("Lineart + colors","Colors only")
-#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/12/2016</i>.</small>")
-gimp_autofill_lineart :
-  -repeat $! -l[$>] nm=${-gimp_layer_name}
-
-    # Format input lineart to expected format.
-    is_alpha={s==2||s==4}
-    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif # Check is alpha-channel contains lineart
-    -if $is_alpha --channels 100% -negate.
-    -else --norm -endif
-    -n. 0,255
-    -l.
-
-      # Start multi-scale filling.
-      -repeat {1+$4}
-        fact={2^-$<}
-        nw={0,max(1,round(w*$fact))}
-        nh={0,max(1,round(h*$fact))}
-        --r[0] $nw,$nh,1,1,2 -if $2 -normalize_local. , -endif --ge. {min(99.5,$1)}%
-
-        -if $colors
-          -scale2x[colors] -r[colors] .,1 -*[colors,-1] -rv[-2,-1]
-        -endif
-
-        -label_fg. 0,1 -b.. 0.8 -watershed. .. -rm.. -nm. colors
-      -done
-
-      # Inpaint regions that are too small.
-      --area. 0,1 label_maxarea={"P=[xM,yM];i(#-2,P)-1"}
-      -if {$3>1}
-        -gt. {$3*sqrt($3)} -*[-2,-1]
-        -b.. 0.8 -watershed. ..
-      -else
-        -rm.
-      -endif
-      -rm..
-
-      # Colorize regions.
-      N={iM}
-      -if $N
-        --. 1
-        -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))"
-        -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
-        -map.. . -rm.
-      -endif
-    -endl
-
-    # Format output layers.
-    -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
-    -gimp_set_layer_name. $nm" [colors]"
-  -endl -done
-
-gimp_autofill_lineart_preview :
-  -repeat $! -l[$>]
-    -gimp_autofill_lineart ${1-4}
-    -if $5 -k. -else -rv -blend multiply -endif
-  -endl -done
-
-#@gimp Colorize [lineart] : gimp_colorize_lineart, gimp_colorize_lineart_preview(1)
-#@gimp : note = note("<b>Layers ordering:</b>")
-#@gimp : Input layers = choice{0,"Color spots + lineart","Lineart + color spots","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
-#@gimp : Output layers = _choice{1,"Single (merged)","Extrapolated colors + lineart","Lineart + extrapolated colors","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
-#@gimp : Extrapolate colors as = choice("One layer","Two layers","Three layers","Four layers","Five layers","Six layers","Seven layers","Eight layers","Nine layers","Ten layers","One layer per single color","One layer per single region")
-#@gimp : sep = separator()
-#@gimp : Smoothness = float(0.05,0,1)
-#@gimp : sep = separator(), note = note{"<small><b>Note:</b> You probably need to select <i>All</i> for the <i>Input layers</i> option on the left.\n
-#@gimp : <i>Color spots</i> = your layer with color indications.\n
-#@gimp : <i>Lineart</i> = your layer with line-art (b&amp;w or transparent).\n
-#@gimp : <i>Extrapolated colors</i> = the G'MIC generated layer with flat colors.\n\n
-#@gimp : <b>Warnings:</b>
-#@gimp : \n  - Do not rely too much on the preview, it is probably not accurate !
-#@gimp : \n  - Activate option <i>Extrapolate color as one layer per single color/region</i> only if you have <i>a lot</i> of available memory !
-#@gimp : </small>"}
-#@gimp : sep = separator(), link = link("Click here for a detailed description of this filter.","http://www.gimpchat.com/viewtopic.php?f=28&t=7567")
-#@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>Timoth&#233;e Giet</i> and <i>David Revoy</i>.      Latest update: <i>06/19/2013</i>.</small>")
-gimp_colorize_lineart :
-  -if {$!<2} -return -endif
-  -if {$1<2} selection=0,1 -else selection=0,1,2 -endif
-  -l[$selection]
-
-    # Format input layers.
-    -if {$1==0}              # Color strokes + drawing
-    -elif {$1==1} -rv        # Drawing + color strokes
-    -elif {$1==2} -rm[1]     # Color strokes + extrapolated colors + drawing
-    -elif {$1==3} -rm[2] -rv # Drawing + color strokes + extrapolated colors.
-    -endif
-
-    # Here we have only 'color strokes + drawing' -> process.
-    --to_rgba[0] -split_opacity. -+.. 1 -!=. 0 -*[-2,-1]   # Map of color labels to spread.
-    --norm[1] -n. 0,1 --histogram. 2,0,1
-    -if {i(0)>i(1)} -*.. -1 -+.. 1 -endif -rm.          # Determine color model of the drawing.
-    -b. $4% -watershed.. . -rm.                         # Priority map.
-    --. 1
-    # Here we have 'color strokes + drawing + extrapolated colors'.
-
-    # Format output layers.
-    -if {$2==0} -rm[0] -rv -blend[0,1] multiply ind=-1
-    -elif {$2==1} -rm[0] -rv ind=0
-    -elif {$2==2} -rm[0] ind=1
-    -elif {$2==3} -rv[1,2] ind=1
-    -elif {$2==4} -rv[0,1] ind=2
-    -endif
-
-    # Separate extrapolated colors as multiple layers.
-    -if {$3&&$ind>=0} -l[$ind]
-      --mix_channels (65536,256,1)
-      -if {$3==10} -do  # Split by colors.
-        iM={1,iM}
-        -if {$iM>=0}
-          --==[1] $iM area={is} -replace[1] $iM,-1
-          --r. 100%,100%,1,3 -*. [0]
-          -rv[-2,-1] -*. 255 -a[-2,-1] c -nm. $area
-        -endif
-      -while {$iM>=0} -else  # Split by disconnected regions.
-        -label.
-        -if {$3<10} -%. {$3+1} -endif
-        -repeat {iM+1} --==[1] $< area={is} --r. 100%,100%,1,[0] -*. [0] -rv[-2,-1] -*. 255 -a[-2,-1] c -nm. $area -done
-      -endif
-      -rm[0,1]
-      -sort_list +,n
-    -endl -endif
-
-  -endl
-
-gimp_colorize_lineart_preview :
-  -gimp_colorize_lineart $1,0,$3,$4
-
 #@gimp Colorize [interactive] : gimp_colorize_interactive, gimp_colorize_interactive_preview
 #@gimp : Input type = _choice("B&amp;W photograph","Lineart")
 #@gimp : Output type = _choice{"Colorized image (1 layer)","Colors only (1 layer)","Image + Colors (2 layers)","Image + Colors (multi-layers)"}
@@ -24380,6 +24248,250 @@ gimp_bwrecolorize :
 
 gimp_bwrecolorize_preview :
   -gimp_split_preview "-gimp_bwrecolorize ${^0}",$-1
+
+#@gimp Colorize lineart [auto-fill] : gimp_autofill_lineart, gimp_autofill_lineart_preview(0)
+#@gimp : Contour threshold (%) = float(90,0,100)
+#@gimp : Contour normalization = bool(1)
+#@gimp : Minimal region area = int(8,0,256)
+#@gimp : Tolerance to gaps = int(0,0,10)
+#@gimp : Preview type = choice("Lineart + colors","Colors only")
+#@gimp : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>11/12/2016</i>.</small>")
+gimp_autofill_lineart :
+  -repeat $! -l[$>] nm=${-gimp_layer_name}
+
+    # Format input lineart to expected format.
+    is_alpha={s==2||s==4}
+    -if $is_alpha -sh 100% is_alpha={im<128&&iM>128} -rm. -endif # Check is alpha-channel contains lineart
+    -if $is_alpha --channels 100% -negate.
+    -else --norm -endif
+    -n. 0,255
+    -l.
+
+      # Start multi-scale filling.
+      -repeat {1+$4}
+        fact={2^-$<}
+        nw={0,max(1,round(w*$fact))}
+        nh={0,max(1,round(h*$fact))}
+        --r[0] $nw,$nh,1,1,2 -if $2 -normalize_local. , -endif --ge. {min(99.5,$1)}%
+
+        -if $colors
+          -scale2x[colors] -r[colors] .,1 -*[colors,-1] -rv[-2,-1]
+        -endif
+
+        -label_fg. 0,1 -b.. 0.8 -watershed. .. -rm.. -nm. colors
+      -done
+
+      # Inpaint regions that are too small.
+      --area. 0,1 label_maxarea={"P=[xM,yM];i(#-2,P)-1"}
+      -if {$3>1}
+        -gt. {$3*sqrt($3)} -*[-2,-1]
+        -b.. 0.8 -watershed. ..
+      -else
+        -rm.
+      -endif
+      -rm..
+
+      # Colorize regions.
+      N={iM}
+      -if $N
+        --. 1
+        -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(135,225),u(0,0.7),u(0.4,0.9))"
+        -hsv2rgb. -round. -point. $label_maxarea,0,0,1,255
+        -map.. . -rm.
+      -endif
+    -endl
+
+    # Format output layers.
+    -if {!$is_alpha} -gimp_set_layer_mode.. multiply -endif
+    -gimp_set_layer_name. $nm" [colors]"
+  -endl -done
+
+gimp_autofill_lineart_preview :
+  -repeat $! -l[$>]
+    -gimp_autofill_lineart ${1-4}
+    -if $5 -k. -else -rv -blend multiply -endif
+  -endl -done
+
+#@gimp Colorize lineart [smart paint] : gimp_colorize_lineart_smartpaint, gimp_colorize_lineart_smartpaint_preview(0)
+#@gimp : Colorize with = choice("Random colors","Color spots on transparent top layer")
+#@gimp : sep = separator(), note = note{"<small><b>Global geometry parameters:</b></small>"}
+#@gimp : Contour detection (%) = float(95,0,100)
+#@gimp : Contour erosion = int(0,-1,10)
+#@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
+#@gimp : Minimal color area = float(5,0,100)
+#@gimp : note = note{"<small><i>Minimal color area</i> has effect only when filling with random colors.</small>"}
+#@gimp : sep = separator(), note = note{"<small><b>Connection parameters:</b></small>"}
+#@gimp : End point rate (%) = float(75,0,100)
+#@gimp : End point connectivity = int(2,1,5)
+#@gimp : Spline max length (px) = float(60,0,256)
+#@gimp : Segment max length (px) = float(20,0,256)
+#@gimp : Spline max angle (deg.) = float(160,0,180)
+#@gimp : Allow self intersections = bool(0)
+#@gimp : sep = separator(), Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
+#@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/12/2016</i>.</small>")
+gimp_colorize_lineart_smartpaint :
+  -_gimp_colorize_lineart_smartpaint $*,-1
+
+gimp_colorize_lineart_smartpaint_preview :
+  -_gimp_colorize_lineart_smartpaint $*
+
+_gimp_colorize_lineart_smartpaint :
+  -if {$1" && "$!<2} -gimp_warning_preview "A top layer with color strokes is missing, for this colorization mode." -return -endif
+
+  -repeat {$1?1:$!} inds=${-arg\ 1+$1,$>,0--1} -l[$inds]
+    ind_lineart={$1?1:0}
+    nm=${-gimp_layer_name[$ind_lineart]} -nm[$ind_lineart] lineart
+    -if {$!>1} -nm[0] colors -endif
+    -if {$!>=3} -rm[2] -endif # Delete old color layer if any
+
+    # Constrain input lineart to have a single channel.
+    [lineart]
+    is_alpha={s==2||s==4}
+    -if $is_alpha -sh. 100% is_alpha={iM-im>64} -rm. -endif
+    -if $is_alpha -channels. 100%
+    -else -luminance. -negate. -endif
+    -nm. strokes
+
+    # Threshold to reduce to binary lineart.
+    -gt[strokes] {255*(100-$2)%} -area_fg[strokes] 0,1 -ge[strokes] 8  # Remove small glitches
+
+    # Erode strokes (estimate stroke thickness if needed).
+    erode_size=$3
+    -if {$erode_size<0}
+      --label_fg[strokes] 0 --distance[strokes] 0 {-2,iM}
+      -f... ">if (i, j = i - 1; i[#-1,j] = max(i[#-1,j],i(#-2)));i"
+      stroke_width={2*ic}
+      erode_size={round($stroke_width/5)}
+      -rm[-3--1]
+    -endif
+    -if $erode_size -erode[strokes] {2*$erode_size} -area_fg[strokes] 0,1 -ge[strokes] 8 -endif
+
+    # Retrieve closed binary shape.
+    _keep_keypoints={$-1==0}
+    [strokes] -close_binary. ${5-10} -nm. new_strokes
+
+    -if {$-1==0} # Render detected contours.
+      --negate[strokes] -*. 255 -to_rgb.
+      ---[new_strokes] [strokes] -dilate. 2
+      100%,100%,1,3,[0,128,255] -j... .,0,0,0,0,1,.. -rm[-2,-1]
+      -f[keypoints] ${-math_lib}"if (i,draw_circle(#-1,[x,y],3,1,[255,0,0]))" -rm[keypoints]
+      -nm. geometry
+    -endif
+
+    # Label color regions and inpaint strokes.
+    -if {narg($colors)} # Guided colorization
+      -rm[strokes] -to_rgba[$colors] [colors],[colors]
+      -f[colors] "i(#-1) = A<64?0:norm(R,G+0.3,B+0.6);I"
+      -label_fg. 0 {1+iM},1,1,{colors,s+1}
+      -f.. ">I[#-1,i]+=[ I(#"$colors"),1 ];I"
+      -s. c,{-s+1} -/[-2,-1]
+      -l[new_strokes] -* -1 -n 0,1 -^ 5 --b 1% -b.. 1 -min -endl
+      -watershed.. [new_strokes] -map.. .
+      -rm[new_strokes,-1]
+      -nm. new_colors
+
+    -else # Random colorization
+      -distance[strokes] 0 -*[strokes] -1
+      -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
+      min_color_area={new_strokes,$4^2}
+      -if $min_color_area --area_fg[new_strokes] 0,0 xy_bg={[xM,yM]} -gt. $min_color_area -*[new_strokes,-1] -endif
+      -watershed[new_strokes] [strokes] -rm[strokes]
+      ind_bg={new_strokes,i($xy_bg)}
+      -srand 0 {new_strokes,iM+1},1,1,3,">arg(1+c,j(-1) + u(85,125),u(0,0.5),u(0.7,0.9))" -hsv2rgb. -round. -point. $ind_bg,0,0,1,255 -point. 0,0,0,1,255
+      -map[new_strokes] . -rm.
+      -nm[new_strokes] new_colors
+    -endif
+
+    # Final rendering
+    ind_lineart=$lineart
+    ind_colors=$new_colors
+    -gimp_set_layer_name[$ind_colors] $nm" [colors]"
+    -gimp_set_layer_name[$ind_lineart] $nm
+
+    -if {$-1==-1} # Rendering : lineart and color layers
+      -if {!$is_alpha} -gimp_set_layer_mode[$ind_lineart] multiply -endif
+
+    -elif {$-1==0} # Preview : Estimated geometry
+      -if {$is_alpha} -channels[$ind_lineart] 100% -negate[$ind_lineart] -endif -to_rgb[$ind_lineart]
+      -blend[$ind_lineart,$ind_colors] multiply -n[$ind_lineart] 128,255
+      --select_color[geometry] 0,255,255,255 -==. 0 -j[$ind_lineart] [geometry],0,0,0,0,1,. -k[$ind_lineart]
+    -elif {$-1==1} # Preview : Colored regions
+      -k[$ind_colors]
+    -else # Preview : Colored lineart
+      -if {$is_alpha} -channels[$ind_lineart] 100% -negate[$ind_lineart] -endif -to_rgb[$ind_lineart]
+      -blend[$ind_lineart,$ind_colors] multiply -k[$ind_lineart]
+    -endif
+
+  -endl -done
+
+#@gimp Colorize lineart [basic propagation] : gimp_colorize_lineart, gimp_colorize_lineart_preview(1)
+#@gimp : note = note("<b>Layers ordering:</b>")
+#@gimp : Input layers = choice{0,"Color spots + lineart","Lineart + color spots","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
+#@gimp : Output layers = _choice{1,"Single (merged)","Extrapolated colors + lineart","Lineart + extrapolated colors","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
+#@gimp : Extrapolate colors as = choice("One layer","Two layers","Three layers","Four layers","Five layers","Six layers","Seven layers","Eight layers","Nine layers","Ten layers","One layer per single color","One layer per single region")
+#@gimp : sep = separator()
+#@gimp : Smoothness = float(0.05,0,1)
+#@gimp : sep = separator(), note = note{"<small><b>Note:</b> You probably need to select <i>All</i> for the <i>Input layers</i> option on the left.\n
+#@gimp : <i>Color spots</i> = your layer with color indications.\n
+#@gimp : <i>Lineart</i> = your layer with line-art (b&amp;w or transparent).\n
+#@gimp : <i>Extrapolated colors</i> = the G'MIC generated layer with flat colors.\n\n
+#@gimp : <b>Warnings:</b>
+#@gimp : \n  - Do not rely too much on the preview, it is probably not accurate !
+#@gimp : \n  - Activate option <i>Extrapolate color as one layer per single color/region</i> only if you have <i>a lot</i> of available memory !
+#@gimp : </small>"}
+#@gimp : sep = separator(), link = link("Click here for a detailed description of this filter.","http://www.gimpchat.com/viewtopic.php?f=28&t=7567")
+#@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>Timoth&#233;e Giet</i> and <i>David Revoy</i>.      Latest update: <i>06/19/2013</i>.</small>")
+gimp_colorize_lineart :
+  -if {$!<2} -return -endif
+  -if {$1<2} selection=0,1 -else selection=0,1,2 -endif
+  -l[$selection]
+
+    # Format input layers.
+    -if {$1==0}              # Color strokes + drawing
+    -elif {$1==1} -rv        # Drawing + color strokes
+    -elif {$1==2} -rm[1]     # Color strokes + extrapolated colors + drawing
+    -elif {$1==3} -rm[2] -rv # Drawing + color strokes + extrapolated colors.
+    -endif
+
+    # Here we have only 'color strokes + drawing' -> process.
+    --to_rgba[0] -split_opacity. -+.. 1 -!=. 0 -*[-2,-1]   # Map of color labels to spread.
+    --norm[1] -n. 0,1 --histogram. 2,0,1
+    -if {i(0)>i(1)} -*.. -1 -+.. 1 -endif -rm.          # Determine color model of the drawing.
+    -b. $4% -watershed.. . -rm.                         # Priority map.
+    --. 1
+    # Here we have 'color strokes + drawing + extrapolated colors'.
+
+    # Format output layers.
+    -if {$2==0} -rm[0] -rv -blend[0,1] multiply ind=-1
+    -elif {$2==1} -rm[0] -rv ind=0
+    -elif {$2==2} -rm[0] ind=1
+    -elif {$2==3} -rv[1,2] ind=1
+    -elif {$2==4} -rv[0,1] ind=2
+    -endif
+
+    # Separate extrapolated colors as multiple layers.
+    -if {$3&&$ind>=0} -l[$ind]
+      --mix_channels (65536,256,1)
+      -if {$3==10} -do  # Split by colors.
+        iM={1,iM}
+        -if {$iM>=0}
+          --==[1] $iM area={is} -replace[1] $iM,-1
+          --r. 100%,100%,1,3 -*. [0]
+          -rv[-2,-1] -*. 255 -a[-2,-1] c -nm. $area
+        -endif
+      -while {$iM>=0} -else  # Split by disconnected regions.
+        -label.
+        -if {$3<10} -%. {$3+1} -endif
+        -repeat {iM+1} --==[1] $< area={is} --r. 100%,100%,1,[0] -*. [0] -rv[-2,-1] -*. 255 -a[-2,-1] c -nm. $area -done
+      -endif
+      -rm[0,1]
+      -sort_list +,n
+    -endl -endif
+
+  -endl
+
+gimp_colorize_lineart_preview :
+  -gimp_colorize_lineart $1,0,$3,$4
 
 #@gimp Dithering : gimp_ditheredbw, gimp_ditheredbw_preview(0)
 #@gimp : Brightness (%) = float(0,-100,100)
@@ -32841,106 +32953,6 @@ gmicol_rgb_distribution_preview :
 #@gmicol clone("Fourier analysis")
 #@gmicol clone("Fourier transform")
 #@gmicol clone("Fourier watermark")
-
-
-#@gimp _<b>Testing</b>
-#@gimp <i>Ronounours</i>
-
-#@gimp Colorize [auto-close lineart] : gimp_autofill_lineart_new, gimp_autofill_lineart_new_preview(0)
-#@gimp : note = note{"<small><b>Global geometry parameters:</b></small>"}
-#@gimp : Contour detection (%) = float(95,0,100)
-#@gimp : Contour erosion = int(-1,-1,10)
-#@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for auto stroke thickness estimation.</small>"}
-#@gimp : Minimal color area = float(5,0,100)
-#@gimp : sep = separator()
-#@gimp : note = note{"<small><b>Connection parameters:</b></small>"}
-#@gimp : End point rate (%) = float(75,0,100)
-#@gimp : End point connectivity = int(2,1,5)
-#@gimp : Spline max length (px) = float(60,0,256)
-#@gimp : Segment max length (px) = float(20,0,256)
-#@gimp : Spline max angle (deg.) = float(160,0,180)
-#@gimp : Allow self intersections = bool(0)
-#@gimp : sep = separator()
-#@gimp : Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
-#@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/11/2016</i>.</small>")
-gimp_autofill_lineart_new :
-  -_gimp_autofill_lineart_new $*,-1
-
-gimp_autofill_lineart_new_preview :
-  -_gimp_autofill_lineart_new $*
-
-_gimp_autofill_lineart_new :
-  -repeat $! -l[$>]
-    nm=${-gimp_layer_name} --l
-
-      # Constrain input image to be a single-channel lineart.
-      is_alpha={s==2||s==4}
-      -if $is_alpha -sh 100% is_alpha={iM-im>64} -rm. -endif
-      -if $is_alpha -channels 100%
-      -else -luminance -negate -endif
-
-      # Threshold to reduce to binary lineart.
-      -gt {255*(100-$1)%} -area_fg 0,1 -ge 8  # Remove small glitches
-
-      # Erode strokes (estimate stroke thickness if needed).
-      erode_size=$2
-      -if {$2<0}
-        --label_fg 0 --distance.. 0 {-2,iM}
-        -f... ">if (i, j = i - 1; i[#-1,j] = max(i[#-1,j],i(#-2)));i"
-        stroke_width={2*ic}
-        erode_size={round($stroke_width/5)}
-        -rm[-3--1]
-      -endif
-      -if $erode_size -erode {2*$erode_size} -area_fg 0,1 -ge 8 -endif
-
-      # Retrieve closed binary shape.
-      _keep_keypoints={$-1==0}
-      --close_binary ${4-9}
-
-      -if {$-1==0} # Render detected contours.
-        --negate... -*. 255 -to_rgb.
-        ---.. [-4] -dilate. 2
-        100%,100%,1,3,[0,128,255] -j... .,0,0,0,0,1,.. -rm[-2,-1]
-        -f... ${-math_lib}"if (i,draw_circle(#-1,[x,y],3,1,[255,0,0]))" -rm...
-      -endif
-
-      # Label color regions and inpaint strokes.
-      -l[0,1]
-        -distance.. 0 -*.. -1
-        -eq. 0 -label_fg. 0,0
-        min_color_area={$3^2}
-        -if $min_color_area --area_fg. 0,0 xy_bg={[xM,yM]} -gt. $min_color_area -*[-2,-1] -endif
-        -watershed. ..
-        -rm..
-        ind_bg={i($xy_bg)}
-
-        # Map random color palette.
-        -srand 0 {iM+1},1,1,3,">arg(1+c,j(-1) + u(85,125),u(0,0.5),u(0.7,0.9))" -hsv2rgb. -round. -point. $ind_bg,0,0,1,255 -point. 0,0,0,1,255
-        -map.. . -rm.
-        -gimp_set_layer_name. $nm" [colors]"
-
-      -endl
-
-    -endl
-
-    -if {$-1==-1} # Final rendering
-      -if {!$is_alpha} -gimp_set_layer_mode[0] multiply -endif
-
-    -elif {$-1==0} # Preview : Estimated geometry
-      -if {$is_alpha} -channels[0] 100% -negate[0] -endif -to_rgb[0]
-      -blend[0,1] multiply -n.. 128,255
-      --select_color. 0,255,255,255 -==. 0
-      -j... ..,0,0,0,0,1,. -k...
-    -elif {$-1==1} # Preview : Colored regions
-      -k.
-    -else # Preview : Colored lineart
-      -if {$is_alpha} -channels[0] 100% -negate[0] -endif -to_rgb[0]
-      -blend multiply
-    -endif
-
-  -endl -done
-
-
 
 
 # Local Variables:
