@@ -24333,10 +24333,11 @@ gimp_colorize_lineart_smartpaint :
   -_gimp_colorize_lineart_smartpaint $*,-1
 
 gimp_colorize_lineart_smartpaint_preview :
+  -if {$1" && "$!<2} -gimp_warning_preview "A top layer with color strokes is missing, for this colorization mode." -return -endif
   -_gimp_colorize_lineart_smartpaint $*
 
 _gimp_colorize_lineart_smartpaint :
-  -if {$1" && "$!<2} -gimp_warning_preview "A top layer with color strokes is missing, for this colorization mode." -return -endif
+  -if {$1" && "$!<2} -error "A top layer with color strokes is missing, for this colorization mode." -endif
 
   -repeat {$1?1:$!} inds=${-arg\ 1+$1,$>,0--1} -l[$inds]
     ind_lineart={$1?1:0}
