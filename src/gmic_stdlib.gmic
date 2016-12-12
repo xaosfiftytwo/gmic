@@ -24387,7 +24387,7 @@ _gimp_colorize_lineart_smartpaint :
       -f.. ">I[#-1,i]+=[ I(#"$colors"),1 ];I"
       -s. c,{-s+1} -/[-2,-1]
       -l[new_strokes] -* -1 -n 0,1 -^ 5 --b 1% -b.. 1 -min -endl
-      -watershed.. [new_strokes] -map.. .
+      -watershed.. [new_strokes],0 -map.. .
       -rm[new_strokes,-1]
       -nm. new_colors
 
@@ -24396,7 +24396,7 @@ _gimp_colorize_lineart_smartpaint :
       -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
       min_color_area={new_strokes,$4^2}
       -if $min_color_area --area_fg[new_strokes] 0,0 xy_bg={[xM,yM]} -gt. $min_color_area -*[new_strokes,-1] -endif
-      -watershed[new_strokes] [strokes] -rm[strokes]
+      -watershed[new_strokes] [strokes],0 -rm[strokes]
       ind_bg={new_strokes,i($xy_bg)}
       -srand 0 {new_strokes,iM+1},1,1,3,">arg(1+c,j(-1) + u(85,125),u(0,0.5),u(0.7,0.9))" -hsv2rgb. -round. -point. $ind_bg,0,0,1,255 -point. 0,0,0,1,255
       -map[new_strokes] . -rm.
