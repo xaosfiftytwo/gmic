@@ -24425,7 +24425,7 @@ _gimp_colorize_lineart_smartpaint :
 
   -endl -done
 
-#@gimp Colorize lineart [basic propagation] : gimp_colorize_lineart, gimp_colorize_lineart_preview(1)
+#@gimp Colorize lineart [propagation] : gimp_colorize_lineart, gimp_colorize_lineart_preview(1)
 #@gimp : note = note("<b>Layers ordering:</b>")
 #@gimp : Input layers = choice{0,"Color spots + lineart","Lineart + color spots","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
 #@gimp : Output layers = _choice{1,"Single (merged)","Extrapolated colors + lineart","Lineart + extrapolated colors","Color spots + extrapolated colors + lineart","Lineart + color spots + extrapolated colors"}
