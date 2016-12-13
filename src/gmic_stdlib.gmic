@@ -24322,7 +24322,7 @@ gimp_autofill_lineart_preview :
 #@gimp : Contour detection (%) = float(95,0,100)
 #@gimp : Contour erosion = int(0,-1,10)
 #@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
-#@gimp : Output added contours = _bool(0)
+#@gimp : Output closing strokes = _bool(0)
 #@gimp : sep = separator(), note = note{"<small><b>For <i>Random colors</i> mode only:</b></small>"}
 #@gimp : Minimal color area = float(5,0,100)
 #@gimp : Maximal color saturation = int(32,0,255)
@@ -24390,7 +24390,7 @@ _gimp_colorize_lineart_smartpaint :
 
     -if $4 # Output closed contour layer
       ---[new_strokes] [strokes] -*. 255 -b. 0.7 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
-      -nm. added_contours
+      -nm. closing_strokes
     -endif
 
     # Label color regions and inpaint strokes.
@@ -24429,9 +24429,9 @@ _gimp_colorize_lineart_smartpaint :
     -endif
 
     # Final rendering
-    -if {narg($added_contours)}
-      -mv[added_contours] {$lineart+1}
-      -gimp_set_layer_name[added_contours] $nm" [added contours]"
+    -if {narg($closing_strokes)}
+      -mv[closing_strokes] {$lineart+1}
+      -gimp_set_layer_name[closing_strokes] $nm" [closing strokes]"
     -endif
 
     ind_lineart=$lineart
