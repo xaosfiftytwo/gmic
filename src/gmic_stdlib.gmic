@@ -24334,7 +24334,7 @@ gimp_autofill_lineart_preview :
 #@gimp : Spline max angle (deg.) = float(160,0,180)
 #@gimp : Allow self intersections = bool(1)
 #@gimp : sep = separator(), Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
-#@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/12/2016</i>.</small>")
+#@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/13/2016</i>.</small>")
 gimp_colorize_lineart_smartpaint :
   -_gimp_colorize_lineart_smartpaint $*,-1
 
