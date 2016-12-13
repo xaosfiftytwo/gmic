@@ -9013,12 +9013,13 @@ _inpaint_patchmatch :
   -endif
   -k[0]
 
-#@gmic inpaint_diffusion : [mask],_nb_scales[%]>=0,_diffusion_type={ 0=isotropic | 1=delaunay-oriented | 2=edge-oriented },_diffusion_iter>=0
+#@gmic inpaint_diffusion : [mask],_nb_scales[%]>=0,_diffusion_type={ 0=isotropic | 1=delaunay-guided | 2=edge-guided | 3=mask-guided },_diffusion_iter>=0
 #@gmic : Inpaint selected images by specified mask using a multiscale transport-diffusion algorithm.
+#@gmic : If 'diffusion type==3', non-zero values of the mask (e.g. a distance function) are used to guide the diffusion process.
 #@gmic : Default values: 'nb_scales=75%', 'diffusion_type=1' and 'diffusion_iter=20'.
 #@gmic : $ image.jpg 100%,100% -ellipse[-1] 30%,30%,40,30,0,1,255 --inpaint_diffusion[0] [1]
-inpaint_diffusion : -check ${-is_image_arg\ $1}" && ${2=75%}>=0 && isint(${3=1}) && $3>=0 && $3<=2 && ${4=20}>=0"
-  -v - s0="isotropic" s1="delaunay-oriented" s2="edge-oriented"
+inpaint_diffusion : -check ${-is_image_arg\ $1}" && ${2=75%}>=0 && isint(${3=1}) && $3>=0 && $3<=3 && ${4=20}>=0"
+  -v - s0="isotropic" s1="delaunay-guided" s2="edge-guided" s3="mask_guided"
   -v + -e[^-1] "Inpaint image$? by mask $1, using a multiscale diffusion algorithm with $2 scales and $4 iterations of "${s$3}" diffusion." -v -
   -repeat $! nm={n} -pass$1 -l[$>,-1]
     nb_scalesM={round(log2(max(w,h,d)))}
@@ -9032,14 +9033,12 @@ inpaint_diffusion : -check ${-is_image_arg\ $1}" && ${2=75%}>=0 && isint(${3=1})
       height={0,max(1,round(h/$scale))}
       depth={0,max(1,round(d/$scale))}
       $width,$height,$depth,{0,s} 100%,100%,100%
-      -f[1] "init(
-               wl1 = w#-1 - 1;
-               hl1 = h#-1 - 1;
-               dl1 = d#-1 - 1;
-               w1 = max(1,w - 1);
-               h1 = max(1,h - 1);
-               d1 = max(1,d - 1);
-             );
+      -f[1] "const wl1 = w#-1 - 1;
+             const hl1 = h#-1 - 1;
+             const dl1 = d#-1 - 1;
+             const w1 = max(1,w - 1);
+             const h1 = max(1,h - 1);
+             const d1 = max(1,d - 1);
              if(i,i,
                X = round(x*wl1/w1);
                Y = round(y*hl1/h1);
@@ -9061,20 +9060,25 @@ inpaint_diffusion : -check ${-is_image_arg\ $1}" && ${2=75%}>=0 && isint(${3=1})
         -r... ..,3
         -if {$3==0} # Isotropic diffusion
           -repeat $nb_iter -j... ..,0,0,0,0,1,. -b... 0.5 -done
-        -elif {$3==1} # Delaunay-oriented
+        -elif {$3==1} # Delaunay-guided
           --distance. 1 -g. -a[-{d==1?2:3}--1] c -orientation.
           -repeat {$nb_iter}
             -j[-4] ...,0,0,0,0,1,..
             --warp[-4] .,1,2,1 -*.. -1 -warp[-5] ..,1,2,1 -+[-5,-1] -/[-4] 2
           -done -rm.
-        -else # Edge-oriented
+        -elif {$3==2} # Edge-guided
           -repeat $nb_iter
             --diffusiontensors... 0,1,1.5,0.5
             -j[-4] ...,0,0,0,0,1,..
             -smooth[-4] .,1,10,0 -rm.
           -done
+        -else # Mask-guided
+          --r[1] .,2 -g. -a[-{d==1?2:3}--1] c -orientation.
+          -repeat {$nb_iter}
+            -j[-4] ...,0,0,0,0,1,..
+            --warp[-4] .,1,2,1 -*.. -1 -warp[-5] ..,1,2,1 -+[-5,-1] -/[-4] 2
+          -done -rm.
         -endif
-
         -j... ..,0,0,0,0,1,.
       -endif
       -rm[-2,-1]
