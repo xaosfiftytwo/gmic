@@ -24322,7 +24322,7 @@ gimp_autofill_lineart_preview :
 #@gimp : Contour detection (%) = float(95,0,100)
 #@gimp : Contour erosion = int(0,-1,10)
 #@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
-#@gimp : Output added contour layer = const(0)
+#@gimp : Output added contours = _bool(0)
 #@gimp : sep = separator(), note = note{"<small><b>For <i>Random colors</i> mode only:</b></small>"}
 #@gimp : Minimal color area = float(5,0,100)
 #@gimp : Maximal color saturation = int(32,0,255)
@@ -24343,7 +24343,7 @@ gimp_colorize_lineart_smartpaint :
 
 gimp_colorize_lineart_smartpaint_preview :
   -if {$1" && "$!<2} -gimp_warning_preview "A top layer with color spots is missing, for this colorization mode." -return -endif
-  -_gimp_colorize_lineart_smartpaint $*
+  -_gimp_colorize_lineart_smartpaint ${1-3},0,${5--1}
 
 _gimp_colorize_lineart_smartpaint :
   -if {$1" && "$!<2} -error "A top layer with color strokes is missing, for this colorization mode." -endif
@@ -24380,12 +24380,17 @@ _gimp_colorize_lineart_smartpaint :
     _keep_keypoints={$-1==0}
     [strokes] -close_binary. ${9-14} -nm. new_strokes
 
-    -if {$-1==0} # Render detected contours.
+    -if {$-1==0} # Render estimated geometry
       --negate[strokes] -*. 255 -to_rgb.
       ---[new_strokes] [strokes] -dilate. 2
       100%,100%,1,3,[0,128,255] -j... .,0,0,0,0,1,.. -rm[-2,-1]
       -f[keypoints] ${-math_lib}"if (i,draw_circle(#-1,[x,y],3,1,[255,0,0]))" -rm[keypoints]
       -nm. geometry
+    -endif
+
+    -if $4 # Output closed contour layer
+      ---[new_strokes] [strokes] -*. 255 -b. 0.7 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
+      -nm. added_contours
     -endif
 
     # Label color regions and inpaint strokes.
@@ -24424,6 +24429,11 @@ _gimp_colorize_lineart_smartpaint :
     -endif
 
     # Final rendering
+    -if {narg($added_contours)}
+      -mv[added_contours] {$lineart+1}
+      -nm[added_contours] $nm" [added contours]"
+    -endif
+
     ind_lineart=$lineart
     ind_colors=$new_colors
     -gimp_set_layer_name[$ind_colors] $nm" [colors]"
