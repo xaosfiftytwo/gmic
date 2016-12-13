@@ -24324,6 +24324,8 @@ gimp_autofill_lineart_preview :
 #@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
 #@gimp : Minimal color area = float(5,0,100)
 #@gimp : note = note{"<small><i>Minimal color area</i> has effect only when filling with random colors.</small>"}
+#@gimp : Color shading (%) = int(0,0,100)
+#@gimp : note = note{"<small><i>Color shading</i> has effect only when filling is guided by color spots.</small>"}
 #@gimp : sep = separator(), note = note{"<small><b>Connection parameters:</b></small>"}
 #@gimp : End point rate (%) = float(75,0,100)
 #@gimp : End point connectivity = int(2,1,5)
@@ -24373,7 +24375,7 @@ _gimp_colorize_lineart_smartpaint :
 
     # Retrieve closed binary shape.
     _keep_keypoints={$-1==0}
-    [strokes] -close_binary. ${5-10} -nm. new_strokes
+    [strokes] -close_binary. ${6-10} -nm. new_strokes
 
     -if {$-1==0} # Render detected contours.
       --negate[strokes] -*. 255 -to_rgb.
@@ -24385,14 +24387,24 @@ _gimp_colorize_lineart_smartpaint :
 
     # Label color regions and inpaint strokes.
     -if {narg($colors)} # Guided colorization
-      -rm[strokes] -to_rgba[$colors] [colors],[colors]
+      -to_rgba[$colors] [colors],[colors]
       -f[colors] "i(#-1) = A<255?0:norm(R,G+0.3,B+0.6);I"
       -label_fg. 0 {1+iM},1,1,{colors,s+1}
       -f.. ">I[#-1,i]+=[ I(#"$colors"),1 ];I"
       -s. c,{-s+1} -/[-2,-1]
-      -l[new_strokes] -* -1 -n 0,1 -^ 5 --b 1% -b.. 1 -min -endl
-      -watershed.. [new_strokes],0 -map.. .
-      -rm[new_strokes,-1]
+      --l[new_strokes] -* -1 -n 0,1 -^ 5 --b 1% -b.. 1 -min -endl
+      -watershed... .,0 -rm. -map.. . -rm.
+
+      -if {!$5} -rm[strokes] # No color shading
+      -else # Shade colors
+        -distance[strokes] 0 -*[strokes] -1
+        -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
+        min_color_area={new_strokes,$4^2}
+        -if $min_color_area --area_fg[new_strokes] 0,0 xy_bg={[xM,yM]} -gt. $min_color_area -*[new_strokes,-1] -endif
+        -watershed[new_strokes] [strokes],0 -rm[strokes]
+        -srgb2rgb. -guided. [new_strokes],{1+$5/5},0 -rgb2srgb.
+      -endif
+      -rm[new_strokes]
       -nm. new_colors
 
     -else # Random colorization
@@ -24413,12 +24425,12 @@ _gimp_colorize_lineart_smartpaint :
     -gimp_set_layer_name[$ind_colors] $nm" [colors]"
     -gimp_set_layer_name[$ind_lineart] $nm
 
-    -if {$-1==-1} # Rendering : lineart and color layers
+    -if {$-1==-1} # Rendering : Lineart and color layers
       -if {!$is_alpha} -gimp_set_layer_mode[$ind_lineart] multiply -endif
 
-    -elif {$-1==0} # Preview : Estimated geometry
+    -elif {$-1==0} # Preview : Colored geometry
       -if {$is_alpha} -channels[$ind_lineart] 100% -negate[$ind_lineart] -endif -to_rgb[$ind_lineart]
-      -blend[$ind_lineart,$ind_colors] multiply -n[$ind_lineart] 128,255
+      -blend[$ind_lineart,$ind_colors] multiply -n[$ind_lineart] 100,255
       --select_color[geometry] 0,255,255,255 -==. 0 -j[$ind_lineart] [geometry],0,0,0,0,1,. -k[$ind_lineart]
     -elif {$-1==1} # Preview : Colored regions
       -k[$ind_colors]
