@@ -24430,7 +24430,7 @@ _gimp_colorize_lineart_smartpaint :
 
     -elif {$-1==0} # Preview : Colored geometry
       -if {$is_alpha} -channels[$ind_lineart] 100% -negate[$ind_lineart] -endif -to_rgb[$ind_lineart]
-      -blend[$ind_lineart,$ind_colors] multiply -n[$ind_lineart] 100,255
+      -blend[$ind_lineart,$ind_colors] multiply -n[$ind_lineart] 64,255
       --select_color[geometry] 0,255,255,255 -==. 0 -j[$ind_lineart] [geometry],0,0,0,0,1,. -k[$ind_lineart]
     -elif {$-1==1} # Preview : Colored regions
       -k[$ind_colors]
