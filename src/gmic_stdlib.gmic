@@ -24352,7 +24352,7 @@ _gimp_colorize_lineart_smartpaint :
     ind_lineart={$1?1:0}
     nm=${-gimp_layer_name[$ind_lineart]} -nm[$ind_lineart] lineart
     -if {$!>1} -nm[0] colors -endif
-    -if {$!>=3} -rm[2] -endif # Delete old color layer if any
+    -if {$!>=3} -rm[2--1] -endif # Delete old color and added contour layers if any
 
     # Constrain input lineart to have a single channel.
     [lineart]
@@ -24431,7 +24431,7 @@ _gimp_colorize_lineart_smartpaint :
     # Final rendering
     -if {narg($added_contours)}
       -mv[added_contours] {$lineart+1}
-      -nm[added_contours] $nm" [added contours]"
+      -gimp_set_layer_name[added_contours] $nm" [added contours]"
     -endif
 
     ind_lineart=$lineart
