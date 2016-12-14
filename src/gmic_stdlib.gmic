@@ -24399,16 +24399,14 @@ _gimp_colorize_lineart_smartpaint :
     -if {$!>1} -nm[0] colors -endif
     -if {$!>=3} -rm[2--1] -endif # Delete old color and added contour layers if any
 
-    # Constrain input lineart to have a single channel.
+    # Constrain input lineart to be a binary, single channel image.
     [lineart]
     is_alpha={s==2||s==4}
     -if $is_alpha -sh. 100% is_alpha={iM-im>64} -rm. -endif
     -if $is_alpha -channels. 100%
     -else -luminance. -negate. -endif
+    -gt. {255*(1-$2%)}
     -nm. strokes
-
-    # Threshold to reduce to binary lineart.
-    -gt[strokes] {255*(1-$2%)} -area_fg[strokes] 0,1 -ge[strokes] 8  # Remove small glitches
 
     # Erode strokes (estimate stroke thickness if needed).
     erode_size=$3
@@ -24419,7 +24417,8 @@ _gimp_colorize_lineart_smartpaint :
       erode_size={round($stroke_width/5)}
       -rm[-3--1]
     -endif
-    -if $erode_size -erode[strokes] {2*$erode_size} -area_fg[strokes] 0,1 -ge[strokes] 8 -endif
+    -if $erode_size -erode[strokes] {2*$erode_size} -endif
+    -area_fg[strokes] 0,1 -ge[strokes] 2
 
     # Retrieve closed binary shape.
     _keep_keypoints={$-1==0}
@@ -24450,7 +24449,7 @@ _gimp_colorize_lineart_smartpaint :
 
       -if {!$8} -rm[strokes] # No color shading
       -else # Shade colors
-        -distance[strokes] 0 -*[strokes] -1
+        -j[strokes] [new_strokes] -distance[strokes] 0 -*[strokes] -1
         -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
         min_color_area={new_strokes,$5^2}
         -if $min_color_area --area_fg[new_strokes] 0,0 -gt. $min_color_area -*[new_strokes,-1] -endif
@@ -24461,7 +24460,7 @@ _gimp_colorize_lineart_smartpaint :
       -nm. new_colors
 
     -else # Mode: Random colorization
-      -distance[strokes] 0 -*[strokes] -1
+      -j[strokes] [new_strokes] -distance[strokes] 0 -*[strokes] -1
       -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
       min_color_area={new_strokes,$5^2}
       -if $min_color_area --area_fg[new_strokes] 0,0 xy_bg={[xM,yM]} -gt. $min_color_area -*[new_strokes,-1] -endif
