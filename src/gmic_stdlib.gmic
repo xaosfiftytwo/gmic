@@ -24367,7 +24367,7 @@ gimp_autofill_lineart_preview :
 #@gimp : Contour detection (%) = float(95,0,100)
 #@gimp : Contour erosion = int(0,-1,10)
 #@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
-#@gimp : Output closing strokes = _bool(0)
+#@gimp : Output region delimiters = _bool(0)
 #@gimp : sep = separator(), note = note{"<small><b>For <i>Random colors</i> mode only:</b></small>"}
 #@gimp : Minimal color area = float(5,0,100)
 #@gimp : Maximal color saturation = int(32,0,255)
@@ -24432,11 +24432,6 @@ _gimp_colorize_lineart_smartpaint :
       -nm. geometry
     -endif
 
-    -if $4 # Output closed contour layer
-      ---[new_strokes] [strokes] -*. 255 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
-      -nm. closing_strokes
-    -endif
-
     # Label color regions and inpaint strokes.
     -if {narg($colors)} # Mode: Guided colorization
       -to_rgba[$colors] [colors],[colors]
@@ -24473,13 +24468,15 @@ _gimp_colorize_lineart_smartpaint :
     -endif
 
     # Final rendering
-    -if {narg($closing_strokes)}
-      -mv[closing_strokes] {$lineart+1}
-      -gimp_set_layer_name[closing_strokes] $nm" [closing strokes]"
-    -endif
-
     ind_lineart=$lineart
     ind_colors=$new_colors
+
+    -if $4 # Output region delimiters
+      100%,100%,1,1,"const boundary = 1; J(#"$new_colors",1)!=I(#"$new_colors") || J(#"$new_colors",0,1)!=I(#"$new_colors")"
+      -*. 255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
+      -gimp_set_layer_name. $nm" [region delimiters]"
+      -mv. {$lineart+1}
+    -endif
     -gimp_set_layer_name[$ind_colors] $nm" [colors]"
     -gimp_set_layer_name[$ind_lineart] $nm
 
