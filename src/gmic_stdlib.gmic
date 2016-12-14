@@ -6464,6 +6464,32 @@ rgb2cmyk :
     -/[0-2] . -rm. -a c
   -endl -done -v +
 
+#@gmic rgb2hcy
+#@gmic : Convert selected images from RGB to HCY colorbases.
+#@gmic : $ image.jpg -rgb2hcy -split c
+rgb2hcy :
+  -e[^-1] "Convert image$? from RGB to HCY color bases."
+  -v - -to_color -f "
+    M = max(I);
+    m = min(I);
+    C = M - m;
+    H = 60*(C==0?0:M==R?((G-B)/C)%6:M==G?(B-R)/C+2:(R-G)/C+4);
+    Y = 0.299*R + 0.587*G + 0.114*B;
+    [ H,C/255,Y/255 ]"
+  -v +
+
+#@gmic hcy2rgb :
+#@gmic : Convert selected images from HCY to RGB colorbases.
+hcy2rgb :
+  -e[^-1] "Convert image$? from HCY to RGB color bases."
+  -v - -to_color -f "
+    H = (R/60)%6;
+    X = G*(1 - abs(H%2 - 1));
+    RGB1 = arg(1 + int(H),[G,X,0],[X,G,0],[0,G,X],[0,X,G],[X,0,G],[G,0,X]);
+    m = B - 0.3*RGB1[0] - 0.59*RGB1[1] - 0.11*RGB1[2];
+    RGB1 + m" -* 255
+  -v +
+
 #@gmic rgb2hsi : (+)
 #@gmic : Convert selected images from RGB to HSI colorbases.
 #@gmic : $ image.jpg -rgb2hsi -split c
