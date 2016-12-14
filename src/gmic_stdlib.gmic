@@ -24408,12 +24408,12 @@ _gimp_colorize_lineart_smartpaint :
     -endif
 
     -if $4 # Output closed contour layer
-      ---[new_strokes] [strokes] -*. 255 -boxfilter. 2 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
+      ---[new_strokes] [strokes] -*. 255 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
       -nm. closing_strokes
     -endif
 
     # Label color regions and inpaint strokes.
-    -if {narg($colors)} # Guided colorization
+    -if {narg($colors)} # Mode: Guided colorization
       -to_rgba[$colors] [colors],[colors]
       -f[colors] "i(#-1) = A<255?0:norm(R,G+0.3,B+0.6);I"
       -label_fg. 0 {1+iM},1,1,{colors,s+1}
@@ -24427,14 +24427,14 @@ _gimp_colorize_lineart_smartpaint :
         -distance[strokes] 0 -*[strokes] -1
         -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
         min_color_area={new_strokes,$5^2}
-        -if $min_color_area --area_fg[new_strokes] 0,0 xy_bg={[xM,yM]} -gt. $min_color_area -*[new_strokes,-1] -endif
+        -if $min_color_area --area_fg[new_strokes] 0,0 -gt. $min_color_area -*[new_strokes,-1] -endif
         -watershed[new_strokes] [strokes],0 -rm[strokes]
         -srgb2rgb. -guided. [new_strokes],{1+$8/5},0 -rgb2srgb.
       -endif
       -rm[new_strokes]
       -nm. new_colors
 
-    -else # Random colorization
+    -else # Mode: Random colorization
       -distance[strokes] 0 -*[strokes] -1
       -eq[new_strokes] 0 -label_fg[new_strokes] 0,0
       min_color_area={new_strokes,$5^2}
@@ -28633,7 +28633,7 @@ gimp_blend_seamless_preview :
 #@gimp : "Divide","Dodge","Edges","Exclusion","Freeze","Grain extract","Grain merge","Green","Hard light",
 #@gimp : "Hard mix","Hue","Interpolation","Lighten","Lightness","Linear burn","Linear light","Luminance",
 #@gimp : "Multiply","Negation","Or","Overlay","Pin light","Red","Reflect","Saturation",
-#@gimp : "Shape Area Max","Shape Area Max0","Shape Area Min","Shape Area Min0","Shape Average","Shape Average0","Shape min","Shape min0","Shape max","Shape max0",
+#@gimp : "Shape area max","Shape area max0","Shape area min","Shape area min0","Shape average","Shape average0","Shape min","Shape min0","Shape max","Shape max0",
 #@gimp : "Soft burn","Soft dodge","Soft light","Screen","Stamp","Subtract","Value","Vivid light","Xor"}
 #@gimp : Process as = choice("Two-by-two","Upper layer is the top layer for all blends","Lower layer is the bottom layer for all blends")
 #@gimp : Opacity = float(1,0,1)
