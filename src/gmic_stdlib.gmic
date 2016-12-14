@@ -15319,9 +15319,9 @@ watermark_visible : -skip "${1=\251\ G\47MIC}" -check "${2=0.3}>0 && $2<1 && ${3
 #@gmic : 'blending_mode' can be { add | alpha | and | average | blue | burn | darken | difference |
 #@gmic : divide | dodge | edges | exclusion | freeze | grainextract | grainmerge | green | hardlight |
 #@gmic : hardmix | hue | interpolation | lighten | lightness | linearburn | linearlight | luminance |
-#@gmic : multiply | negation | or | overlay | pinlight | red | reflect | saturation | seamless | seamless_mixed |
-#@gmic : screen | shapeaverage | shapeaverage0 | shapemin | shapemin0 | shapemax | shapemax0 | softburn | softdodge |
-#@gmic : softlight | stamp | subtract | value | vividlight | xor }.
+#@gmic : multiply | negation | or | overlay | pinlight | red | reflect | saturation | seamless | seamless_mixed | screen |
+#@gmic : shapeareamax | shapeareamax0 | shapeareamin | shapeareamin0 | shapeaverage | shapeaverage0 | shapemin | shapemin0 | shapemax | shapemax0 |
+#@gmic : softburn | softdodge | softlight | stamp | subtract | value | vividlight | xor }.
 #@gmic : Default values: 'blending_mode=alpha', 'opacity=1' and 'selection_is=0'.
 #@gmic : $ image.jpg --drop_shadow , -resize2dy[-1] 200 -rotate[-1] 20 --blend alpha -display_rgba[-2]
 #@gmic : $ image.jpg -testimage2d {w},{h} -blend overlay
@@ -15442,34 +15442,53 @@ _blend_saturation :
   -to_color -sh 0,2 -rgb2hsv[2,3] -shift[2,3] 0,0,0,-1,2 -sh[2] 1,2 -j[1] [4],0,0,0,1 -rm[4] -shift[2,3] 0,0,0,1,2 -hsv2rgb[2,3] -rm[2,3]
 _blend_screen :
   ---[0] 255 --[1] 255 -*[1,2] -/[1] 255 -*[1] -1 -+[1] 255
+
+_blend_shapeareamax :
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[1] -label[1] 0
+  --f[0] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[2] -area[2] 0,0
+  {1,iM+1},1,1,{0,s+1}
+  -f[1] ">area = i(#2); best = I[#3,i]; if (area>best[size(best) - 1], I[#3,i] = [ I(#0),area ]);i"
+  -rm[2] -channels[2] 0,{s-2} -map[1] [2] -rm[2]
+_blend_shapeareamax0 :
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I" -norm[1] -label_fg[1] 0
+  --f[0] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[2] -area[2] 0,0
+  {1,iM+1},1,1,{0,s+1}
+  -f[1] ">area = i(#2); best = I[#3,i]; if (area>best[size(best) - 1], I[#3,i] = [ I(#0),area ]);i"
+  -rm[2] -channels[2] 0,{s-2} -point[2] 0,0,0,1,0 -map[1] [2] -rm[2]
+_blend_shapeareamin :
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[1] -label[1] 0
+  --f[0] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[2] -area[2] 0,0
+  {1,iM+1},1,1,{0,s+1},inf
+  -f[1] ">area = i(#2); best = I[#3,i]; if (area<best[size(best) - 1], I[#3,i] = [ I(#0),area ]);i"
+  -rm[2] -channels[2] 0,{s-2} -map[1] [2] -rm[2]
+_blend_shapeareamin0 :
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I" -norm[1] -label_fg[1] 0
+  --f[0] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[2] -area[2] 0,0
+  {1,iM+1},1,1,{0,s+1},inf
+  -f[1] ">area = i(#2); best = I[#3,i]; if (area<best[size(best) - 1], I[#3,i] = [ I(#0),area ]);i"
+  -rm[2] -channels[2] 0,{s-2} -point[2] 0,0,0,1,0 -map[1] [2] -rm[2]
 _blend_shapeaverage :
-  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A"
-  -norm[1] -label[1] 0 {iM+1},1,1,{0,s}
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[1] -label[1] 0 {iM+1},1,1,{0,s}
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c)+=i;i"
   --histogram[1] {w},0,{w-1} -/[-2,-1] -map[1] . -rm.
 _blend_shapeaverage0 : # Same as shapeaverage except that zero pixels in foreground layer are kept to black.
-  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I"
-  -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s}
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I" -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s}
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c)+=i;i"
   --histogram[1] {w},0,{w-1} -/[-2,-1] -point. 0,0,0,1,0 -map[1] . -rm.
 _blend_shapemin :
-  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A"
-  -norm[1] -label[1] 0 {iM+1},1,1,{0,s},inf
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[1] -label[1] 0 {iM+1},1,1,{0,s},inf
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c) = min(i(#2,i(#1,x,y,z,0),0,0,c),i);i"
   -map[1] [2] -rm.
 _blend_shapemin0 :
-  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I"
-  -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s},inf
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I" -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s},inf
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c) = min(i(#2,i(#1,x,y,z,0),0,0,c),i);i"
   -point. 0,0,0,1,0 -map[1] [2] -rm.
 _blend_shapemax :
-  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A"
-  -norm[1] -label[1] 0 {iM+1},1,1,{0,s},-inf
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I+A" -norm[1] -label[1] 0 {iM+1},1,1,{0,s},-inf
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c) = max(i(#2,i(#1,x,y,z,0),0,0,c),i);i"
   -map[1] [2] -rm.
 _blend_shapemax0 :
-  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I"
-  -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s},-inf
+  -f[1] "init(A = resize([ 0,(s-1)/s ],s,3));I!=0?I+A:I" -norm[1] -label_fg[1] 0 {iM+1},1,1,{0,s},-inf
   -f[0] ">i(#2,i(#1,x,y,z,0),0,0,c) = max(i(#2,i(#1,x,y,z,0),0,0,c),i);i"
   -point. 0,0,0,1,0 -map[1] [2] -rm.
 _blend_softburn :
@@ -24389,7 +24408,7 @@ _gimp_colorize_lineart_smartpaint :
     -endif
 
     -if $4 # Output closed contour layer
-      ---[new_strokes] [strokes] -*. 255 -b. 0.7 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
+      ---[new_strokes] [strokes] -*. 255 -boxfilter. 2 -n. 0,255 -channels. -3,0 -sh. 0,2 -fc. 255,0,0 -rm.
       -nm. closing_strokes
     -endif
 
@@ -24444,7 +24463,8 @@ _gimp_colorize_lineart_smartpaint :
 
     -elif {$-1==0} # Preview : Colored geometry
       -if {$is_alpha} -channels[$ind_lineart] 100% -negate[$ind_lineart] -endif -to_rgb[$ind_lineart]
-      -blend[$ind_lineart,$ind_colors] multiply -n[$ind_lineart] 64,255
+      -n[$ind_lineart] 180,255
+      -blend[$ind_lineart,$ind_colors] multiply
       --select_color[geometry] 0,255,255,255 -==. 0 -j[$ind_lineart] [geometry],0,0,0,0,1,. -k[$ind_lineart]
     -elif {$-1==1} # Preview : Colored regions
       -k[$ind_colors]
@@ -28613,7 +28633,7 @@ gimp_blend_seamless_preview :
 #@gimp : "Divide","Dodge","Edges","Exclusion","Freeze","Grain extract","Grain merge","Green","Hard light",
 #@gimp : "Hard mix","Hue","Interpolation","Lighten","Lightness","Linear burn","Linear light","Luminance",
 #@gimp : "Multiply","Negation","Or","Overlay","Pin light","Red","Reflect","Saturation",
-#@gimp : "Shape Average","Shape Average0","Shape min","Shape min0","Shape max","Shape max0",
+#@gimp : "Shape Area Max","Shape Area Max0","Shape Area Min","Shape Area Min0","Shape Average","Shape Average0","Shape min","Shape min0","Shape max","Shape max0",
 #@gimp : "Soft burn","Soft dodge","Soft light","Screen","Stamp","Subtract","Value","Vivid light","Xor"}
 #@gimp : Process as = choice("Two-by-two","Upper layer is the top layer for all blends","Lower layer is the bottom layer for all blends")
 #@gimp : Opacity = float(1,0,1)
@@ -28628,6 +28648,7 @@ gimp_blend :
        divide,dodge,edges,exclusion,freeze,grainextract,grainmerge,green,hardlight,\
        hardmix,hue,interpolation,lighten,lightness,linearburn,linearlight,luminance,\
        multiply,negation,or,overlay,pinlight,red,reflect,saturation,\
+       shapeareamax,shapeareamax0,shapeareamin,shapeareamin0,\
        shapeaverage,shapeaverage0,shapemin,shapemin0,shapemax,shapemax0,\
        softburn,softdodge,softlight,screen,stamp,subtract,value,\
        vividlight,xor}
