@@ -10656,7 +10656,16 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
         dist = norm(ST);
         cosN = dot(NS,-NT);
         angN = acos(cosN)*180/pi;
-        is_cond = dist<"$spline_distmax" && (dot(NS,ST)>0 || dot(NT,ST)<0) && angN<"$spline_anglemax";"
+
+        # quality_dist = max(0,1-dist/"$spline_distmax");
+        # quality_normal = (max(0,dot(NS,ST)) + max(0,-dot(NT,ST)))/dist;
+        # quality_angle = max(0,cos(angN-);
+
+       is_cond = dist<"$spline_distmax" && (dot(NS,ST)>0 || dot(NT,ST)<0) && angN<"$spline_anglemax";
+
+#        quality = quality_dist*quality_normal*quality_angle;
+#        is_cond = quality>0.5;
+      "
 
       N={"
         nb = 0;
@@ -10674,6 +10683,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
           for (nx = x + 1, nx<w#"$keycoords", ++nx,
             "$code_pairing"
             if (is_cond, I[#"$keypairs",ind++] = [ dist,x,nx ]);
+#            if (is_cond, I[#"$keypairs",ind++] = [ quality,x,nx ]);
           ); I"
         -sort[keypairs] +,x
       -endif
@@ -10683,7 +10693,14 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
       ind_strokes={$allow_self_intersections?$strokes:$new_strokes}
 
       -if {narg($keypairs)}
-        -f[keypairs] ">"${-math_lib}"
+        -f[keypairs] ">
+          for_spline(code) = for(t = 0, t<=1, t+=dt,
+            P = round(mul([t^3,t^2,t,1],C,2));
+            code#;
+            dP = abs(mul([3*t^2,2*t,1,0],C,2)) + 1e-8;
+            dt = min(dtmin,0.75/max(dP));
+          );
+
           Ic = I;
           indS = Ic[1];
           indT = Ic[2];
@@ -10702,15 +10719,12 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
             dt = dtmin = 1/max(abs(T - S));
             current_val = 1;
             nb_switches = 0;
-            for (t = 0, t<=1, t+=dt,
-              P = round(mul([t^3,t^2,t,1],C,2));
+            for_spline(
               if (i(#"$ind_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
-              if (nb_switches>2, is_cond = 0; break());
-              dP = abs(mul([3*t^2,2*t,1,0],C,2)) + 1e-8;
-              dt = min(dtmin,0.75/max(dP));
+              if (nb_switches>2, is_cond = 0; break())
             );
-            if (is_cond,
-              draw_spline(#"$new_strokes",S,dist*NS,T,-dist*NT,1,1);
+            if (is_cond, # Spline does not cross existing contours
+              for_spline(i(#"$ind_strokes",P)|=2);
               ++i(#"$keycoords",indS,0,0,2);
               ++i(#"$keycoords",indT,0,0,2);
             );
@@ -24369,7 +24383,7 @@ gimp_autofill_lineart_preview :
 #@gimp : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
 #@gimp : Output region delimiters = _bool(0)
 #@gimp : sep = separator(), note = note{"<small><b>For <i>Random colors</i> mode only:</b></small>"}
-#@gimp : Minimal color area = float(5,0,100)
+#@gimp : Minimal color area = float(15,0,100)
 #@gimp : Maximal color saturation = int(32,0,255)
 #@gimp : Minimal color intensity = int(200,0,255)
 #@gimp : sep = separator(), note = note{"<small><b>For <i>Color spots</i> mode only:</b></small>"}
@@ -24379,7 +24393,7 @@ gimp_autofill_lineart_preview :
 #@gimp : End point connectivity = int(2,1,5)
 #@gimp : Spline max length (px) = float(60,0,256)
 #@gimp : Segment max length (px) = float(20,0,256)
-#@gimp : Spline max angle (deg.) = float(160,0,180)
+#@gimp : Spline max angle (deg.) = float(170,0,180)
 #@gimp : Allow self intersections = bool(1)
 #@gimp : sep = separator(), Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
 #@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/13/2016</i>.</small>")
