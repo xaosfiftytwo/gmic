@@ -10724,7 +10724,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
               if (nb_switches>2, is_cond = 0; break())
             );
             if (is_cond, # Spline does not cross existing contours
-              for_spline(i(#"$ind_strokes",P)==1);
+              for_spline(i(#"$new_strokes",P)==1);
               ++i(#"$keycoords",indS,0,0,2);
               ++i(#"$keycoords",indT,0,0,2);
             );
