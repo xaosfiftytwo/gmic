@@ -10716,7 +10716,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
               if (nb_switches>2, is_cond = 0; break())
             );
             if (is_cond,
-              for_spline(i(#"$new_strokes",P) = 2);
+              for_spline(i(#"$new_strokes",P) = 1);
               ++i(#"$keycoords",indS,0,0,2);
               ++i(#"$keycoords",indT,0,0,2);
             );
@@ -10726,7 +10726,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
       # Find and connect segments.
       -eq[new_strokes] 0 # Invert values to consider boundary pixels as strokes.
-      -f[keycoords] ">"${-math_lib}"
+      -f[keycoords] ">
         if (i(#"$keycoords",x,0,0,2)<"$endpoint_connectivity",
           S = I(#"$keycoords",x)[0,2];
           angS = i(#"$normals",S)*pi/180;
@@ -10734,13 +10734,17 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
           is_cond = 0;
           current_val = 0;
           nb_switches = 0;
-          for (t = 0, t<="$segment_distmax", t+=1,
+          for (t = 0, t<="$segment_distmax", ++t,
             P = round(S + t*NS);
             if (i(#"$new_strokes",P,0,0)!=current_val, ++nb_switches; current_val=!current_val);
             if (nb_switches==2,is_cond = 1; break(););
           );
+          tmax = t;
           if (is_cond,
-            draw_line(#"$new_strokes",S,P,1,0);
+            for (t = 0, t<=tmax, ++t,
+              P = round(S + t*NS);
+              i(#"$new_strokes",P) = 0;
+            );
             ++i(#"$keycoords",x,0,0,2);
           );
         ); I"
