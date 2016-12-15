@@ -879,8 +879,8 @@ _help_usage :
 \n          (and returns the value of the last expression).
 \n       . '"${c}"debug(expression)"$n" prints detailed debug information about the sequence of operations done
 \n          by the math parser to evaluate the expression (and returns its value).
-\n       . '"${c}"display(_X)"$n" prints and displays the contents of the specified vector '"${c}"X"$n"', and wait for
-\n          user events. if no arguments are provided, a memory snapshot of the math parser
+\n       . '"${c}"display(_X,_w,_h,_d,_s)"$n" prints and displays the contents of the specified vector '"${c}"X"$n"',
+\n          and wait for user events. if no arguments are provided, a memory snapshot of the math parser
 \n          environment is displayed instead.
 \n       . '"${c}"init(expression)"$n" evaluates the specified expression only once, even when multiple
 \n          evaluations are required (e.g. in '"${c}"-fill init(foo=0);++foo"$n"').
