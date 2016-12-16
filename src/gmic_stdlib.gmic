@@ -10663,6 +10663,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
     -else
       code_pairing="
+        const cosmin = cos("$spline_anglemax"*pi/180);
         Ic = I[#"$keycoords",x];
         In = I[#"$keycoords",nx];
         S = Ic[0,2];
@@ -10675,14 +10676,17 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
         dist = norm(ST);
         cosN = dot(NS,-NT);
         angN = acos(cosN)*180/pi;
-        is_cond = dist<"$spline_distmax" && (dot(NS,ST)>0 || dot(NT,ST)<0) && angN<"$spline_anglemax";"
+        quality = max(0,1 - dist/"$spline_distmax") * max(0,dot(NS,ST) - dot(NT,ST))/dist * (cosN - cosmin);
+#        is_cond = dist<"$spline_distmax" && (dot(NS,ST)>0 || dot(NT,ST)<0) && angN<"$spline_anglemax";
+#        quality = is_cond*(1 - dist/"$spline_distmax");
+      "
 
       N={"
         nb = 0;
         for (x = 0, x<w#"$keycoords", ++x,
           for (nx = x + 1, nx<w#"$keycoords", ++nx,
             "$code_pairing"
-            if (is_cond, ++nb);
+            if (quality>0, ++nb);
           );
         ); nb"}
 
@@ -10692,9 +10696,9 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
           init(ind = 0);
           for (nx = x + 1, nx<w#"$keycoords", ++nx,
             "$code_pairing"
-            if (is_cond, I[#"$keypairs",ind++] = [ dist,x,nx ]);
+            if (quality>0, I[#"$keypairs",ind++] = [ quality,x,nx ]);
           ); I"
-        -sort[keypairs] +,x
+        -sort[keypairs] -,x
       -endif
 
       # Find and connect splines.
