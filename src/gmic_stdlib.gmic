@@ -10703,9 +10703,10 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
       -if {narg($keypairs)}
         -f[keypairs] ">"$edgel_lib"
           for_spline(code) = for (t = 0, t<=1, t+=dt,
-            P = round(mul([t^3,t^2,t,1],C,2));
+            t3 = t*(t2 = t*t);
+            P = round(mul([t3,t2,t,1],C,2));
             code#;
-            dP = abs(mul([3*t^2,2*t,1,0],C,2)) + 1e-8;
+            dP = abs(mul([3*t2,2*t,1,0],C,2)) + 1e-8;
             dt = min(dtmin,0.75/max(dP));
           );
 
