@@ -10784,9 +10784,11 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
                   );
                 0);
                 for_spline(i(#"$new_strokes",P) = is_cond?1:(i(#"$new_strokes",P)&1));
+                if (is_cond,
+                  ++i(#"$keycoords",indS,0,0,2);
+                  ++i(#"$keycoords",indT,0,0,2);
+                );
               );
-              ++i(#"$keycoords",indS,0,0,2);
-              ++i(#"$keycoords",indT,0,0,2);
             );
           ); I"
         -rm[keypairs]
@@ -10867,8 +10869,8 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
                 );
               0);
               for_segment(i(#"$new_strokes",P) = is_cond?0:i(#"$new_strokes",P)&3);
+              if (is_cond, ++i(#"$keycoords",x,0,0,2));
             );
-            ++i(#"$keycoords",x,0,0,2);
           );
         ); I"
       -eq[new_strokes] 0
