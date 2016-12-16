@@ -22386,6 +22386,7 @@ _gimp_download_all_data :
 #@gimp : note = note{"\n<span foreground="purple" underline="single">Supporters:</span>"}
 #@gimp : note = note{" <b>-</b> A big hug goes to these friends who supported the project:"}
 #@gimp : note = note{"<i>
+#@gimp : Frank Paull,
 #@gimp : <a href="https://500px.com/spodeworld">Steven Brener</a>,
 #@gimp : Susanne Gabrielski,
 #@gimp : Andrea Correani,
