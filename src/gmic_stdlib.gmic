@@ -10529,7 +10529,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
   -repeat $! -l[$>] nm={n}
 
-    # Remove small glitches in input stroke image.
+    # Ensure input is a 2d binary image.
     -slices 50% -channels 0 -gt 0
     -nm. strokes
 
@@ -10548,28 +10548,28 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
         pp = [ 0,-1,1,-1,1,0,1,1,0,1,-1,1,-1,0,-1,-1 ];
       );
 
-      next(img,p) = ( # Used when shape is made of '1' (in 8-connexity)
+      next(img,p) = ( # Used when shape is made of '!=0' (in 8-connexity)
         p0 = p#[0,2] + pn[4*p#[2],2];
         p1 = p#[0,2] + pn[4*p#[2] + 2,2];
-        case = (i(#img,p0)==1) + 2*(i(#img,p1)==1);
+        case = !!i(#img,p0) + 2*!!i(#img,p1);
         !case?[ p[0],p[1],(p[2]+1)%4 ]:case==1?[ p0[0],p0[1],p[2] ]:[ p1[0],p1[1],(p[2]-1)%4 ];
       );
 
-      previous(img,p) = (
+      previous(img,p) = ( # Used when shape is made of '!=0' (in 8-connexity)
         p0 = p#[0,2] + pp[4*p#[2],2];
         p1 = p#[0,2] + pp[4*p#[2] + 2,2];
-        case = (i(#img,p0)==1) + 2*(i(#img,p1)==1);
+        case = !!i(#img,p0) + 2*!!i(#img,p1);
         !case?[ p[0],p[1],(p[2]-1)%4 ]:case==1?[ p0[0],p0[1],p[2] ]:[ p1[0],p1[1],(p[2]+1)%4 ];
       );
 
-      next2(img,p) = ( # Used when shape is made of values { 0 | 4 } (in 4-connexity)
+      next2(img,p) = ( # Used when shape is made of '{ 0 | 4 }' (in 4-connexity)
         p0 = p#[0,2] + pn[4*p#[2],2];
         p1 = p#[0,2] + pn[4*p#[2] + 2,2];
-        case = (!(i(#img,p0)&3)) + 2*(!(i(#img,p1)&3));
+        case = !(i(#img,p0)&3) + 2*!(i(#img,p1)&3);
         case==1?[ p0[0],p0[1],p[2] ]:case==3?[ p1[0],p1[1],(p[2]-1)%4 ]:[ p[0],p[1],(p[2]+1)%4 ];
       );
 
-      next3(img,p) = ( # Used when shape is made of values { 1 | 2 } (in 4-connexity)
+      next3(img,p) = ( # Used when shape is made of '{ 1 | 2 }' (in 4-connexity)
         p0 = p#[0,2] + pn[4*p#[2],2];
         p1 = p#[0,2] + pn[4*p#[2] + 2,2];
         val1 = i(#img,p0);
@@ -10735,7 +10735,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
               # Check that the new spline did not create small closed regions.
               const area_threshold = "$area_min";
-              const max_edgels = area_threshold*2 + 1;
+              const max_edgels = 2*(area_threshold + 1);
 
               if (area_threshold<=0,
                 for_spline(i(#"$new_strokes",P)=1);
@@ -10796,6 +10796,11 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
       -eq[new_strokes] 0 # Negate values to consider boundary pixels (0) as strokes.
 
       -f[keycoords] ">"$edgel_lib"
+        for_segment(code) = for (t = 0, t<=tmax, ++t,
+          P = round(S + t*NS);
+          code#;
+        );
+
         if (i(#"$keycoords",x,0,0,2)<"$endpoint_connectivity",
           S = I(#"$keycoords",x)[0,2];
           angS = i(#"$normals",S)*pi/180;
@@ -10803,8 +10808,8 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
           is_cond = 0;
           current_val = 0;
           nb_switches = 0;
-          for (t = 0, t<="$segment_distmax", ++t,
-            P = round(S + t*NS);
+          tmax = "$segment_distmax";
+          for_segment(
             if (i(#"$new_strokes",P,0,0)!=current_val, ++nb_switches; current_val=1 - current_val);
             if (nb_switches==2,is_cond = 1; break(););
           );
@@ -10813,13 +10818,13 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
             # Check that the new segment did not create small closed regions.
             const area_threshold = "$area_min";
-            const max_edgels = area_threshold*2 + 1;
+            const max_edgels = 2*(area_threshold + 1);
             if (area_threshold<=0,
-              for (t = 0, t<=tmax, ++t, P = round(S + t*NS); i(#"$new_strokes",P)=0);
+              for_segment(i(#"$new_strokes",P)=0);
             , #else
-              for (t = 0, t<=tmax, ++t, P = round(S + t*NS); i(#"$new_strokes",P)|=4);
+              for_segment(i(#"$new_strokes",P)|=4);
 
-              for (t = 0, t<=tmax, ++t, P = round(S + t*NS);
+              for_segment(
                 if (i(#"$new_strokes",P[0] + 1,P[1])==1,
                   edgels = area = 0; Q0 = Q = [ P[0] + 1,P[1],2 ];
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 2; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
@@ -10840,10 +10845,10 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 2; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
                   if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
                 );
-              );
+              0);
 
               # Set or unset spline, and clean temp points used for area estimations.
-              for (t = 0, t<=tmax, ++t, P = round(S + t*NS);
+              for_segment(
                 if (i(#"$new_strokes",P[0] + 1,P[1])==2,
                   edgels = 0; Q0 = Q = [ P[0] + 1,P[1],2 ];
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 1; Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels)
@@ -10861,7 +10866,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 1; Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels)
                 );
               0);
-              for (t = 0, t<=tmax, ++t, P = round(S + t*NS); i(#"$new_strokes",P) = is_cond?0:(i(#"$new_strokes",P)&3));
+              for_segment(i(#"$new_strokes",P) = is_cond?0:i(#"$new_strokes",P)&3);
             );
             ++i(#"$keycoords",x,0,0,2);
           );
@@ -24490,7 +24495,7 @@ gimp_autofill_lineart_preview :
     -if $5 -k. -else -rv -blend multiply -endif
   -endl -done
 
-#@gimp Colorize lineart [smart paint] : gimp_colorize_lineart_smartpaint, gimp_colorize_lineart_smartpaint_preview(0)
+#@gimp Colorize lineart [smart coloring] : gimp_colorize_lineart_smartcoloring, gimp_colorize_lineart_smartcoloring_preview(0)
 #@gimp : Colorize with = choice("Random colors","Color spots on transparent top layer")
 #@gimp : sep = separator(), note = note{"<small><b>Global geometry parameters:</b></small>"}
 #@gimp : Contour detection (%) = float(95,0,100)
@@ -24512,14 +24517,14 @@ gimp_autofill_lineart_preview :
 #@gimp : Allow self intersections = bool(1)
 #@gimp : sep = separator(), Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
 #@gimp : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>, <i>S&#233;bastien Fourey</i> and <i>David Revoy</i>.      Latest update: <i>12/13/2016</i>.</small>")
-gimp_colorize_lineart_smartpaint :
-  -_gimp_colorize_lineart_smartpaint $*,-1
+gimp_colorize_lineart_smartcoloring :
+  -_gimp_colorize_lineart_smartcoloring $*,-1
 
-gimp_colorize_lineart_smartpaint_preview :
+gimp_colorize_lineart_smartcoloring_preview :
   -if {$1" && "$!<2} -gimp_warning_preview "A top layer with color spots is missing, for this colorization mode." -return -endif
-  -_gimp_colorize_lineart_smartpaint ${1-3},0,${5--1}
+  -_gimp_colorize_lineart_smartcoloring ${1-3},0,${5--1}
 
-_gimp_colorize_lineart_smartpaint :
+_gimp_colorize_lineart_smartcoloring :
   -if {$1" && "$!<2} -error "A top layer with color strokes is missing, for this colorization mode." -endif
   min_color_area={$13^2}
 
