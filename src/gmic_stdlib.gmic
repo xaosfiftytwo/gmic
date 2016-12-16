@@ -10543,7 +10543,6 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
     # Define useful functions to navigate through edgels.
     edgel_lib="
       init(
-        boundary = 1;
         pn = [ 0,1,1,1,-1,0,-1,1,0,-1,-1,-1,1,0,1,-1 ];
         pp = [ 0,-1,1,-1,1,0,1,1,0,1,-1,1,-1,0,-1,-1 ];
       );
@@ -10585,6 +10584,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
     # Smooth edgel normals.
     -f[e_normals] $edgel_lib"
+      const boundary = 1;
       if (i<0,-1,
         ppos = npos = pos = [ x,y,c ];
         u = vec(pos);
@@ -10600,6 +10600,7 @@ close_binary : -check "${1=25}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
     # Estimate edgel curvature.
     --f[e_normals] $edgel_lib"
+      const boundary = 1;
       kappa = 0;
       if (i<0,-1,
         pos = [ x,y,c ];
