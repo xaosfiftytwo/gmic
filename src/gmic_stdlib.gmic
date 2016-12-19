@@ -3,9 +3,7 @@
 #  File        : gmic_stdlib.gmic
 #                ( G'MIC command file )
 #
-#  Description : Define the commands of the standard G'MIC library, as well as
-#                the base filters for the G'MIC plug-in for GIMP, and for the
-#                web service G'MIC Online.
+#  Description : Define the commands and filters of the standard G'MIC library.
 #                ( http://gmic.eu )
 #
 #  Copyright   : David Tschumperle
@@ -3198,18 +3196,18 @@ shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0
        f3 = [ -0.04,0.2,0.16,0.04 ];    g3 = [ 0.12,0.07 ];
        f4 = [ 0.95,0.005,-0.005,0.93 ]; g4 = [ -0.002,0.5 ];
      );
-      xy = [ 0,0 ];
-      for (n = 0, n<"$N", ++n,
-        r = u(100);
-        xy = r<=1?((f1**xy)+=g1):
-             r<=8?((f2**xy)+=g2):
-             r<=15?((f3**xy)+=g3):((f4**xy)+=g4);
-        I[n] = xy
-      )"}
-      -permute xczy
-      -i.. 2,2,1,1,{"R=rot(-$3); R[2] = -R[2]; R[3] = -R[3]; R"} -**
-      -repeat 2 -sh. $>,$>,0,0 --. {im} -rm. -done -n 0,{$ir-1}
-      -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
+     xy = [ 0,0 ];
+     for (n = 0, n<"$N", ++n,
+       r = u(100);
+       xy = r<=1?((f1**xy)+=g1):
+            r<=8?((f2**xy)+=g2):
+            r<=15?((f3**xy)+=g3):((f4**xy)+=g4);
+       I[n] = xy
+    )"}
+    -permute xczy
+    -i.. 2,2,1,1,{"R=rot(-$3); R[2] = -R[2]; R[3] = -R[3]; R"} -**
+    -repeat 2 -sh. $>,$>,0,0 --. {im} -rm. -done -n 0,{$ir-1}
+    -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
   -endl -endif
   -nm "[2d Barnsley fern]"
   -v +
