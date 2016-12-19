@@ -1430,6 +1430,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
 
   // Use English for default language if no translated filters found.
   if (!std::strstr(gmic_additional_commands,line)) { locale[0] = 'e'; locale[1] = 'n'; locale[2] = 0; }
+
   for (const char *data = gmic_additional_commands; *data; ) {
     char *_line = line;
     // Read new line.
@@ -1439,6 +1440,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
     for (_line = line; *_line; ++_line) if (*_line<' ') *_line = ' '; // Replace non-usual characters by spaces.
     if (line[0]!='#' || line[1]!='@' || line[2]!='g' || // Check for a '#@gui' line.
         line[3]!='u' || line[4]!='i') continue;
+
     if (line[5]=='_') { // Check for a localized filter.
       // Whether the entry match current locale or not.
       if (line[6]==locale[0] && line[7]==locale[1] && line[8]==' ') _line = line.data() + 9;
