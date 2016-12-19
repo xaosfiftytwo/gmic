@@ -4159,6 +4159,7 @@ update_server :
   -m "nb_levels : -l[] ({'$""1'}) -s -,{'/'} -u $! -rm -endl"  # Command to count number of folders in a given path.
 
   path=/
+
   -repeat $! -l[$>]
     npath=${"-parent "{0,n}}
     -if {['$path']!=['$npath']} # Need to change the path.
@@ -4211,7 +4212,7 @@ update_server :
 
   # Retrieve G'MIC command name for each filter.
   -repeat $! --l[$>] command_name$>=""
-    --rows 0,6 head={t} -rm.
+    --rows 0,5 head={t} -rm.
     -if {['$head']=='"#@gui "'} -s -,{':'}
       -if {$!>=1} -l[1] -s -,{','}
         -if $! -autocrop[0] 32 command_name$>={0,t} -endif
