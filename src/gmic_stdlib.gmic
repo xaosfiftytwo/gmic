@@ -4063,14 +4063,14 @@ update_server :
     ind={$>-$offset}
     -if {{{$ind-1},@-1}==10" && "same([{^}],'#@gui',5)" && "({$ind,@5}==32" || "{$ind,@5}==_'_')} -l[$ind] # Line starts by '#@gui[_] '
 
-      -if {i[6]==_'_'} locale=_{`[i[7],i[8]]`}  # Retrieve locale if any specified
+      -if {i[5]==_'_'} locale=_{`[i[6],i[7]]`}  # Retrieve locale if any specified
       -else locale=
       -endif
 
       is_folder=0
       -s +,10
-      -if {{0,@6}==_'_'} --rows[0] 9,100% -rows[0] 0,8  # Treat a localized filter as a regular filter.
-      -else --rows[0] 6,100% -rows[0] 0,5
+      -if {{0,@5}==_'_'} --rows[0] 8,100% -rows[0] 0,7  # Treat a localized filter as a regular filter.
+      -else --rows[0] 5,100% -rows[0] 0,4
       -endif
       -autocrop. 32 -mv. 1
 
