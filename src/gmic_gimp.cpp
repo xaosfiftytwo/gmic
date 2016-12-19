@@ -1246,7 +1246,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   CImgList<char> _names;
   CImg<char> command(1024);
   cimg_snprintf(command,command.width(),
-                "%s-gimp_filter_sources %d",
+                "%s-gui_filter_sources %d",
                 get_verbosity_mode()>5?"-debug ":get_verbosity_mode()>3?"":"-v -99 ",
                 try_net_update?1:0);
   try { gmic(command,_sources,_names,gmic_additional_commands,true); } catch (...) { }
@@ -1376,7 +1376,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
         add_code_separator = true;
       }
       if (add_code_separator)
-        CImg<char>::string("\n#@gimp ________\n",false).unroll('y').move_to(_gmic_additional_commands);
+        CImg<char>::string("\n#@gui ________\n",false).unroll('y').move_to(_gmic_additional_commands);
     } catch(...) {
       if (get_verbosity_mode()>1)
         std::fprintf(cimg::output(),
@@ -1390,7 +1390,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
 
   if (!is_default_update) { // Add hardcoded default filters if no updates of the default commands.
     _gmic_additional_commands.insert(gmic::decompress_stdlib());
-    CImg<char>::string("\n#@gimp ________\n",false).unroll('y').move_to(_gmic_additional_commands);
+    CImg<char>::string("\n#@gui ________\n",false).unroll('y').move_to(_gmic_additional_commands);
   }
 
   cimglist_for(_gmic_additional_commands,l) { // Remove unusual characters.
@@ -1426,7 +1426,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   int level = 0, err = 0;
   bool is_testing = false;
   nb_available_filters = 0;
-  cimg_snprintf(line,line.width(),"#@gimp_%s ",locale.data());
+  cimg_snprintf(line,line.width(),"#@gui_%s ",locale.data());
 
   // Use English for default language if no translated filters found.
   if (!std::strstr(gmic_additional_commands,line)) { locale[0] = 'e'; locale[1] = 'n'; locale[2] = 0; }
@@ -1437,13 +1437,13 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
     *_line = 0;
     while (*data=='\n') ++data; // Skip next '\n'.
     for (_line = line; *_line; ++_line) if (*_line<' ') *_line = ' '; // Replace non-usual characters by spaces.
-    if (line[0]!='#' || line[1]!='@' || line[2]!='g' || // Check for a '#@gimp' line.
-        line[3]!='i' || line[4]!='m' || line[5]!='p') continue;
-    if (line[6]=='_') { // Check for a localized filter.
+    if (line[0]!='#' || line[1]!='@' || line[2]!='g' || // Check for a '#@gui' line.
+        line[3]!='u' || line[4]!='i') continue;
+    if (line[5]=='_') { // Check for a localized filter.
       // Whether the entry match current locale or not.
-      if (line[7]==locale[0] && line[8]==locale[1] && line[9]==' ') _line = line.data() + 10;
+      if (line[6]==locale[0] && line[7]==locale[1] && line[8]==' ') _line = line.data() + 9;
       else continue;
-    } else if (line[6]==' ') _line = line.data() + 7; else continue; // Check for a non-localized filter.
+    } else if (line[5]==' ') _line = line.data() + 6; else continue; // Check for a non-localized filter.
 
     if (*_line!=':') { // Check for a description of a possible filter or menu folder.
       *entry = *command = *preview_command = *arguments = 0;
@@ -3354,13 +3354,13 @@ void process_preview() {
       spt.images_names.assign();
       original_preview.move_to(spt.images);
       CImg<char> command(1024);
-      cimg_snprintf(command,command.width(),"%s-gimp_error_preview \"%s\"",
+      cimg_snprintf(command,command.width(),"%s-gui_error_preview \"%s\"",
                     get_verbosity_mode()>5?"-debug ":get_verbosity_mode()>3?"":"-v -99 ",
                     spt.error_message.data());
       try {
         gmic(command,spt.images,spt.images_names,gmic_additional_commands,true);
 
-      } catch (...) {  // Fallback for '-gimp_error_preview'.
+      } catch (...) {  // Fallback for '-gui_error_preview'.
         const unsigned char white[] = { 155,155,155 };
         spt.images.assign(1).back().draw_text(0,0," Preview\n  error ",white,0,1,57).
           resize(-100,-100,1,4).get_shared_channel(3).dilate(5);
@@ -3410,11 +3410,11 @@ void process_preview() {
     if (preview_images.size()==1) preview_images[0].move_to(computed_preview);
     else if (preview_images.size()>1) try {
         CImgList<char> preview_images_names;
-        gmic("-gimp_preview",preview_images,preview_images_names,gmic_additional_commands,true);
+        gmic("-gui_preview",preview_images,preview_images_names,gmic_additional_commands,true);
         if (preview_images.size()) preview_images[0].move_to(computed_preview);
         preview_images.assign();
         preview_images_names.assign();
-      } catch (...) { // Fallback for '-gimp_preview'.
+      } catch (...) { // Fallback for '-gui_preview'.
         const unsigned char white[] = { 155,155,155 };
         preview_images.assign();
         computed_preview.draw_text(0,0," Preview\n  error ",white,0,1,57).
