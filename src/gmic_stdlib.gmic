@@ -16873,7 +16873,7 @@ compress_gmic :
 
 _compress_gmic :
   -if {i==_'#'}
-    -if {h<6" || "!same([{^}],'#@g',3)} -rm. (10) -endif
+    -if {h<6" || "(!same([{^}],'#@gimp',6)" && "!same([{^}],'#@cli',5))} -rm. (10) -endif
   -else
     -l. -s +,32,35 -if {$!>2} -k[0] -endif -a y -endl
     -autocrop. 32 -if {!w} -rm. (10) -endif
