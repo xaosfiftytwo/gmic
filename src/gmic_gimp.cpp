@@ -3922,7 +3922,7 @@ void create_parameters_gui(const bool reset_params) {
           }
 
           // Check for a constant value.
-          if (!found_valid_argument && !cimg::strcasecmp(argument_type,"const")) {
+          if (!found_valid_argument && !cimg::strcasecmp(argument_type,"value")) {
             const char *value = argument_arg;
             if (is_fave) value = argument_fave;
             if (!reset_params && *argument_value) value = argument_value;

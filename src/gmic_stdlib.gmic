@@ -47,9 +47,9 @@
 # - Each line starting with '#' is a comment line.
 # - Any other line is considered as the continuation of a previously started G'MIC custom command.
 #
-#*** Specific rules for 'gmic' (command-line interpreter) :
+#*** Specific rules for the command-line interface 'gmic':
 #
-# - A comment line starting with '#@cli' will be parsed by 'gmic' in order to display help for
+# - A comment line starting with '#@cli' will be parsed by 'gmic' to display help for
 #    G'MIC custom commands (when invoked with option '-h'). More precisely :
 #
 #      _ '#@cli :: subsection' defines a new command subsection in the displayed help.
@@ -57,9 +57,9 @@
 #        starts a new command description.
 #      _ '#@cli : description' add a new description line to the current command description.
 #
-#*** Specific rules for 'gmic_gimp' (plug-in for GIMP) :
+#*** Specific rules for the GUI plug-in :
 #
-# - A comment line starting with '#@gui' will be parsed by the GIMP plug-in to define the filters tree.
+# - A comment line starting with '#@gui' will be parsed by the GUI plug-in to define the filters tree.
 # - A comment line starting with '#@gui_xx' will define a filter only for a specific language 'xx'
 #    (e.g. 'en','fr'...).
 # - More precisely, the syntax of a '#@gui' comment line is :
@@ -91,7 +91,7 @@
 #      _ 'button(_alignment)'                             : Add a boolean parameter (0 or 1) (as a button).
 #      _ 'choice(_default_indice,Choice0,..,ChoiceN)'     : Add a integer parameter (as a combobox).
 #      _ 'color(defaultR,defaultG,defaultB,_defaultA)'    : Add R,G,B[,A] parameters (as a colorchooser).
-#      _ 'const(value)'                                   : Add a constant parameter (not displayed).
+#      _ 'value(value)'                                   : Add a constant parameter (not displayed).
 #      _ 'file(_default_filename)'                        : Add a filename parameter (as a filechooser).
 #      _ 'float(default_value,min_value,max_value)'       : Add a float-valued parameter (as a float slider).
 #      _ 'folder(_default_foldername)'                    : Add a foldername parameter (as a folderchooser).
@@ -24308,8 +24308,8 @@ fx_charcoal_preview :
 #@gui : To clear all control points, click on the <i>Reset</i> button below.
 #@gui : </small>"}
 #@gui : Clear control points = button(0.5)
-#@gui : Last image size = const(0,0)
-#@gui : Control points = const(-1)
+#@gui : Last image size = value(0,0)
+#@gui : Control points = value(-1)
 #@gui : sep = separator()
 #@gui : note = note{"<small><b>Interactions:</b>\n
 #@gui : Use the following actions in the interactive window to manage your colorization :\n\n
@@ -25231,8 +25231,8 @@ fx_colormap_preview :
 #@gui : Colorspace = choice{"RGB","CMY","CMYK","HSI","HSL","HSV","Lab","Lch","YCbCr"}
 #@gui : Output preset as a HaldCLUT layer = _choice("Disable","Low-res CLUT","High-res CLUT")
 #@gui : Apply transformation from = _choice("New curves [interactive]","Curves defined previously")
-#@gui : Colorspace = const(0)
-#@gui : Keypoints = const(0,0,100,100,-1,0,0,100,100,-1,0,0,100,100,-1,0,0,100,100,-1,0,0,100,100)
+#@gui : Colorspace = value(0)
+#@gui : Keypoints = value(0,0,100,100,-1,0,0,100,100,-1,0,0,100,100,-1,0,0,100,100,-1,0,0,100,100)
 #@gui : sep = separator()
 #@gui : note = note{"<small><b>Description:</b>\n
 #@gui : This filter allows to apply color curves on your images, in many different colorspaces.
@@ -26134,8 +26134,8 @@ fx_edge_offsets_preview :
 #@gui : If you are not satisfied with the result, click on <i>Apply</i> once again to modify your control points defined previously.
 #@gui : To remove all control points, click on the <i>Reset</i> button below.
 #@gui : </small>"}
-#@gui : Last image size = const(0,0)
-#@gui : Control points = const(-1)
+#@gui : Last image size = value(0,0)
+#@gui : Control points = value(-1)
 #@gui : sep = separator()
 #@gui : note = note{"<small><b>Interactions:</b>\n
 #@gui : Use the following actions in the interactive window to build your extraction mask :\n\n
@@ -32123,7 +32123,7 @@ fx_animate_glow_preview :
 #@gui : sep = separator()
 #@gui : Preview type = choice(1,"Transition map","Timed image","Sequence x4","Sequence x6","Sequence x8")
 #@gui : Preview time = float(0.5,0,1)
-#@gui : is_preview = const(0)
+#@gui : is_preview = value(0)
 #@gui : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>04/10/2015</i>.</small>")
 fx_spatial_transition :
   -to_rgba -r ${-max_wh},1,100%,0,0,0.5,0.5
@@ -32853,7 +32853,7 @@ gmicol_rotate :
 
 #@web Drop water : fx_drop_water_preview, fx_drop_water_preview(1)
 #@web : note = note("<small><b>Shape geometry:</b></small>")
-#@web : Shapes = const(0)
+#@web : Shapes = value(0)
 #@web : Density = float(30,0,100)
 #@web : Radius = float(2,0,5)
 #@web : Variability = float(80,0,100)
@@ -32869,7 +32869,7 @@ gmicol_rotate :
 #@web : Shadow smoothness = float(0.75,0,3)
 #@web : Diffuse shadow = float(0.05,0,3)
 #@web : Smoothness = float(0.15,0,3)
-#@web : Output as separate layers = const(0)
+#@web : Output as separate layers = value(0)
 #@web : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>07/21/2015</i>.</small>")
 
 #@web clone("Equirectangular to nadir-zenith")
