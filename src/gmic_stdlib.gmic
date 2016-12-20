@@ -248,7 +248,7 @@ __help :
   -m "_help_paragraph : -_help_paragraph_$1 \"$""1\""
   -_help_header_$1[]
   -_help_usage[]
-  -s -,{'__help_end\ :'} -k[0] # Avoid parsing code for GIMP filters.
+  -s -,{'__help_end\ :'} -k[0] # Avoid parsing code for GUI filters.
   -document_gmic $1,"img/",0
   -_help_examples[]
   -_help_footer_$1[]
@@ -2808,9 +2808,9 @@ _input_glob :
   -v +
 
 #@cli input_gpl : filename
-#@cli : Input specified filename as a GIMP palette data file.
+#@cli : Input specified filename as a .gpl palette data file.
 input_gpl :
-  -e[^-1] "Input GIMP palette file '$*'."
+  -e[^-1] "Input .gpl palette file '$*'."
   -v - -l[]
     -i raw:"$*",char -replace 9,32 -s -,10
     colors=0
@@ -2853,10 +2853,10 @@ output_cube :
  -endl -done -v +
 
 #@cli output_ggr : filename,_gradient_name
-#@cli : Output selected images as GIMP gradient files.
+#@cli : Output selected images as .ggr gradient files (GIMP).
 #@cli : If no gradient name is specified, it is deduced from the filename.
 output_ggr : -skip "${2=}"
- -e[^-1] "Output image$? as GIMP gradient file '$1'."
+ -e[^-1] "Output image$? as .ggr gradient file '$1'."
  -v - N=$!
   -repeat $N --l[$>] -r 1,{w*h*d},1,100%,-1 -to_rgba -/ 255
     -if {narg("$2")} name="$2"
@@ -4261,7 +4261,7 @@ update_server :
   -v + -e[] "> Output list of filters in stdout.\n" -v -
   -x "date +%Y,%m,%d,%H >"${-path_tmp}date.dlm
   ${-path_tmp}date.dlm
-  -echo_stdout "*** List of filters in the G\47MIC plug-in for GIMP ("$nb_filters" filters, on "{i}/{i(1)}/{i(2)}" "{i[3]}:00") ***\n"
+  -echo_stdout "*** List of filters in the G\47MIC plug-in ("$nb_filters" filters, on "{i}/{i(1)}/{i(2)}" "{i[3]}:00") ***\n"
   -rm.
   -echo_stdout "* List of filters, sorted by path:\n"
   -repeat $! -l[$>]
@@ -16896,17 +16896,17 @@ _compress_gmic_cli :
     -autocrop. 32 -if {!w} -rm. (10) -endif
   -endif
 
-# compress_gmic_gimp
-# Compress .gmic custom command files for the GIMP plug-in,
+# compress_gmic_gui
+# Compress .gmic custom command files for the plug-in,
 # by removing empty lines, and useless comments (non starting with '#@gui').
-compress_gmic_gimp :
+compress_gmic_gui :
   -v -
   -s -,10 N=$!
-  -ap -_compress_gmic_gimp
+  -ap -_compress_gmic_gui
   -s -,10 -i[1--2] (10) -a y
   -v +
 
-_compress_gmic_gimp :
+_compress_gmic_gui :
   -if {i==_'#'}
     -if {!same([{^}],'#@gui',5)} -rm. (10) -endif
   -else
@@ -18573,7 +18573,7 @@ _x_colorize :
   fdim=${-fitscreen[]\ $w,$h} ww={arg(1,$fdim)} wh={arg(2,$fdim)} x0=0 y0=0 x1={w-1} y1={h-1}
   selection=-1 view_markers=2 contrast=9 xpan=-1 ypan=-1 replace_color= current_replace_color=
 
-  -if {narg($_gui_control_points)>=6}  ($_gui_control_points) -r. {w/6},6,1,1,-1 # Import list of control points from GIMP interface.
+  -if {narg($_gui_control_points)>=6}  ($_gui_control_points) -r. {w/6},6,1,1,-1 # Import list of control points from plug-in GUI.
   -else 0 # Empty list of control points.
   -endif
   -nm. points
@@ -20776,7 +20776,7 @@ x_segment : -check "${1=1024}==0 || $1>=128"
     selection=-1 marker_mode=2 xpan=-1 ypan=-1 bg_mode=0 opacity=64
     -to_rgb -nm img
 
-    -if {narg($_gui_control_points)>=4}  ($_gui_control_points) -r. {w/4},4,1,1,-1 # Import list of control points from GIMP interface.
+    -if {narg($_gui_control_points)>=4}  ($_gui_control_points) -r. {w/4},4,1,1,-1 # Import list of control points from plug-in GUI.
     -else 0 # Empty list of control points.
     -endif
     -nm. points
@@ -21817,12 +21817,12 @@ x_whirl : -check ${1=0.2}>=0
 #-------------------------------------
 #
 # Define menu entries for
-# the G'MIC plug-in for GIMP
+# the G'MIC plug-in
 #
 #-------------------------------------
 __help_end : #  <-- don't remove me, used as a end marker for command '-help' !
 
-# Function that returns the list of external sources to be included in the GIMP plug-in.
+# Function that returns the list of external sources to be included in the plug-in.
 # This command can be superseded on the user '.gmic' file to add sources for the plug-in.
 # $1 = try network update
 # $2 = try '-gui_filter_sources' defined in local update file.
@@ -21849,44 +21849,44 @@ gui_parallel_overlap :
 gui_preview :
   -frame 1,1,0,0,0,255 -montage B
 
-# Return name of a gimp layer.
+# Return name of a layer.
 gui_layer_name :
   -u ${"-_gui_merge_layers[0] name,[unnamed]"}
 
-# Return blending mode of a gimp layer.
+# Return blending mode of a layer.
 gui_layer_mode :
   -u ${"-_gui_merge_layers[0] mode,alpha"}
 
-# Return opacity of a gimp layer.
+# Return opacity of a layer.
 gui_layer_opacity :
   -u ${"-_gui_merge_layers[0] opacity,100"}
 
-# Return (x,y) position of a gimp layer.
+# Return (x,y) position of a layer.
 gui_layer_pos :
   -u ${"-_gui_merge_layers[0] pos,0,0"}
 
-# Set name of a gimp layer.
+# Set name of a layer.
 gui_set_layer_name :
   -repeat $! -l[$>]
     opacity=${-gui_layer_opacity} mode=${-gui_layer_mode} pos=${-gui_layer_pos}
     -nm "name($1),mode("$mode"),opacity("$opacity"),pos("$pos")"
   -endl -done
 
-# Set blending mode of a gimp layer.
+# Set blending mode of a layer.
 gui_set_layer_mode :
   -repeat $! -l[$>]
     name=${-gui_layer_name} opacity=${-gui_layer_opacity} pos=${-gui_layer_pos}
     -nm "name("$name"),mode($1),opacity("$opacity"),pos("$pos")"
   -endl -done
 
-# Set opacity of a gimp layer.
+# Set opacity of a layer.
 gui_set_layer_opacity :
   -repeat $! -l[$>]
     name=${-gui_layer_name} mode=${-gui_layer_mode} pos=${-gui_layer_pos}
     -nm "name("$name"),mode("$mode"),opacity($1),pos("$pos")"
   -endl -done
 
-# Set position of a gimp layer.
+# Set position of a layer.
 gui_set_layer_pos :
   -repeat $! -l[$>]
     name=${-gui_layer_name} mode=${-gui_layer_mode} opacity=${-gui_layer_opacity}
@@ -21894,7 +21894,7 @@ gui_set_layer_pos :
   -endl -done
 
 # Flatten list of input layers according to their blending modes, opacities and positions,
-# set in each layer name by the GIMP plug-in.
+# set in each layer name by the G'MIC plug-in.
 gui_merge_layers :
   mode0=${"-_gui_merge_layers. mode,alpha"}
   opacity0=${"-_gui_merge_layers. opacity,100"}
@@ -22054,7 +22054,7 @@ gui_check_version :
   -else -u 1
   -endif
 
-# Function to auto-crop layers and set their position for GIMP.
+# Function to auto-crop layers and set their positions.
 gui_autocrop_layers :
   -repeat $! -l[$>]
     nm=${-gui_layer_name}
@@ -22067,7 +22067,7 @@ gui_autocrop_layers :
 
 # Do not forget to ucomment this entry for a deprecated version of the G'MIC plug-in!
 # #@gui <span foreground="red"><b>  UPDATE INFORMATION</b></span> : _none_, fx_logo_en
-# #@gui : note = note{"A <b>new version</b> of the G'MIC plug-in for GIMP is available!
+# #@gui : note = note{"A <b>new version</b> of the G'MIC plug-in is available!
 # #@gui : You are strongly encouraged to download and install this updated version, by clicking on one of the following urls :"}
 # #@gui : note = note{"\n<span foreground="purple"><u>Windows version :</u></span>"}
 # #@gui : url = link{"Download G'MIC plug-in for Windows (64 bits)","http://gmic.eu/files/latest/gmic_gimp_win64.exe"}
@@ -22109,7 +22109,7 @@ gui_autocrop_layers :
 #@gui_en :  6 Bd du Mar&#233;chal Juin,\n 14050 Caen Cedex / France.</tt></small>\n\n
 #@gui_en : Postcards senders automatically enter the <i>Friends Hall of Fame</i> :) !
 #@gui_en : "}
-fx_logo_version3 : -skip "${1=Plug-in for GIMP}"
+fx_logo_version3 : -skip "${1=GUI plug-in}"
   -rm s="G\47MIC"
   -repeat {narg({'$s'})}
     0 -t. {`arg(1+$>,{'$s'})`},0,0,53,1,1 -frame. 3,0,0
@@ -22133,7 +22133,7 @@ fx_logo_version3 : -skip "${1=Plug-in for GIMP}"
   -blend alpha
   -frame 0,1,0,0,0 -frame 0,5,255,255,255
 
-fx_logo_version2 : -skip "${1=Plug-in for GIMP}"
+fx_logo_version2 : -skip "${1=GUI plug-in}"
   -if $! -k[0] -endif
   -to_rgb 0 -t. "G\47MIC",0,0,53,1,1 -label.
   6,1,1,3 -rand. 150,255 -point. 0 -map.. . -rm.
@@ -22146,7 +22146,7 @@ fx_logo_version2 : -skip "${1=Plug-in for GIMP}"
   -frame. 1,1,128 -mv. 0
   -if {$!>1} -*[^0] 0.45 -repeat {$!-1} -j. [0],{(w-{0,w})/2},{(h-{0,h})/2} -mv. 1 -done -rm[0] -endif
 
-fx_logo_version1 : -skip "${1=Plug-in for GIMP}"
+fx_logo_version1 : -skip "${1=GUI plug-in}"
   -if $! ratio={w/h} -else ratio=1 -endif
   -rm 118,44,1,1 -t "G\47MIC",3,-6,53,1,255 -r 100%,100%,10,1 -r 100%,100%,20,1,0,0,0.5,0.5,0.5 -b 1.5
   -isosurface3d 50%
@@ -22161,15 +22161,15 @@ fx_logo_version1 : -skip "${1=Plug-in for GIMP}"
   -blur_radial.. 20 -sharpen.. 300
   -r. ..,..,1,4,0,0,0.5,0.5 -blend alpha
 
-fx_logo : -skip "${1=Plug-in for GIMP\n    [ "${-strver}" ]}"
+fx_logo : -skip "${1=GUI plug-in\n    [ "${-strver}" ]}"
     -fx_logo_version{round(u(0.5,3.49))} "$1"
 
 fx_logo_en :
   -srand 5
   -if {narg($_prerelease)}
-    -fx_logo_version{round(u(0.5,3.49))} "       Plug-in for GIMP\n"[" "${-strver}" pre-release ""#"$_prerelease]
+    -fx_logo_version{round(u(0.5,3.49))} "       GUI plug-in\n"[" "${-strver}" pre-release ""#"$_prerelease]
   -else
-    -fx_logo_version{round(u(0.5,3.49))} "Plug-in for GIMP\n     "[" "${-strver}" "]
+    -fx_logo_version{round(u(0.5,3.49))} "GUI plug-in\n     "[" "${-strver}" "]
   -endif
 
 #---------------------
@@ -22196,9 +22196,9 @@ fx_logo_en :
 #@gui_fr : "}
 fx_logo_fr :
   -if {narg($_prerelease)}
-    -fx_logo_version{round(u(0.5,3.49))} "     Greffon pour GIMP\n"[" "${-strver}" pre-release ""#"$_prerelease]
+    -fx_logo_version{round(u(0.5,3.49))} "     Greffon GUI\n"[" "${-strver}" pre-release ""#"$_prerelease]
   -else
-    -fx_logo_version{round(u(0.5,3.49))} "Greffon pour GIMP\n    "[" "${-strver}" "]
+    -fx_logo_version{round(u(0.5,3.49))} "Greffon GUI\n    "[" "${-strver}" "]
   -endif
 
 #----------------------
@@ -22312,7 +22312,7 @@ fx_logo_ca :
 #@gui : <b> -</b>"}
 
 #@gui Download external data : gui_download_all_data, gui_no_preview(1)
-#@gui : note = note{"This filter will download all external data files used by some filters of the <i>G'MIC</i> plug-in for GIMP (<i>film emulation</i>, <i>light leaks</i>, <i>grain</i>, etc...),
+#@gui : note = note{"This filter will download all external data files used by some filters of the <i>G'MIC</i> plug-in (<i>film emulation</i>, <i>light leaks</i>, <i>grain</i>, etc...),
 #@gui : and will install them as persistent files on your hard drive. After this operation, you won't need a permanent
 #@gui : internet connection anymore in order to use some of the G'MIC filters."}
 #@gui : note = note()
@@ -22715,7 +22715,7 @@ gui_search_filters : -skip "${1=}"
 #@gui : sep = separator(), note = note{"<small><b>How often am I using G'MIC?</b></small>"}
 #@gui : Your answer: = _choice{"Choose...","Several times a day","Almost everyday","Few times a week","Rarely","Never","I've just discovered G'MIC today"}
 #@gui : sep = separator(), note = note{"<small><b>My preferred G'MIC interface:</b></small>"}
-#@gui : Your answer: = _choice{"Choose...","the CLI tool 'gmic'","the plug-in for GIMP","the plug-in for Krita","the web interface G'MICol","ZArt","I don't know about other interfaces"}
+#@gui : Your answer: = _choice{"Choose...","the CLI tool 'gmic'","the GUI plug-in","the plug-in for Krita","the web interface G'MICol","ZArt","I don't know about other interfaces"}
 #@gui : sep = separator(), note = note{"<small><b>I follow the news about the G'MIC project on:</b>\n(Selecting several items is allowed)</small>"}
 #@gui : The G'MIC website = _bool()
 #@gui : The Google+ page = _bool()
@@ -22792,7 +22792,7 @@ survey :
 
   -_survey_choice[] 2,"2. How did I hear about G'MIC?","N.C.","A friend showed me","From a search engine","From a discussion forum","From a blog entry","From an online magazine","From a physical magazine",420
   -_survey_choice[] 3,"3. How often am I using G'MIC?","N.C.","Several times a day","Almost everyday","Few times a week","Rarely","Never","I've just discovered G'MIC today",420
-  -_survey_choice[] 4,"4. My preferred G'MIC interface:","N.C.","the CLI tool 'gmic'","the plug-in for GIMP","the plug-in for Krita","the web interface G'MICol","ZArt","I don't know about other interfaces",420
+  -_survey_choice[] 4,"4. My preferred G'MIC interface:","N.C.","the CLI tool 'gmic'","the GUI plug-in","the plug-in for Krita","the web interface G'MICol","ZArt","I don't know about other interfaces",420
 
   0 -t. "5. I follow the news about the G'MIC project on:",0,0,32,1,127,0,0,255 -frame. 8,16,0,0,0,0
   -i.. 100%,100%,1,3 -fc.. $_back -blend[-2,-1] alpha
@@ -24303,7 +24303,7 @@ fx_charcoal_preview :
 #@gui : note = note{"<small><b>Description:</b>\n
 #@gui : This filter allows to quickly colorize a B&amp;W image or lineart.
 #@gui : Click on the <i>Apply</i> or <i>OK</i> buttons below to open the G'MIC interactive window and start adding color control points.
-#@gui : When you're done, exit the interactive window: your colored result will be transfered back to GIMP.\n\n
+#@gui : When you're done, exit the interactive window: your colored result will be transfered back to the host software.\n\n
 #@gui : If you are not satisfied with the result, <i>Undo it (CTRL+Z)</i>, and click on <i>Apply</i> once again to modify your control points defined previously.
 #@gui : To clear all control points, click on the <i>Reset</i> button below.
 #@gui : </small>"}
@@ -25237,7 +25237,7 @@ fx_colormap_preview :
 #@gui : note = note{"<small><b>Description:</b>\n
 #@gui : This filter allows to apply color curves on your images, in many different colorspaces.
 #@gui : Click on the <i>Apply</i> or <i>OK</i> buttons below to open the G'MIC interactive windows and start building your color curves.
-#@gui : When you're done, exit the main image window: your modified result will be transfered back to GIMP.\n\n
+#@gui : When you're done, exit the main image window: your modified result will be transfered back to the host software.\n\n
 #@gui : Once you've set curves, you can save them by pressing the <b>Add to faves</b> button below the filter tree.
 #@gui : To clear control points for your curves, click on the <i>Reset</i> button at the bottom.
 #@gui : </small>"}
@@ -26130,7 +26130,7 @@ fx_edge_offsets_preview :
 #@gui : note = note{"<small><b>Description:</b>\n
 #@gui : This filter allows to quickly extract foreground objects from background in opaque RGB images.
 #@gui : Click on the <i>Apply</i> or <i>OK</i> buttons below to open the interactive window and start adding foreground and background control points.
-#@gui : When you're done, exit the interactive window: your extracted foreground will be transfered back to GIMP.\n\n
+#@gui : When you're done, exit the interactive window: your extracted foreground will be transfered back to the host software.\n\n
 #@gui : If you are not satisfied with the result, click on <i>Apply</i> once again to modify your control points defined previously.
 #@gui : To remove all control points, click on the <i>Reset</i> button below.
 #@gui : </small>"}
@@ -27577,7 +27577,7 @@ fx_sharpen_texture_preview :
 #@gui : sep = separator(), Channel(s) = choice("All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gui : note = note{"\n\n<small><b>Note: </b>
-#@gui : This filter is inspired by the original <i>Unsharp Mask</i> filter in GIMP, with additional parameters.
+#@gui : This filter is inspired by the original GIMP <i>Unsharp Mask</i> filter, with additional parameters.
 #@gui : </small>"}
 #@gui : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
 _fx_unsharp :
@@ -32174,7 +32174,7 @@ fx_spatial_transition_preview :
 #@gui : sep = separator(), Preview type = choice{"Full (allows multi-layers)","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right"}
 #@gui : sep = separator(), note = note{"<small><b>Note: </b>
 #@gui : This filter can execute any set of instructions understood by the <b>G'MIC</b> language interpreter.
-#@gui : Here, you can then test some commands before creating your own G'MIC custom commands and GIMP menu entries.\n\n
+#@gui : Here, you can then test some commands before creating your own G'MIC custom commands and GUI plug-in menu entries.\n\n
 #@gui : Please look at the documentation reference web page :</small>"}
 #@gui : note = link("http://gmic.eu/reference.shtml")
 #@gui : note = note{"<small>
@@ -32191,7 +32191,7 @@ fx_spatial_transition_preview :
 #@gui : sep = separator(), Preview type = choice{"Full (allows multi-layers)","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right"}
 #@gui : sep = separator(), note = note{"<small><b>Note: </b>
 #@gui : This filter can execute any set of instructions understood by the <b>G'MIC</b> language interpreter.
-#@gui : Here, you can then test some commands before creating your own G'MIC custom commands and GIMP menu entries.\n\n
+#@gui : Here, you can then test some commands before creating your own G'MIC custom commands and GUI plug-in menu entries.\n\n
 #@gui : Please look at the documentation reference web page :</small>"}
 #@gui : note = link("http://gmic.eu/reference.shtml")
 #@gui : note = note{"<small>
