@@ -16870,7 +16870,7 @@ compress_gmic :
 
 _compress_gmic :
   -if {i==_'#'}
-    -if {h<5" || "(!same([{^}],'#@gui',5)" && "!same([{^}],'#@cli',5))} -rm. (10) -endif
+    -if {h<5" || "(!same([{^}],'#@gui',5)" && "!same([{^}],'#@cli',5)" && "!same([{^}],'#@web',5))} -rm. (10) -endif
   -else
     -l. -s +,32,35 -if {$!>2} -k[0] -endif -a y -endl
     -autocrop. 32 -if {!w} -rm. (10) -endif
