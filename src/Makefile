@@ -590,7 +590,7 @@ stdlib:
 	@echo "#ifndef gmic_gimp" >> gmic_stdlib.h
 	@\gmic gmic_stdlib.gmic raw:gmic_stdlib.gmic,char -compress_gmic_cli 1 -a y -serialize char,1,0 -o -.h,uchar | sed 's/unsigned char/const unsigned char/' | sed 's/unnamed/gmic_stdlib/' >> gmic_stdlib.h
 	@echo "#else" >> gmic_stdlib.h
-	@\gmic gmic_stdlib.gmic raw:gmic_stdlib.gmic,char -compress_gmic_gimp 1 -a y -serialize char,1,0 -o -.h,uchar | sed 's/unsigned char/const unsigned char/' | sed 's/unnamed/gmic_stdlib/' >> gmic_stdlib.h
+	@\gmic gmic_stdlib.gmic raw:gmic_stdlib.gmic,char -compress_gmic_gui 1 -a y -serialize char,1,0 -o -.h,uchar | sed 's/unsigned char/const unsigned char/' | sed 's/unnamed/gmic_stdlib/' >> gmic_stdlib.h
 	@\gmic -v - ../html/img/gimp_logos.png -serialize uchar,1,0 -o -.h,uchar | sed 's/unsigned char/const unsigned char/' | sed 's/unnamed/gmic_logo/' >> gmic_stdlib.h
 	@echo "const unsigned long size_data_gmic_logo = (unsigned long)sizeof(data_gmic_logo);" >> gmic_stdlib.h
 	@echo "#endif" >> gmic_stdlib.h
