@@ -257,11 +257,11 @@ fi
 # Perform filters update on the G'MIC server.
 #---------------------------------------------
 echo " - Create list of filters."
-rm -f /tmp/gimp_filters.txt
-\gmic gmic_stdlib.gmic -update_server > /tmp/gimp_filters.txt
-size=`du -b /tmp/gimp_filters.txt | head -c 1`
+rm -f /tmp/gui_filters.txt
+\gmic gmic_stdlib.gmic -update_server > /tmp/gui_filters.txt
+size=`du -b /tmp/gui_filters.txt | head -c 1`
 if [ "$size" != "0" ]; then
-    cp -f /tmp/gimp_filters.txt ../html/
+    cp -f /tmp/gui_filters.txt ../html/
 fi
 
 # Create man page and bash autocompletion script.
