@@ -32731,7 +32731,7 @@ gmicol_rotate :
 #@web clone("Black &amp; white")
 #@web clone("B&amp;W stencil")
 #@web clone("Charcoal")
-#@web clone("Colorize [auto-fill lineart]")
+#@web clone("Colorize lineart [auto-fill]")
 #@web clone("Colorize [with colormap]")
 #@web clone("Dithering")
 #@web clone("Emboss")
