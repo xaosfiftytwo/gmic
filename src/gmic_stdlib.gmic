@@ -10669,11 +10669,7 @@ close_binary : -check "${1=75}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
     # Detect pairs of keypoints preserving the spline constraints.
     -if {!narg($keycoords)}
       -rm[normals] -i[new_strokes] [strokes]
-
     -else
-      code_pairing="
-      "
-
       -i[keypairs] 1,1,1,3
       -f[keycoords] ">
         init(ind = 0);
