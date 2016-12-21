@@ -719,6 +719,11 @@ _help_usage :
 \n       . You may add '"${c}"#ind"$n"' to any of the variable name above to retrieve the information for any
 \n          numbered image "${g}"[ind]"$n" of the list (when this makes sense). For instance '"${c}"ia#0"$n"' denotes the
 \n          average value of the first image of the list).
+\n       . These variables are considered as "${g}"constant values"$n" by the math parser (for optimization
+\n          purposes) which is indeed the case most of the time. Anyway, this might not be the case,
+\n          e.g. if function '"${c}"resize(#ind,..)"$n"' is used in your expression.
+\n          If so, it is safer to invoke functions '"${c}"w(_#ind)"$n"', '"${c}"h(_#ind)"$n"', '"${c}"d(_#ind)"$n"', '"${c}"s(_#ind)"$n"',
+\n          '"${c}"wh(_#ind)"$n"', '"${c}"whd(_#ind)"$n"' and '"${c}"whds(_#ind)"$n"' instead of the corresponding named variables.
 \n       . '"${c}"x"$n"': current processed column of the associated image, if any ("${g}"0"$n" otherwise).
 \n       . '"${c}"y"$n"': current processed row of the associated image, if any ("${g}"0"$n" otherwise).
 \n       . '"${c}"z"$n"': current processed slice of the associated image, if any ("${g}"0"$n" otherwise).
@@ -847,6 +852,11 @@ _help_usage :
 \n          (or in default image selected if '"${c}"ind"$n"' is not specified) at coordinates "${g}"(x,y,z,c)"$n".
 \n          The size of the sprite "${g}"dx x dy x dz x dc"$n" must be specified. You can also specify a
 \n          corresponding opacity mask "${g}"M"$n" if its size matches "${g}"S"$n".
+\n       . '"${c}"resize(#ind,w,_h,_d,_s,_interp,_boundary,cx,_cy,_cz,_cc)"$n"' resizes an image of the
+\n          associated list with specified dimension and interpolation method. When using this,
+\n          function, you should consider retrieving the (non-constant) image dimensions using the
+\n          dynamic functions '"${c}"w(_#ind)"$n"', '"${c}"h(_#ind)"$n"', '"${c}"d(_#ind)"$n"', '"${c}"s(_#ind)"$n"', '"${c}"wh(_#ind)"$n"',
+\n          '"${c}"whd(_#ind)"$n"' and '"${c}"whds(_#ind)"$n"' instead of the corresponding constant variables.
 \n       . '"${c}"if(condition,expr_then,_expr_else)"$n"': return value of '"${c}"expr_then"$n"' or '"${c}"expr_else"$n"',
 \n          depending on the value of '"${c}"condition"$n"' "${g}"(0=false, other=true)"$n". '"${c}"expr_else"$n"' can be omitted
 \n          in which case "${g}"0"$n" is returned if the condition does not hold. Using the ternary operator
