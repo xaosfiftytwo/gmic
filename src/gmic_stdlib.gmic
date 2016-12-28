@@ -261,7 +261,7 @@ _help_usage :
   -_help_paragraph "    "$c${b}"gmic [-command1 [arg1_1,arg1_2,..]] .. [-commandN [argN_1,argN_2,..]]"$n"
 \n
 \n    '"${g}"gmic"$n"' is the open-source interpreter of the "${-GMIC}" language, a script-based programming
-\n    language dedicated to the design of possibly complex image processing pipelines.
+\n    language dedicated to the design of possibly complex image processing pipelines and operators.
 \n    It can be used to convert, manipulate, filter and visualize image datasets made of one
 \n    or several 1d/2d or 3d multi-spectral images.
 \n
@@ -285,7 +285,7 @@ _help_usage :
 \n     the processing pipeline (see commands '"$c"-name"$n"' and '"$c"-input"$n"' for this purpose).
 \n
 \n  - "${-GMIC}" defines a set of various commands and substitution mechanisms to allow the design of
-\n     complex pipelines managing this list of images, in a very flexible way:
+\n     complex pipelines and operators managing this list of images, in a very flexible way:
 \n     You can insert or remove images in the list, rearrange image indices, process images
 \n     (individually or grouped), merge image data together, display and output image files, etc.
 \n
@@ -897,7 +897,7 @@ _help_usage :
 \n          increments defined by '"${c}"inc_d"$n"' and '"${c}"inc_s"$n"' respectively for the destination and source
 \n          pointers.
 \n       . '"${c}"unref(a,b,...)"$n" destroys references to the named variable given as arguments.
-\n       . '"${c}"breakpoint()"$n" inserts a computation breakpoint (not supported by the cli interface).
+\n       . '"${c}"breakpoint()"$n" inserts a possible computation breakpoint (not supported by the cli interface).
 \n
 \n    - "${g}"User-defined macros:"$n"
 \n
