@@ -6867,7 +6867,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                (cimg_sscanf(argz,"%f%c%c",&z,&sepz,&end)==2 && sepz=='%')) &&
               tolerance>=0) {
             print(images,0,
-                  "Flood fill image%s from (%g%s,%g%s,%g%s), with tolerance %g, %s connectivity,"
+                  "Flood fill image%s from (%g%s,%g%s,%g%s), with tolerance %g, %s connectivity, "
                   "opacity %g and color (%s).",
                   gmic_selection.data(),
                   x,sepx=='%'?"%":"",
