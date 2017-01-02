@@ -24513,11 +24513,11 @@ fx_autofill_lineart_preview :
 #@gui : sep = separator(), note = note{"<small><b>For <i>Color spots</i> mode only:</b></small>"}
 #@gui : Color shading (%) = int(0,0,100)
 #@gui : sep = separator(), note = note{"<small><b>Connection parameters:</b></small>"}
-#@gui : End point rate (%) = float(75,0,100)
+#@gui : End point rate (%) = float(85,0,100)
 #@gui : End point connectivity = int(2,1,5)
 #@gui : Spline max length (px) = float(60,0,256)
 #@gui : Segment max length (px) = float(20,0,256)
-#@gui : Spline max angle (deg.) = float(180,0,180)
+#@gui : Spline max angle (deg.) = float(90,0,180)
 #@gui : Minimal region area = float(10,0,100)
 #@gui : Allow self intersections = bool(1)
 #@gui : sep = separator(), Preview type = choice(0,"Colored geometry","Colored regions","Colored lineart")
