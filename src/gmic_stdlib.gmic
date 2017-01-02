@@ -22632,6 +22632,7 @@ fx_gmicky_preview :
 #@gui : - <b>08/20/2014</b> : version <i>1.6.0</i>.\n
 #@gui : - <b>03/25/2016</b> : version <i>1.7.0</i>.\n
 #@gui : - <span foreground="purple"><b>11/18/2016</b> : version <i>1.7.9</i> (Current stable).</span>\n
+#@gui : - <b>01/02/2017</b> : version <i>1.8.0</i> (Current beta).\n
 #@gui : "}
 #@gui : sep = separator()
 #@gui : link = link("View latest changelog","https://discuss.pixls.us/t/release-of-gmic-1-7-9")
@@ -23749,7 +23750,7 @@ fx_cutout_preview :
 #@gui Diffusion tensors : fx_diffusiontensors, fx_diffusiontensors_preview(0)
 #@gui : Resolution (%) = float(10,0,20)
 #@gui : Size = float(5,0,16)
-#@gui : Color mode = choice(2,"Monochrome","Grayscale","Orientation","Color")
+#@gui : Color mode = choice(3,"Monochrome","Grayscale","Orientation","Color")
 #@gui : Outline = int(1,0,16)
 #@gui : sep = separator()
 #@gui : Sharpness = float(0.15,0,1)
