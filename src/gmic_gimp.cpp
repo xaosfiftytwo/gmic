@@ -3209,7 +3209,7 @@ void process_preview() {
   static int _xp = -1, _yp = -1;
   static double _factor = -1;
   const double factor = gimp_zoom_preview_get_factor(GIMP_ZOOM_PREVIEW(gui_preview));
-  if (factor>=cimg::min(gimp_preview_width,gimp_preview_height)/3) return;
+  if (factor>=std::min(gimp_preview_width,gimp_preview_height)/3) return;
 
   guchar *const ptr0 = gimp_zoom_preview_get_source(GIMP_ZOOM_PREVIEW(gui_preview),&wp,&hp,&sp);
   gimp_preview_get_position(GIMP_PREVIEW(gui_preview),&xp,&yp);
@@ -3297,8 +3297,8 @@ void process_preview() {
               y1 = y0 + (int)(h/factor) - 1,
               ox = (int)(posx*_wp/w0),
               oy = (int)(posy*_hp/h0);
-            img.get_crop(x0,y0,x1,y1).resize(cimg::max(1.0,cimg::round(img.width()*ratio)),
-                                             cimg::max(1.0,cimg::round(img.height()*ratio))).
+            img.get_crop(x0,y0,x1,y1).resize(std::max(1.0,cimg::round(img.width()*ratio)),
+                                             std::max(1.0,cimg::round(img.height()*ratio))).
               move_to(spt.images[p]);
             cimg_snprintf(layer_name,layer_name.width(),"mode(%s),opacity(%g),pos(%d,%d)",
                           s_blendmode[blendmode],opacity,ox,oy);
