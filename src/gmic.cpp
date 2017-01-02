@@ -8648,9 +8648,10 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
           }
           strreplace_fw(_filename);
           strreplace_fw(options);
+          const bool is_stdout = *_filename=='-' && (!_filename[1] || _filename[1]=='.');
 
           if (*cext) { // Force output to be written as a '.ext' file : generate random filename.
-            if (*_filename=='-' && (!_filename[1] || _filename[1]=='.')) {
+            if (is_stdout) {
               // Simplify filename 'ext:-.foo' as '-.ext'.
               cimg_snprintf(_filename,_filename.width(),"-.%s",cext);
               *cext = 0;
@@ -9206,6 +9207,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
             }
           }
           g_list.assign();
+          if (is_stdout) std::fflush(stdout);
           is_released = true; ++position; continue;
         }
 
