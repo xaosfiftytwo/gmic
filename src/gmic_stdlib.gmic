@@ -24504,7 +24504,7 @@ fx_autofill_lineart_preview :
 #@gui : Colorize with = choice("Random colors","Color spots on transparent top layer")
 #@gui : sep = separator(), note = note{"<small><b>Global geometry parameters:</b></small>"}
 #@gui : Contour detection (%) = float(95,0,100)
-#@gui : Contour erosion = int(0,-1,10)
+#@gui : Contour erosion = int(-1,-1,10)
 #@gui : note = note{"<small>Set <i>Contour erosion</i> to <i>-1</i> for erosion based on automatic estimation of stroke thickness.</small>"}
 #@gui : Output region delimiters = _bool(0)
 #@gui : sep = separator(), note = note{"<small><b>For <i>Random colors</i> mode only:</b></small>"}
