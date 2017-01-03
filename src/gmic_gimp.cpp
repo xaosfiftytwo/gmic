@@ -946,20 +946,20 @@ const char *t(const char *const s) {
     _t("Very verbose (logfile)","Dok\305\202adny (plik log)");
     _t("Debug mode (console)","Debugowanie (konsola)");
     _t("Debug mode (logfile)","Debugowanie (plik log)");
-    _t("Preview size...","Rozmiar podgl\304\205d...");
-    _t("Tiny","Male");
-    _t("Small","Mala");
-    _t("Normal","Normalne");
-    _t("Large","Duza");
+    _t("Preview size...","Rozmiar podgl\304\205du...");
+    _t("Tiny","Malutki");
+    _t("Small","Ma\305\202y");
+    _t("Normal","Normalny");
+    _t("Large","Du\305\274y");
     _t(" Available filters (%u)"," Dost\304\231pne filtry (%u)");
     _t("Update","Uaktualnij");
     _t("Rename","Zmiana nazwy");
     _t("Add filter to faves","Dodaj filtr do ulubionych");
-    _t("Remove filter from faves","Usun filtr z Ulubionych");
-    _t("Update filters","Filtry aktualizacji");
-    _t("Enable Internet updates","Wlacz aktualizacje internetowe");
-    _t("Expand/collapse","Rozwin/Zwin");
-    _t("Reset zoom","Zresetowa\304\207 zoomu");
+    _t("Remove filter from faves","Usu\305\204 filtr z ulubionych");
+    _t("Update filters","Aktualizuj filtry");
+    _t("Enable Internet updates","W\305\202\304\205cz aktualizacje internetow\304\205");
+    _t("Expand/collapse","Rozwi\305\204/Zwi\305\204");
+    _t("Reset zoom","Reset powi\304\231kszenia");
   }
 
   // Portuguese translation.
