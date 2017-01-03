@@ -1178,9 +1178,12 @@ gint tree_view_sort_func(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gp
 
 CImg<char> tree_view_sort_str(const char *str, const bool is_folder) {
   CImg<char> res;
-  if (!str || !*str || !is_folder) return CImg<char>::string(str,true,true);
+  if (!str || !*str) return CImg<char>::string("");
+  const char c = *str=='!'?'!':is_folder?'#':0;
+  if (*str=='!') ++str;
   while (str[0]=='<' && str[1] && str[2]=='>') str+=3;
-  return CImg<char>(1,1,1,1,' ').append(CImg<char>::string(str,true,true),'x');
+  if (!c) return CImg<char>::string(str,true,true);
+  return CImg<char>(1,1,1,1,c).append(CImg<char>::string(str,true,true),'x');
 }
 
 // Flush filter tree view
@@ -1460,12 +1463,12 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
         if (*nentry) {
           if (level) {
             gtk_tree_store_append(tree_view_store,&parent[level],level?&parent[level - 1]:0);
-            gtk_tree_store_set(tree_view_store,&parent[level],0,0,1,nentry,
+            gtk_tree_store_set(tree_view_store,&parent[level],0,0,1,nentry + (*nentry=='!'),
                                2,tree_view_sort_str(nentry,true).data(),-1);
           } else { // 1st-level folder.
             bool is_duplicate = false;
             cimglist_for(gmic_1stlevel_names,l)
-              if (!std::strcmp(nentry,gmic_1stlevel_names[l].data())) { // Folder name is a duplicate.
+              if (!std::strcmp(nentry + (*nentry=='!'),gmic_1stlevel_names[l].data())) { // Folder name is a duplicate.
                 if (gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(tree_view_store),&parent[level],
                                                         gmic_1stlevel_entries[l].data())) {
                   is_duplicate = true;
@@ -1480,17 +1483,12 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
 
             if (!is_duplicate) {
               gtk_tree_store_append(tree_view_store,&parent[level],level?&parent[level - 1]:0);
-              gtk_tree_store_set(tree_view_store,&parent[level],0,0,1,nentry,
+              gtk_tree_store_set(tree_view_store,&parent[level],0,0,1,nentry + (*nentry=='!'),
                                  2,tree_view_sort_str(nentry,true).data(),-1);
               const char *treepath = gtk_tree_model_get_string_from_iter(GTK_TREE_MODEL(tree_view_store),
                                                                          &parent[level]);
-              CImg<char>::string(nentry).move_to(gmic_1stlevel_names);
+              CImg<char>::string(nentry + (*nentry=='!')).move_to(gmic_1stlevel_names);
               CImg<char>::string(treepath).move_to(gmic_1stlevel_entries);
-              unsigned int order = 0;
-              for (unsigned int i = 0; i<4; ++i) {
-                order<<=8;
-                if (*_nentry) order|=(unsigned char)cimg::lowercase(*(_nentry++));
-              }
             }
           }
           ++level;
@@ -1504,7 +1502,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
         cimg::strpare(command,' ',false,true);
         cimg::strpare(arguments,' ',false,true);
         if (*nentry) {
-          CImg<char>::string(nentry).move_to(gmic_entries);
+          CImg<char>::string(nentry + (*nentry=='!')).move_to(gmic_entries);
           CImg<char>::string(command).move_to(gmic_commands);
           CImg<char>::string(arguments).move_to(gmic_arguments);
           if (err>=3) { // Filter has a specified preview command.
@@ -1527,14 +1525,8 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
             CImg<double>::vector(-1,1).move_to(gmic_preview_factors);
           }
           gtk_tree_store_append(tree_view_store,&iter,level?&parent[level - 1]:0);
-          gtk_tree_store_set(tree_view_store,&iter,0,gmic_entries.size() - 1,1,nentry,
+          gtk_tree_store_set(tree_view_store,&iter,0,gmic_entries.size() - 1,1,nentry + (*nentry=='!'),
                              2,tree_view_sort_str(nentry,false).data(),-1);
-          if (!level) {
-            gtk_label_set_markup(GTK_LABEL(markup2ascii),nentry);
-            const char *_nentry = gtk_label_get_text(GTK_LABEL(markup2ascii));
-            unsigned int order = 0;
-            for (unsigned int i = 0; i<3; ++i) { order<<=8; if (*_nentry) order|=cimg::lowercase(*(_nentry++)); }
-          }
           if (!is_testing) ++nb_available_filters;  // Count only non-testing filters.
         }
       }
