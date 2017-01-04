@@ -24635,7 +24635,7 @@ _fx_colorize_lineart_smartcoloring :
       -rm[-3--1]
     -endif
     -if $erode_size -erode[strokes] {2*$erode_size} -endif
-    -area_fg[strokes] 0,1 -ge[strokes] 2
+    -area_fg[strokes] 0,1 -gt[strokes] 4
 
     # Retrieve closed binary shape.
     _keep_keypoints={$-1==0}
