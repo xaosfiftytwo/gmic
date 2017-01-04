@@ -2874,6 +2874,17 @@ void process_image(const char *const command_line, const bool is_apply) {
         message = gtk_message_dialog_new(0,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_OK,"%s",
                                          spt.error_message.data());
       gtk_widget_show(message);
+      CImg<char> dialog_title(64);
+#ifdef gmic_prerelease
+      cimg_snprintf(dialog_title,dialog_title.width(),"%s - %d.%d.%dpre#%s",
+                    t("G'MIC for GIMP"),
+                    gmic_version/100,(gmic_version/10)%10,gmic_version%10,gmic_prerelease);
+#else
+      cimg_snprintf(dialog_title,dialog_title.width(),"%s - %d.%d.%d",
+                    t("G'MIC for GIMP"),
+                    gmic_version/100,(gmic_version/10)%10,gmic_version%10);
+#endif
+      gtk_window_set_title(GTK_WINDOW(message),dialog_title);
       gtk_dialog_run(GTK_DIALOG(message));
       gtk_widget_destroy(message);
     } else {
