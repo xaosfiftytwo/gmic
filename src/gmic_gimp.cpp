@@ -468,10 +468,8 @@ const char *t(const char *const s) {
         "No es possible arribar a aquestes fonts de filtres :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Av\303\255s:</b> Previsualitzaci\303\263 pot ser inexacta\n"
-       "(factor de zoom s'ha modificat)</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Av\303\255s: Previsualitzaci\303\263 pot ser inexacta, factor de zoom s'ha modificat.");
     _t("G'MIC for GIMP","G'MIC per al GIMP");
     _t("<i>Select a filter...</i>","<i>Selecciona un filtre...</i>");
     _t("<i>No parameters to set...</i>","<i>Sense par\303\240metres...</i>");
@@ -533,10 +531,8 @@ const char *t(const char *const s) {
         "Kan deze filters bronnen te bereiken :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Waarschuwing:</b> Voorbeeld mogelijk niet correct\n"
-       "(zoomratio veranderd)﻿</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Waarschuwing: Voorbeeld mogelijk niet correct, zoomratio veranderd.");
     _t("G'MIC for GIMP","G'MIC voor GIMP");
     _t("<i>Select a filter...</i>","<i>Kies een filter...</i>");
     _t("<i>No parameters to set...</i>","<i>Geen parameters nodig...</i>");
@@ -598,10 +594,8 @@ const char *t(const char *const s) {
         "Acc&#232;s impossible aux sources de filtres :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Avertissement:</b> L'aper\303\247u est probablement inexact\n"
-       "(le facteur de zoom a \303\251t\303\251 modifi\303\251)</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Avertissement: L'aper\303\247u est probablement inexact, le facteur de zoom a \303\251t\303\251 modifi\303\251.");
     _t("G'MIC for GIMP","G'MIC pour GIMP");
     _t("<i>Select a filter...</i>","<i>Choisissez un filtre...</i>");
     _t("<i>No parameters to set...</i>","<i>Pas de param&#232;tres...</i>");
@@ -663,10 +657,8 @@ const char *t(const char *const s) {
         "Kann diese Filter Quellen erreichen :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Warnung:</b> Vorschau kann ungenau sein\n"
-       "(Vergr\303\266\303\237erung wurde ver\303\244ndert)﻿</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Warnung: Vorschau kann ungenau sein, vergr\303\266\303\237erung wurde ver\303\244ndert.");
     _t("G'MIC for GIMP","G'MIC f\303\274r GIMP");
     _t("<i>Select a filter...</i>","<i>W\303\244hlen Sie einen Filter...</i>");
     _t("<i>No parameters to set...</i>","<i>Keine w\303\244hlbaren Parameter...</i>");
@@ -728,10 +720,8 @@ const char *t(const char *const s) {
         "Impossibile raggiungere queste fonti filtri :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Attenzione:</b> L'anteprima pu\303\262 essere inaccurata\n"
-       "(il fattore di zoom \303\250 stato modificato)</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Attenzione: L'anteprima pu\303\262 essere inaccurata, il fattore di zoom \303\250 stato modificato.");
     _t("G'MIC for GIMP","G'MIC per GIMP");
     _t("<i>Select a filter...</i>","<i>Sciegliete un Filtro...</i>");
     _t("<i>No parameters to set...</i>","<i>Filtro senza Parametri...</i>");
@@ -798,14 +788,13 @@ const char *t(const char *const s) {
         "\xE3\x81\xBE\xE3\x81\x9B\xE3\x82\x93\xE3\x81\xA7\xE3\x81\x97\xE3\x81\x9F\xE3\x80\x82\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>\xE8\xAD\xA6\xE5\x91\x8A:</b> \xE3\x83\x97\xE3\x83\xAC\xE3\x83\x93\xE3\x83\xA5"
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "\xE8\xAD\xA6\xE5\x91\x8A: \xE3\x83\x97\xE3\x83\xAC\xE3\x83\x93\xE3\x83\xA5"
        "\xE3\x83\xBC\xE3\x81\xAF\xE5\xAE\x9F\xE9\x9A\x9B\xE3\x81\xAE\xE5\xAE\x9F\xE8\xA1\x8C\xE7\xB5\x90\xE6\x9E\x9C"
        "\xE3\x81\xA8\xE7\x95\xB0\xE3\x81\xAA\xE3\x82\x8B\xE5\xA0\xB4\xE5\x90\x88\xE3\x81\x8C\xE3\x81\x82\xE3\x82\x8A"
-       "\xE3\x81\xBE\xE3\x81\x99\n"
-       "(\xE6\x8B\xA1\xE5\xA4\xA7\xE7\x8E\x87\xE3\x81\x8C\xE5\xA4\x89\xE6\x9B\xB4\xE3\x81\x95\xE3\x82\x8C\xE3\x81\xBE"
-       "\xE3\x81\x97\xE3\x81\x9F)</span>");
+       "\xE3\x81\xBE\xE3\x81\x99,"
+       "\xE6\x8B\xA1\xE5\xA4\xA7\xE7\x8E\x87\xE3\x81\x8C\xE5\xA4\x89\xE6\x9B\xB4\xE3\x81\x95\xE3\x82\x8C\xE3\x81\xBE"
+       "\xE3\x81\x97\xE3\x81\x9F.");
     _t("G'MIC for GIMP","G'MIC for GIMP");
     _t("<i>Select a filter...</i>","<i>\xE3\x83\x95\xE3\x82\xA3\xE3\x83\xAB\xE3\x82\xBF\xE3\x82\x92\xE9\x81\xB8\xE6\x8A"
        "\x9E\xE3\x81\x97\xE3\x81\xA6\xE3\x81\x8F\xE3\x81\xA0\xE3\x81\x95\xE3\x81\x84...</i>");
@@ -903,11 +892,9 @@ const char *t(const char *const s) {
         "Brak dost\304\231pu do tych \305\272r\303\263de\305\202 filtr\303\263w :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Uwaga:</b> Podgl\304\205d mo\305\274e si\304\231 r\303\263\305\274ni\304\207 od "
-       "efektu ko\305\204cowego\n"
-       "ze wzgl\304\231du na zmian\304\231 przybli\305\274enia</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Uwaga: Podgl\304\205d mo\305\274e si\304\231 r\303\263\305\274ni\304\207 od "
+       "efektu ko\305\204cowego, ze wzgl\304\231du na zmian\304\231 przybli\305\274enia.");
     _t("G'MIC for GIMP","G'MIC dla GIMP");
     _t("<i>Select a filter...</i>","<i>Wybierz filtr...</i>");
     _t("<i>No parameters to set...</i>","<i>Brak parametr\304\205w do ustawienia...</i>");
@@ -969,11 +956,9 @@ const char *t(const char *const s) {
         "Incapaz de chegar a essas fontes de filtros :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Aten\303\247\303\243o:</b> a pr\303\251-visualiza\303\247\303\243o pode "
-       "estar incorreta\n"
-       "(o fator amplia\303\247\303\243o foi modificado)</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Aten\303\247\303\243o: a pr\303\251-visualiza\303\247\303\243o pode "
+       "estar incorreta, o fator amplia\303\247\303\243o foi modificado.");
     _t("G'MIC for GIMP","G'MIC para o GIMP");
     _t("<i>Select a filter...</i>","<i>Escolha um filtro</i>");
     _t("<i>No parameters to set...</i>","<i>Sem par\303\242metros para configurar...</i>");
@@ -1035,10 +1020,8 @@ const char *t(const char *const s) {
         "Nije mogu\304\207e dospeti do izvorne lokacije ovih filtera :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Upozorenje :</b> Pregled mo\305\276e biti neta\304\215na\n"
-       "( zum faktor je modifikovan )</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Upozorenje : Pregled mo\305\276e biti neta\304\215na, zum faktor je modifikovan.");
     _t("G'MIC for GIMP","G'MIC za GIMP");
     _t("<i>Select a filter...</i>","<i>Izaberite filter...</i>");
     _t("<i>No parameters to set...</i>","<i>Nema parametara za pode\305\241avanje...</i>");
@@ -1100,10 +1083,8 @@ const char *t(const char *const s) {
         "No es posible acceder a estas fuentes de filtros :\n";
       return ns;
     }
-    _t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-       "(zoom factor has been modified)</span>",
-       "\n<span color=\"#AA0000\"><b>Advertencia:</b> La vista previa puede ser inexacta\n"
-       "(el factor de zoom ha sido modificado)</span>");
+    _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
+       "Advertencia: La vista previa puede ser inexacta, el factor de zoom ha sido modificado.");
     _t("G'MIC for GIMP","G'MIC para GIMP");
     _t("<i>Select a filter...</i>","<i>Selecciona un filtro...</i>");
     _t("<i>No parameters to set...</i>","<i>Sin par\303\241metros...</i>");
@@ -2173,28 +2154,45 @@ void _gimp_preview_invalidate() {
     GtkWidget *const preview_button = child1->widget;
     g_signal_connect(preview_button,"toggled",G_CALLBACK(on_preview_button_changed),0);
 
-    // Add 'reset zoom' button.
     GList *const children2 = children1->next;
     GtkBoxChild *const child2 = (GtkBoxChild*)children2->data;
-    GtkWidget
-      *const zoom_buttons = child2->widget,
-      *const reset_zoom_button = gtk_button_new();
+    GtkWidget *const preview_buttons = child2->widget;
+
+    // Add zoom warning icon.
+    static const CImg<unsigned char> preview_warning =
+      CImgList<unsigned char>::get_unserialize(CImg<unsigned char>(data_gmic_preview_warning,
+                                                                   1,size_data_gmic_preview_warning,1,1,true))[0].
+      permute_axes("cxyz");
+    const unsigned int
+      preview_warning_width = preview_warning._height,
+      preview_warning_height = preview_warning._depth;
+    GdkPixbuf *const preview_warning_pixbuf = gdk_pixbuf_new_from_data(preview_warning,GDK_COLORSPACE_RGB,
+                                                                       true,8,
+                                                                       preview_warning_width,
+                                                                       preview_warning_height,
+                                                                       4*preview_warning_width,0,0);
+    gui_preview_warning = gtk_image_new_from_pixbuf(preview_warning_pixbuf);
+    gtk_widget_set_tooltip_text(gui_preview_warning,
+                                t("Warning: Preview may be inaccurate, default zoom factor has been modified."));
+    gtk_box_pack_start(GTK_BOX(preview_buttons),gui_preview_warning,false,false,0);
+
+    // Add 'reset zoom' button.
+    GtkWidget *const reset_zoom_button = gtk_button_new();
     reset_zoom_stock = gtk_button_new_from_stock(GTK_STOCK_REFRESH);
     GtkWidget *const reset_zoom_image = gtk_button_get_image(GTK_BUTTON(reset_zoom_stock));
     gtk_button_set_image(GTK_BUTTON(reset_zoom_button),reset_zoom_image);
     gtk_widget_show(reset_zoom_button);
-    gtk_box_pack_start(GTK_BOX(zoom_buttons),reset_zoom_button,false,false,0);
+    gtk_box_pack_start(GTK_BOX(preview_buttons),reset_zoom_button,false,false,0);
     gtk_widget_set_tooltip_text(reset_zoom_button,t("Reset zoom"));
     g_signal_connect(reset_zoom_button,"clicked",G_CALLBACK(on_dialog_reset_zoom_button_clicked),0);
 
     // Add 'preview side' button.
-    GtkWidget
-      *const preview_side_button = gtk_button_new();
+    GtkWidget *const preview_side_button = gtk_button_new();
     preview_side_stock = gtk_button_new_from_stock(get_preview_side()?GTK_STOCK_GO_BACK:GTK_STOCK_GO_FORWARD);
     GtkWidget *const preview_side_image = gtk_button_get_image(GTK_BUTTON(preview_side_stock));
     gtk_button_set_image(GTK_BUTTON(preview_side_button),preview_side_image);
     gtk_widget_show(preview_side_button);
-    gtk_box_pack_start(GTK_BOX(zoom_buttons),preview_side_button,false,false,0);
+    gtk_box_pack_start(GTK_BOX(preview_buttons),preview_side_button,false,false,0);
     g_signal_connect(preview_side_button,"clicked",G_CALLBACK(on_dialog_preview_side_button_clicked),0);
 
     gtk_widget_show(gui_preview);
@@ -4002,12 +4000,12 @@ void create_parameters_gui(const bool reset_params) {
     }
 
     // Add preview warning message (initially hidden).
-    gui_preview_warning = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(gui_preview_warning),
-                         t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-                           "(zoom factor has been modified)</span>"));
-    gtk_table_attach(GTK_TABLE(table),gui_preview_warning,0,3,(int)current_table_line,(int)current_table_line + 1,
-                     (GtkAttachOptions)(GTK_EXPAND | GTK_FILL),GTK_SHRINK,0,0);
+    // gui_preview_warning = gtk_label_new(NULL);
+    // gtk_label_set_markup(GTK_LABEL(gui_preview_warning),
+    //                      t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
+    //                        "(zoom factor has been modified)</span>"));
+    // gtk_table_attach(GTK_TABLE(table),gui_preview_warning,0,3,(int)current_table_line,(int)current_table_line + 1,
+    //                  (GtkAttachOptions)(GTK_EXPAND | GTK_FILL),GTK_SHRINK,0,0);
   }
 
   gtk_container_add(GTK_CONTAINER(param_frame),table);
@@ -4105,9 +4103,6 @@ void create_dialog_gui(const bool preview_on_right) {
                               "CNRS (http://www.cnrs.fr)\n"
                               "Normandy University (http://www.normandie-univ.fr)\n"
                               "ENSICAEN (http://www.ensicaen.fr)");
-  // GtkWidget *const image_but = gtk_link_button_new_with_label("http://gmic.eu","");
-  // gtk_widget_show(image_but);
-  // gtk_button_set_image(GTK_BUTTON(image_but),image); // Doesn't display image on Windows...
   gtk_widget_show(image);
   gtk_container_add(GTK_CONTAINER(image_align),image);
 
