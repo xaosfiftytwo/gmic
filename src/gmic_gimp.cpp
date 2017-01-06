@@ -1221,7 +1221,7 @@ void flush_tree_view(GtkWidget *const tree_view) {
     gtk_tree_selection_select_path(selection,path);
     gtk_tree_path_free(path);
   }
-  if (indice_faves<gmic_entries.size()) { // Always shows 'Faves' folder when available.
+  if (indice_faves<gmic_entries.size()) { // Always expand 'Faves' folder when available.
     GtkTreePath *path = gtk_tree_path_new_from_string(gmic_1stlevel_entries[0].data());
     gtk_tree_view_expand_row(GTK_TREE_VIEW(tree_view),path,false);
     gtk_tree_path_free(path);

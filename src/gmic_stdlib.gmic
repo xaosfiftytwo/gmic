@@ -23874,8 +23874,8 @@ fx_illustration_look :
 
     # Order and set layer properties.
     -mv[detail_layer] 0 -nm[detail_layer] "name("$nm" [Detail]),mode(grainmerge),opacity(100)"
-    -mv[graphicnovel_layer] 1 -nm[graphicnovel_layer] "name("$nm" [Graphic novel]),mode(normal),opacity(50)"
-    -mv[blur_layer] 2 -nm[blur_layer] "name("$nm" [Simple local contrast]),mode(normal),opacity(100)"
+    -mv[graphicnovel_layer] 1 -nm[graphicnovel_layer] "name("$nm" [Paint]),mode(normal),opacity(50)"
+    -mv[blur_layer] 2 -nm[blur_layer] "name("$nm" [Base]),mode(normal),opacity(100)"
     -rm[base_layer]
 
     -if {!$4} -gui_merge_layers -nm "name("$nm"),mode(normal),opacity(100)" -endif
