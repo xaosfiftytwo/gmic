@@ -2175,6 +2175,7 @@ void _gimp_preview_invalidate() {
     gtk_widget_set_tooltip_text(gui_preview_warning,
                                 t("Warning: Preview may be inaccurate, default zoom factor has been modified."));
     gtk_box_pack_start(GTK_BOX(preview_buttons),gui_preview_warning,false,false,0);
+    gtk_box_reorder_child(GTK_BOX(preview_buttons),gui_preview_warning,0);
 
     // Add 'reset zoom' button.
     GtkWidget *const reset_zoom_button = gtk_button_new();
@@ -3998,16 +3999,7 @@ void create_parameters_gui(const bool reset_params) {
       }
       set_filter_nbparams(filter,current_argument);
     }
-
-    // Add preview warning message (initially hidden).
-    // gui_preview_warning = gtk_label_new(NULL);
-    // gtk_label_set_markup(GTK_LABEL(gui_preview_warning),
-    //                      t("\n<span color=\"#AA0000\"><b>Warning:</b> Preview may be inaccurate\n"
-    //                        "(zoom factor has been modified)</span>"));
-    // gtk_table_attach(GTK_TABLE(table),gui_preview_warning,0,3,(int)current_table_line,(int)current_table_line + 1,
-    //                  (GtkAttachOptions)(GTK_EXPAND | GTK_FILL),GTK_SHRINK,0,0);
   }
-
   gtk_container_add(GTK_CONTAINER(param_frame),table);
 
   // Take care of the size of the parameter table.
