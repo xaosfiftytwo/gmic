@@ -1179,7 +1179,7 @@ gint tree_view_sort_func(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gp
 CImg<char> tree_view_sort_str(const char *str, const bool is_folder) {
   CImg<char> res;
   if (!str || !*str) return CImg<char>::string("");
-  const char c = *str=='!'?'!':is_folder?'#':0;
+  const char c = *str=='!'?'!':is_folder?'$':0;
   if (*str=='!') ++str;
   while (str[0]=='<' && str[1] && str[2]=='>') str+=3;
   if (!c) return CImg<char>::string(str,true,true);
@@ -1417,7 +1417,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   std::FILE *file_gmic_faves = std::fopen(filename_gmic_faves,"rb");
   if (file_gmic_faves) {
     gtk_tree_store_append(tree_view_store,&fave_iter,0);
-    gtk_tree_store_set(tree_view_store,&fave_iter,0,0,1,"<b>Faves</b>",2,"",-1);
+    gtk_tree_store_set(tree_view_store,&fave_iter,0,0,1,"<b>Faves</b>",2,"#",-1);
     const char *treepath = gtk_tree_model_get_string_from_iter(GTK_TREE_MODEL(tree_view_store),&fave_iter);
     CImg<char>::vector(0).move_to(gmic_1stlevel_names);
     CImg<char>::string(treepath).move_to(gmic_1stlevel_entries);
