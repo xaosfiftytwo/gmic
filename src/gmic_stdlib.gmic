@@ -10805,7 +10805,7 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
 
       -f[keycoords] ">"$edgel_lib"
         for_segment(code) = for (t = 0, t<=tmax, ++t,
-          P = round(S + t*NS);
+          P = round(S + t*ST/tmax0);
           code#;
         );
 
@@ -10816,7 +10816,8 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
           is_cond = 0;
           current_val = 0;
           nb_switches = 0;
-          tmax = "$segment_distmax";
+          ST = round(NS*"$segment_distmax");
+          tmax0 = tmax = max(abs(ST));
           for_segment(
             if (i(#"$new_strokes",P,0,0)!=current_val, ++nb_switches; current_val=1 - current_val);
             if (nb_switches==2,is_cond = 1; break(););
