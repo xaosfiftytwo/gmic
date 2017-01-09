@@ -596,7 +596,8 @@ const char *t(const char *const s) {
       return ns;
     }
     _t("Warning: Preview may be inaccurate, default zoom factor has been modified.",
-       "Avertissement: L'aper\303\247u est probablement inexact, le facteur de zoom a \303\251t\303\251 modifi\303\251.");
+       "Avertissement: L'aper\303\247u est probablement inexact, le facteur de zoom a "
+       "\303\251t\303\251 modifi\303\251.");
     _t("G'MIC for GIMP","G'MIC pour GIMP");
     _t("<i>Select a filter...</i>","<i>Choisissez un filtre...</i>");
     _t("<i>No parameters to set...</i>","<i>Pas de param&#232;tres...</i>");
