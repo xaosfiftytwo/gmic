@@ -99,6 +99,7 @@ std::FILE *logfile = 0;                        // The log file if any.
 void *p_spt = 0;                               // A pointer to the current running G'MIC thread if any (or 0).
 GimpRunMode run_mode;                          // Run-mode used to call the plug-in.
 GtkTreeStore *tree_view_store = 0;             // The list of the filters as a GtkTreeView model.
+GtkTreeIter fave_iter;                         // The tree iter corresponding to the 'Faves' category.
 GtkWidget *dialog_window = 0;                  // The plug-in dialog window.
 GtkWidget *gui_preview = 0;                    // The preview window.
 GtkWidget *gui_preview_warning = 0;            // Warning label displaying for unaccurate preview.
@@ -1203,9 +1204,11 @@ void flush_tree_view(GtkWidget *const tree_view) {
     gtk_tree_path_free(path);
   }
   if (indice_faves<gmic_entries.size()) { // Always expand 'Faves' folder when available.
-    GtkTreePath *path = gtk_tree_path_new_from_string(gmic_1stlevel_entries[0].data());
+    char *const s_path = gtk_tree_model_get_string_from_iter(GTK_TREE_MODEL(tree_view_store),&fave_iter);
+    GtkTreePath *path = gtk_tree_path_new_from_string(s_path);
     gtk_tree_view_expand_row(GTK_TREE_VIEW(tree_view),path,false);
     gtk_tree_path_free(path);
+    g_free(s_path);
   }
   if (tree_mode_stock) gtk_widget_destroy(tree_mode_stock);
   tree_mode_stock = gtk_button_new_from_stock(tree_mode?GTK_STOCK_ZOOM_OUT:GTK_STOCK_ZOOM_IN);
@@ -1390,7 +1393,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
 
   // Add fave folder if necessary (make it before actually adding faves to make tree paths valids).
   CImgList<char> gmic_1stlevel_names;
-  GtkTreeIter iter, fave_iter, parent[8];
+  GtkTreeIter iter, parent[8];
   CImg<char> filename_gmic_faves(1024);
   tree_view_store = gtk_tree_store_new(3,G_TYPE_UINT,G_TYPE_STRING,G_TYPE_STRING);
   cimg_snprintf(filename_gmic_faves,filename_gmic_faves.width(),"%sgimp_faves",
