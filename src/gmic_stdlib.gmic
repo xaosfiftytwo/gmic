@@ -10740,10 +10740,11 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
             if (is_cond,
 
               # Check that the new spline did not create small closed regions.
-              const area_threshold = "$area_min";
-              const max_edgels = 2*(area_threshold + 1);
+              const area_max_threshold = "$area_min";
+              const area_min_threshold = 5;
+              const max_edgels = 2*(area_max_threshold + 1);
 
-              if (area_threshold<=0,
+              if (area_max_threshold<=0,
                 for_spline(i(#"$new_strokes",P)=1);
               , #else
                 for_spline(i(#"$new_strokes",P)|=2);
@@ -10751,22 +10752,22 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
                   if (i(#"$new_strokes",P[0] + 1,P[1])==0,
                     edgels = area = 0; Q0 = Q = [ P[0] + 1,P[1],2 ];
                     dowhile(i(#"$new_strokes",Q[0],Q[1]) = 4; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next2(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                    if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                    if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                   );
                   if (i(#"$new_strokes",P[0],P[1] + 1)==0,
                     edgels = area = 0; Q0 = Q = [ P[0],P[1] + 1,3 ];
                     dowhile(i(#"$new_strokes",Q[0],Q[1]) = 4; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next2(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                    if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                    if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                   );
                   if (i(#"$new_strokes",P[0] - 1,P[1])==0,
                     edgels = area = 0; Q0 = Q = [ P[0] - 1,P[1],0 ];
                     dowhile(i(#"$new_strokes",Q[0],Q[1]) = 4; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next2(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                    if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                    if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                   );
                   if (i(#"$new_strokes",P[0],P[1] - 1)==0,
                     edgels = area = 0; Q0 = Q = [ P[0],P[1] - 1,1 ];
                     dowhile(i(#"$new_strokes",Q[0],Q[1]) = 4; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next2(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                    if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                    if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                   );
                 0);
 
@@ -10828,9 +10829,10 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
           if (is_cond,
 
             # Check that the new segment did not create small closed regions.
-            const area_threshold = "$area_min";
-            const max_edgels = 2*(area_threshold + 1);
-            if (area_threshold<=0,
+            const area_max_threshold = "$area_min";
+            const area_min_threshold = 5;
+            const max_edgels = 2*(area_max_threshold + 1);
+            if (area_max_threshold<=0,
               for_segment(i(#"$new_strokes",P)=0);
             , #else
               for_segment(i(#"$new_strokes",P)|=4);
@@ -10839,22 +10841,22 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
                 if (i(#"$new_strokes",P[0] + 1,P[1])==1,
                   edgels = area = 0; Q0 = Q = [ P[0] + 1,P[1],2 ];
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 2; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                  if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                  if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                 );
                 if (i(#"$new_strokes",P[0],P[1] + 1)==1,
                   edgels = area = 0; Q0 = Q = [ P[0],P[1] + 1,3 ];
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 2; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                  if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                  if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                 );
                 if (i(#"$new_strokes",P[0] - 1,P[1])==1,
                   edgels = area = 0; Q0 = Q = [ P[0] - 1,P[1],0 ];
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 2; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                  if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                  if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                 );
                 if (i(#"$new_strokes",P[0],P[1] - 1)==1,
                   edgels = area = 0; Q0 = Q = [ P[0],P[1] - 1,1 ];
                   dowhile(i(#"$new_strokes",Q[0],Q[1]) = 2; area+=(Q[2]&1?0:1-Q[2])*(Q[0]+!Q[2]); Q = next3(#"$new_strokes",Q), Q!=Q0 && ++edgels<=max_edgels);
-                  if (edgels<=max_edgels && area>4 && area<area_threshold, is_cond = 0; break());
+                  if (edgels<=max_edgels && area>=area_min_threshold && area<area_max_threshold, is_cond = 0; break());
                 );
               0);
 
