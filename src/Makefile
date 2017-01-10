@@ -61,7 +61,8 @@ PIC = -fPIC
 EXE =
 WGET = wget --no-check-certificate --quiet -O
 PLUGINDIR = `gimptool-2.0 --gimpplugindir`/plug-ins
-VERSION = `grep 'gmic_version\ ' gmic.h | tail -c 4`
+VERSION = `grep 'gmic_version\ ' gmic.h | tail -c 4 | head -c 3`
+VERSION1 = `grep 'gmic_version\ ' gmic.h | tail -c 4 | head -c 1`
 
 ifeq ($(OS),Linux)
 OS = Unix
@@ -519,7 +520,6 @@ else
 	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 endif
 	$(STRIP) gmic_gimp$(VERSION)$(EXE)
-	@ln -s gmic_gimp$(VERSION)$(EXE) gmic_gimp$(EXE)
 
 # gmic
 gmic: gmic.cpp gmic.h gmic_stdlib.h CImg.h
@@ -627,14 +627,14 @@ install:
 ifneq ($(OS),Darwin)
 	mkdir -p $(DESTDIR)$(USR)/share
 	mkdir -p $(DESTDIR)$(USR)/$(LIB)
-	cp -f libgmic.so $(DESTDIR)$(USR)/$(LIB)/libgmic.so._gmic_versio3
-	ln -fs libgmic.so._gmic_versio3 $(DESTDIR)$(USR)/$(LIB)/libgmic.so._gmic_versio1
-	ln -fs libgmic.so._gmic_versio1 $(DESTDIR)$(USR)/$(LIB)/libgmic.so
+	cp -f libgmic.so $(DESTDIR)$(USR)/$(LIB)/libgmic.so.$(VERSION)
+	ln -fs libgmic.so.$(VERSION) $(DESTDIR)$(USR)/$(LIB)/libgmic.so.$(VERSION1)
+	ln -fs libgmic.so.$(VERSION1) $(DESTDIR)$(USR)/$(LIB)/libgmic.so
 	@if [ -f libcgmic.so ]; then \
 	  cp -f gmic_libc.h $(DESTDIR)$(USR)/$(INCLUDE)/; \
-	  cp -f libcgmic.so $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio3; \
-          ln -fs libcgmic.so._gmic_versio3 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio1 ; \
-          ln -fs libcgmic.so._gmic_versio1 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so; \
+	  cp -f libcgmic.so $(DESTDIR)$(USR)/$(LIB)/libcgmic.so.$(VERSION); \
+          ln -fs libcgmic.so.$(VERSION) $(DESTDIR)$(USR)/$(LIB)/libcgmic.so.$(VERSION1) ; \
+          ln -fs libcgmic.so.$(VERSION1) $(DESTDIR)$(USR)/$(LIB)/libcgmic.so; \
         fi
 	@if [ -f ../zart/zart ]; then \
 	  cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/; \
@@ -652,11 +652,11 @@ uninstall:
 	rm -f $(DESTDIR)$(USR)/$(BIN)/gmic
 	rm -f $(DESTDIR)$(USR)/$(BIN)/zart
 	rm -f $(DESTDIR)$(USR)/$(INCLUDE)/gmic.h
-	rm -f $(DESTDIR)$(USR)/$(LIB)/libgmic.so._gmic_versio3
-	rm -f $(DESTDIR)$(USR)/$(LIB)/libgmic.so._gmic_versio1
+	rm -f $(DESTDIR)$(USR)/$(LIB)/libgmic.so.$(VERSION)
+	rm -f $(DESTDIR)$(USR)/$(LIB)/libgmic.so.$(VERSION1)
 	rm -f $(DESTDIR)$(USR)/$(LIB)/libgmic.so
-	rm -f $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio3
-	rm -f $(DESTDIR)$(USR)/$(LIB)/libcgmic.so._gmic_versio1
+	rm -f $(DESTDIR)$(USR)/$(LIB)/libcgmic.so.$(VERSION)
+	rm -f $(DESTDIR)$(USR)/$(LIB)/libcgmic.so.$(VERSION1)
 	rm -f $(DESTDIR)$(USR)/$(LIB)/libcgmic$(SO)
 	rm -rf $(DESTDIR)$(USR)/share/doc/gmic/
 	rm -f $(DESTDIR)$(USR)/share/man/man1/gmic.1.gz
@@ -665,7 +665,7 @@ uninstall:
 distclean: clean
 
 clean:
-	rm -rf CImg.h gmic_stdlib.h gmic$(EXE) gmic_gimp$(VERSION)$(EXE) gmic_gimp$(EXE) use_libgmic$(EXE) use_libcgmic$(EXE) use_libcgmic_static$(EXE) gmic*.o libgmic* libcgmic* *~
+	rm -rf CImg.h gmic_stdlib.h gmic$(EXE) gmic_gimp$(VERSION)$(EXE) use_libgmic$(EXE) use_libcgmic$(EXE) use_libcgmic_static$(EXE) gmic*.o libgmic* libcgmic* *~
 	@if [ -h ../zart ]; then rm -f ../zart; fi
 	@if [ -h gmic_libc.h ]; then rm -f gmic_libc.h; fi
 	@if [ -h gmic_libc.cpp ]; then rm -f gmic_libc.cpp; fi
