@@ -519,6 +519,7 @@ else
 	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 endif
 	$(STRIP) gmic_gimp$(VERSION)$(EXE)
+	@ln -s gmic_gimp$(VERSION)$(EXE) gmic_gimp
 
 # gmic
 gmic: gmic.cpp gmic.h gmic_stdlib.h CImg.h
