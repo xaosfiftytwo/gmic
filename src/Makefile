@@ -643,10 +643,20 @@ endif
 	mkdir -p $(DESTDIR)$(USR)/share/man/
 	mkdir -p $(DESTDIR)$(USR)/share/man/man1/
 	mkdir -p $(DESTDIR)$(USR)/share/man/fr/man1/
-	cp -f ../man/gmic.1.gz $(DESTDIR)$(USR)/share/man/man1/gmic.1.gz
-	cp -f ../man/gmic.1.gz $(DESTDIR)$(USR)/share/man/fr/man1/gmic.1.gz
-	if [ -d /etc/bash_completion.d/ ]; then mkdir -p $(DESTDIR)/etc/bash_completion.d/; cp -f ../resources/gmic_bashcompletion.sh $(DESTDIR)/etc/bash_completion.d/gmic; fi
-	if [ -d /opt/local/etc/bash_completion.d/ ]; then mkdir -p $(DESTDIR)/opt/local/etc/bash_completion.d/; cp -f ../resources/gmic_bashcompletion.sh $(DESTDIR)/opt/local/etc/bash_completion.d/gmic; fi
+	@if [ -f ../man.gmic.1.gz ]; then \
+	  cp -f ../man/gmic.1.gz $(DESTDIR)$(USR)/share/man/man1/gmic.1.gz; \
+	  cp -f ../man/gmic.1.gz $(DESTDIR)$(USR)/share/man/fr/man1/gmic.1.gz; \
+	fi
+	@if [ -f ../resources/gmic_bashcompletion.sh ]; then \
+	  if [ -d /etc/bash_completion.d/ ]; then \
+	    mkdir -p $(DESTDIR)/etc/bash_completion.d/; \
+            cp -f ../resources/gmic_bashcompletion.sh $(DESTDIR)/etc/bash_completion.d/gmic; \
+	  fi; \
+	  if [ -d /opt/local/etc/bash_completion.d/ ]; then \
+            mkdir -p $(DESTDIR)/opt/local/etc/bash_completion.d/; \
+            cp -f ../resources/gmic_bashcompletion.sh $(DESTDIR)/opt/local/etc/bash_completion.d/gmic; \
+          fi; \
+        fi
 
 uninstall:
 	rm -f $(DESTDIR)$(USR)/$(BIN)/gmic
