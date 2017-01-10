@@ -289,7 +289,7 @@ endif
 
 # CLI interface: Static build.
 #-----------------------------
-GMIC_STATIC_CLI_PATH = $(USR)/${LIB}/x86_64-linux-gnu
+GMIC_STATIC_CLI_PATH = $(USR)/$(LIB)/x86_64-linux-gnu
 GMIC_STATIC_CLI_EXTRA =
 GMIC_STATIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(ZLIB_CFLAGS) $(FFTW_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) -Dcimg_display=0
 GMIC_STATIC_CLI_LIBS = $(PARALLEL_LIBS) \
@@ -519,7 +519,7 @@ else
 	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 endif
 	$(STRIP) gmic_gimp$(VERSION)$(EXE)
-	@ln -s gmic_gimp$(VERSION)$(EXE) gmic_gimp
+	@ln -s gmic_gimp$(VERSION)$(EXE) gmic_gimp$(EXE)
 
 # gmic
 gmic: gmic.cpp gmic.h gmic_stdlib.h CImg.h
@@ -616,7 +616,7 @@ man:
 # Install/uninstall/clean procedures.
 install:
 	mkdir -p $(DESTDIR)$(PLUGINDIR)/
-	cp -f gmic_gimp $(DESTDIR)$(PLUGINDIR)/
+	cp -f gmic_gimp$(VERSION) $(DESTDIR)$(PLUGINDIR)/
 	cp -f ../resources/gmic_film_cluts.gmz $(DESTDIR)$(PLUGINDIR)/
 	mkdir -p $(DESTDIR)$(USR)/$(BIN)/
 	cp -f gmic $(DESTDIR)$(USR)/$(BIN)/
@@ -665,7 +665,7 @@ uninstall:
 distclean: clean
 
 clean:
-	rm -rf CImg.h gmic_stdlib.h gmic$(EXE) gmic_gimp$(EXE) use_libgmic$(EXE) use_libcgmic$(EXE) use_libcgmic_static$(EXE) gmic*.o libgmic* libcgmic* *~
+	rm -rf CImg.h gmic_stdlib.h gmic$(EXE) gmic_gimp$(VERSION)$(EXE) gmic_gimp$(EXE) use_libgmic$(EXE) use_libcgmic$(EXE) use_libcgmic_static$(EXE) gmic*.o libgmic* libcgmic* *~
 	@if [ -h ../zart ]; then rm -f ../zart; fi
 	@if [ -h gmic_libc.h ]; then rm -f gmic_libc.h; fi
 	@if [ -h gmic_libc.cpp ]; then rm -f gmic_libc.cpp; fi
