@@ -4487,24 +4487,6 @@ void gmic_query() {
 
   set_locale();
 
-/*
-  gimp_install_procedure("plug-in-gmic",             // name
-                         "G'MIC",                    // blurb
-                         "G'MIC",                    // help
-                         "David Tschumperl\303\251", // author
-                         "David Tschumperl\303\251", // copyright
-                         "2015",                     // date
-                         "_G'MIC...",                // menu_path
-                         "RGB*, GRAY*",              // image_types
-                         GIMP_PLUGIN,                // type
-                         G_N_ELEMENTS(args),         // nparams
-                         0,                          // nreturn_vals
-                         args,                       // params
-                         0);                         // return_vals
-
-  gimp_plugin_menu_register("plug-in-gmic", "<Image>/Filters");
-*/
-
   CImg<char> name(64), blurb(64), path(64);
   cimg_snprintf(name,name.width(),"plug-in-gmic%u",gmic_version);
   cimg_snprintf(blurb,blurb.width(),"G'MIC %u.%u.%u",
@@ -4531,7 +4513,6 @@ void gmic_query() {
                          0);                 // return_vals
 
   gimp_plugin_menu_register(name.data(), "<Image>/Filters");
-
 }
 
 GimpPlugInInfo PLUG_IN_INFO = { 0, 0, gmic_query, gmic_run };
