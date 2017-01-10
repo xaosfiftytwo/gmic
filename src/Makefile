@@ -61,6 +61,7 @@ PIC = -fPIC
 EXE =
 WGET = wget --no-check-certificate --quiet -O
 PLUGINDIR = `gimptool-2.0 --gimpplugindir`/plug-ins
+VERSION = `grep 'gmic_version\ ' gmic.h | tail -c 4`
 
 ifeq ($(OS),Linux)
 OS = Unix
@@ -510,14 +511,14 @@ gmic_gimp.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 gmic_gimp: gmic_gimp.o gmic_gimp.cpp
 ifeq ($(OS),Darwin)
 ifeq (,$(wildcard /tmp/skl))
-	$(CXX) -o gmic_gimp gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
+	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 else
-	$(CXX) -o gmic_gimp gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` $(subst -L/opt/local,-L/tmp/skl/Gimp.app/Contents/Resources,$(shell gimptool-2.0$(EXE) --libs) $(CFLAGS) $(LIBS))
+	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` $(subst -L/opt/local,-L/tmp/skl/Gimp.app/Contents/Resources,$(shell gimptool-2.0$(EXE) --libs) $(CFLAGS) $(LIBS))
 endif
 else
-	$(CXX) -o gmic_gimp gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
+	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 endif
-	$(STRIP) gmic_gimp$(EXE)
+	$(STRIP) gmic_gimp$(VERSION)$(EXE)
 
 # gmic
 gmic: gmic.cpp gmic.h gmic_stdlib.h CImg.h
