@@ -4488,7 +4488,7 @@ void gmic_query() {
   set_locale();
 
   CImg<char> name(64), blurb(64), path(64);
-  cimg_snprintf(name,name.width(),"plug-in-gmic%u",gmic_version);
+  cimg_snprintf(name,name.width(),"plug-in-gmic%u%u",gmic_version/100,(gmic_version/10)%10);
   cimg_snprintf(blurb,blurb.width(),"G'MIC %u.%u.%u",
                 gmic_version/100,
                 (gmic_version/10)%10,
