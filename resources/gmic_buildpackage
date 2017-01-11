@@ -86,8 +86,8 @@ if [ "$OSTYPE" == "msys" ]; then
             OUTINST=gmic_gimp_${VERSION}${SUFFIX}_win64.exe &&
             rm -rf ${OUTDIR1} ${OUTDIR2} ${OUTZIP1} ${OUTZIP2} ${OUTINST} &&
             sed s\/XXX\/${VERSION}${SUFFIX}\/g /e/work/src/gmic/resources/gmic_gimp64.iss > tmp1.iss &&
-            sed s\/YYY\/${SVERSION}\/g tmp1.iss > tmp.iss
-            cd gmic-src && make clean && rm -f gmic gmic_gimp$SVERSION *.o && \
+            sed s\/YYY\/${RELEASE1}\/g tmp1.iss > tmp.iss
+            cd gmic-src && make clean && rm -f gmic gmic_gimp$RELEASE1 *.o && \
             make OPT_CFLAGS="-O3 -m64 -mtune=generic" cli gimp libc libcstatic
     else
         if [ -f is_64bits ]; then
@@ -101,8 +101,8 @@ if [ "$OSTYPE" == "msys" ]; then
                 OUTINST=gmic_gimp_${VERSION}${SUFFIX}_win64.exe &&
                 rm -rf ${OUTDIR1} ${OUTDIR2} ${OUTZIP1} ${OUTZIP2} ${OUTINST} &&
                 sed s\/XXX\/${VERSION}${SUFFIX}\/g /e/work/src/gmic/resources/gmic_gimp64.iss > tmp1.iss &&
-                sed s\/YYY\/${SVERSION}\/g tmp1.iss > tmp.iss
-                cd gmic-src && make clean && rm -f gmic gmic_gimp$SVERSION *.o && \
+                sed s\/YYY\/${RELEASE1}\/g tmp1.iss > tmp.iss
+                cd gmic-src && make clean && rm -f gmic gmic_gimp$RELEASE1 *.o && \
                 make CC="g++ -I/mingw/include -I/env/gcc492/mingw32/include -I/env/gcc492/mingw32/i686-w64-mingw32/include -I/opencv/include -I/opencv/include/opencv -I/opencv/include/opencv2" \
                      MANDATORY_LIBS+="-L/env/gcc492/mingw32/lib -L/env/gcc492/mingw32/i686-w64-mingw32/lib -L/mingw/lib -lz" \
                      OPT_CFLAGS="-O3 -m64 -mtune=generic" \
@@ -119,8 +119,8 @@ if [ "$OSTYPE" == "msys" ]; then
                 OUTINST=gmic_gimp_${VERSION}${SUFFIX}_win32.exe &&
                 rm -rf ${OUTDIR1} ${OUTDIR2} ${OUTZIP1} ${OUTZIP2} ${OUTINST} &&
                 sed s\/XXX\/${VERSION}${SUFFIX}\/g /e/work/src/gmic/resources/gmic_gimp32.iss > tmp1.iss &&
-                sed s\/YYY\/${SVERSION}\/g tmp1.iss > tmp.iss
-                cd gmic-src && make clean && rm -f gmic gmic_gimp$SVERSION *.o && \
+                sed s\/YYY\/${RELEASE1}\/g tmp1.iss > tmp.iss
+                cd gmic-src && make clean && rm -f gmic gmic_gimp$RELEASE1 *.o && \
                 make CC="g++ -I/mingw/include -I/env/gcc492/mingw32/include -I/env/gcc492/mingw32/i686-w64-mingw32/include -I/opencv/include -I/opencv/include/opencv -I/opencv/include/opencv2" \
                      MANDATORY_LIBS+="-L/env/gcc492/mingw32/lib -L/env/gcc492/mingw32/i686-w64-mingw32/lib -L/mingw/lib -lz" \
                      OPT_CFLAGS="-O3 -march=i686 -mtune=generic" \
@@ -128,9 +128,9 @@ if [ "$OSTYPE" == "msys" ]; then
 
         fi
     fi
-    cp -f gmic_gimp$SVERSION.exe ../gmic-gimp-build/ &&
-#        cp -f gmic_gimp$SVERSION.exe gmic.exe libcgmic.dll libcgmic.def libcgmicstatic.dll libcgmicstatic.def ../gmic-build/ &&
-        cp -f gmic_gimp$SVERSION.exe gmic.exe libcgmic.dll libcgmic.def ../gmic-build/ &&
+    cp -f gmic_gimp$RELEASE1.exe ../gmic-gimp-build/ &&
+#        cp -f gmic_gimp$RELEASE1.exe gmic.exe libcgmic.dll libcgmic.def libcgmicstatic.dll libcgmicstatic.def ../gmic-build/ &&
+        cp -f gmic_gimp$RELEASE1.exe gmic.exe libcgmic.dll libcgmic.def ../gmic-build/ &&
         cd .. &&
 
         # Construct full G'MIC binary archive.
@@ -200,11 +200,11 @@ if [ "$DIST" != "Ubuntu 16.04.1 LTS" ] || [ "$BITS" != "x86_64" ] ; then
     mv ../gmic_${VERSION}_${ARCH}.deb ../$PAK
 
     if [ "$CODENAME" == "ubuntu_yakkety" ]; then
-        zip -j -r -9 ../$PLU2 src/gmic_gimp$SVERSION README &&
+        zip -j -r -9 ../$PLU2 src/gmic_gimp$RELEASE1 README &&
             cd .. &&
             cp -f $PLU2 $PAK $SF_HOME/work/src/
     elif [ "$CODENAME" == "debian_wheezy" ]; then
-        zip -j -r -9 ../$PLU src/gmic_gimp$SVERSION README &&
+        zip -j -r -9 ../$PLU src/gmic_gimp$RELEASE1 README &&
             cd src && make clean && make GMIC_STATIC_CLI_PATH=/usr/lib/${PARCH}-linux-gnu static && mv gmic ../ &&
             cd .. && rm -rf man src zart debian && cd .. &&
             zip -j -r -9 $STA $DIR &&

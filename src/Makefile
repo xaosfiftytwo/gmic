@@ -512,14 +512,14 @@ gmic_gimp.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 gmic_gimp: gmic_gimp.o gmic_gimp.cpp
 ifeq ($(OS),Darwin)
 ifeq (,$(wildcard /tmp/skl))
-	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
+	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 else
-	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` $(subst -L/opt/local,-L/tmp/skl/Gimp.app/Contents/Resources,$(shell gimptool-2.0$(EXE) --libs) $(CFLAGS) $(LIBS))
+	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` $(subst -L/opt/local,-L/tmp/skl/Gimp.app/Contents/Resources,$(shell gimptool-2.0$(EXE) --libs) $(CFLAGS) $(LIBS))
 endif
 else
-	$(CXX) -o gmic_gimp$(VERSION) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
+	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 endif
-	$(STRIP) gmic_gimp$(VERSION)$(EXE)
+	$(STRIP) gmic_gimp$(VERSION1)$(EXE)
 
 # gmic
 gmic: gmic.cpp gmic.h gmic_stdlib.h CImg.h
@@ -616,7 +616,7 @@ man:
 # Install/uninstall/clean procedures.
 install:
 	mkdir -p $(DESTDIR)$(PLUGINDIR)/
-	cp -f gmic_gimp$(VERSION) $(DESTDIR)$(PLUGINDIR)/
+	cp -f gmic_gimp$(VERSION1) $(DESTDIR)$(PLUGINDIR)/
 	cp -f ../resources/gmic_film_cluts.gmz $(DESTDIR)$(PLUGINDIR)/
 	mkdir -p $(DESTDIR)$(USR)/$(BIN)/
 	cp -f gmic $(DESTDIR)$(USR)/$(BIN)/
@@ -675,7 +675,7 @@ uninstall:
 distclean: clean
 
 clean:
-	rm -rf CImg.h gmic_stdlib.h gmic$(EXE) gmic_gimp$(VERSION)$(EXE) use_libgmic$(EXE) use_libcgmic$(EXE) use_libcgmic_static$(EXE) gmic*.o libgmic* libcgmic* *~
+	rm -rf CImg.h gmic_stdlib.h gmic$(EXE) gmic_gimp$(VERSION1)$(EXE) use_libgmic$(EXE) use_libcgmic$(EXE) use_libcgmic_static$(EXE) gmic*.o libgmic* libcgmic* *~
 	@if [ -h ../zart ]; then rm -f ../zart; fi
 	@if [ -h gmic_libc.h ]; then rm -f gmic_libc.h; fi
 	@if [ -h gmic_libc.cpp ]; then rm -f gmic_libc.cpp; fi
