@@ -1415,7 +1415,9 @@ clut : -check "isval(${2=64}) && $2>0"
   -v - -l[]
     -if ${_path_rc}clut_"$1".cimgz -i ${_path_rc}clut_"$1".cimgz -endif
     -if {"!"$!" || w!=$2 || h!=$2 || d!=$2"}
-      g_path_unix=/usr/lib/gimp/2.0/plug-ins/
+      -if {narg($GMIC_SYSTEM_PATH)} g_path_unix=$GMIC_SYSTEM_PATH
+      -else g_path_unix=/usr/lib/gimp/2.0/plug-ins/
+      -endif
       -rm -repeat 2
         -if {!$>" && "(isfile(${_path_rc}gmic_film_cluts.gmz)" || "\
                        isfile(${-path_gimp}plug-ins/gmic_film_cluts.gmz)" || "\
