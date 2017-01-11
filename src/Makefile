@@ -61,8 +61,8 @@ PIC = -fPIC
 EXE =
 WGET = wget --no-check-certificate --quiet -O
 PLUGINDIR = `gimptool-2.0 --gimpplugindir`/plug-ins
-VERSION = `grep 'gmic_version\ ' gmic.h | tail -c 4 | head -c 3`
-VERSION1 = `grep 'gmic_version\ ' gmic.h | tail -c 4 | head -c 1`
+VERSION = `grep 'gmic_version\ ' gmic.h | tail -c4 | head -c3`
+VERSION1 = `grep 'gmic_version\ ' gmic.h | tail -c4 | head -c1`
 
 ifeq ($(OS),Linux)
 OS = Unix
