@@ -21843,7 +21843,7 @@ gui_filter_sources : -skip ${1=0},${2=1}
 
   # Import faves from previous version 1.7.9.
   -if {isfile($_path_rc/gimp_faves)" && "!isfile($_path_rc/gui_faves)} -l[]
-    -i raw:$_path_rc/gimp_faves -replace_str "gimp_","fx_",uchar
+    -i raw:$_path_rc/gimp_faves,uchar -replace_str "gimp_","fx_"
     -o raw:$_path_rc/gui_faves,uchar
     -rm
   -onfail -rm -endl -endif
