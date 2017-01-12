@@ -2879,7 +2879,7 @@ void process_image(const char *const command_line, const bool is_apply) {
       gtk_widget_show(message);
       CImg<char> dialog_title(64);
 #ifdef gmic_prerelease
-      cimg_snprintf(dialog_title,dialog_title.width(),"%s - %d.%d.%dpre#%s",
+      cimg_snprintf(dialog_title,dialog_title.width(),"%s - %d.%d.%d_pre#%s",
                     t("G'MIC for GIMP"),
                     gmic_version/100,(gmic_version/10)%10,gmic_version%10,gmic_prerelease);
 #else
@@ -4029,7 +4029,7 @@ void create_dialog_gui(const bool preview_on_right) {
   // Create main dialog window with buttons.
   CImg<char> dialog_title(64);
 #ifdef gmic_prerelease
-  cimg_snprintf(dialog_title,dialog_title.width(),"%s %d.%d - %s %u bits - %d.%d.%dpre#%s",
+  cimg_snprintf(dialog_title,dialog_title.width(),"%s %d.%d - %s %u bits - %d.%d.%d_pre#%s",
                 t("G'MIC for GIMP"),
                 GIMP_MAJOR_VERSION,GIMP_MINOR_VERSION,
                 cimg::stros(),sizeof(void*)==8?64:32,
