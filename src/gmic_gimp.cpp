@@ -1397,7 +1397,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   GtkTreeIter iter, parent[8];
   CImg<char> filename_gmic_faves(1024);
   tree_view_store = gtk_tree_store_new(3,G_TYPE_UINT,G_TYPE_STRING,G_TYPE_STRING);
-  cimg_snprintf(filename_gmic_faves,filename_gmic_faves.width(),"%sgimp_faves",
+  cimg_snprintf(filename_gmic_faves,filename_gmic_faves.width(),"%sgui_faves",
                 gmic::path_rc());
   std::FILE *file_gmic_faves = std::fopen(filename_gmic_faves,"rb");
   if (file_gmic_faves) {
@@ -2485,7 +2485,7 @@ void on_dialog_add_fave_clicked(GtkWidget *const tree_view) {
   gtk_widget_hide(fave_delete_button);
   if (filter) {
     CImg<char> filename(1024);
-    cimg_snprintf(filename,filename.width(),"%sgimp_faves",
+    cimg_snprintf(filename,filename.width(),"%sgui_faves",
                   gmic::path_rc());
     std::FILE *file = std::fopen(filename,"wb");
     if (file) {
@@ -2550,7 +2550,7 @@ void on_dialog_remove_fave_clicked(GtkWidget *const tree_view) {
   gtk_widget_hide(fave_delete_button);
   if (filter) {
     CImg<char> filename(1024);
-    cimg_snprintf(filename,filename.width(),"%sgimp_faves",
+    cimg_snprintf(filename,filename.width(),"%sgui_faves",
                   gmic::path_rc());
     std::FILE *file = std::fopen(filename,"wb");
     if (file) {
@@ -2657,7 +2657,7 @@ void _on_filter_doubleclicked(GtkWidget *const entry) {
     char *const label = g_markup_escape_text(__label,std::strlen(__label));
     if (*label) {
       CImg<char> filename(1024);
-      cimg_snprintf(filename,filename.width(),"%sgimp_faves",
+      cimg_snprintf(filename,filename.width(),"%sgui_faves",
                     gmic::path_rc());
       std::FILE *file = std::fopen(filename,"wb");
       if (file) {
