@@ -17987,14 +17987,13 @@ demo : -check "isint(${1=2}) && $1>=0 && $1<=2"
     -done -rm. -+3d
   -endl
 
-  cfx={0} cfy={0} cfz={0} nfx={g} nfy={g} nfz={g} alpha=0 time0={$|-4} selected=-1 -f3d 400
-
   # Start main loop.
+  cfx={0} cfy={0} cfz={0} nfx={g} nfy={g} nfz={g} alpha=0 time0={$|-4} selected=-1 -f3d 400
   -w[0] -1,-1,0,0,50%,50%,"[G'MIC - "$strver"]"
   -do
 
     # Set 3d coordinates for object.
-    t={0.5*$|}
+    t={0.8*$|}
     1,128,1,1,'(1-$alpha)*cos($cfx*y+$t)+$alpha*cos($nfx*y+$t)'
     1,128,1,1,'(1-$alpha)*sin($cfy*y+$t)+$alpha*sin($nfy*y+$t)'
     1,128,1,1,'(1-$alpha)*sin($cfz*y+$t)+$alpha*sin($nfz*y+$t)'
@@ -18020,7 +18019,7 @@ demo : -check "isint(${1=2}) && $1>=0 && $1<=2"
     -endif
 
     # Manage ball animation.
-    -if {$|-$time0>5} alpha+=0.01 -endif
+    -if {$|-$time0>5} alpha+=0.02 -endif
     -if {$alpha>1} alpha-=1 cfx=$nfx cfy=$nfy cfz=$nfz nfx={g} nfy={g} nfz={g} time0={$|-u*3} -endif
   -while {{*}" && "!{*,ESC}" && "!{*,Q}}
   -rm -w 0 -endl -v 0 -e[] ""
