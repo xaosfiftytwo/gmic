@@ -17982,10 +17982,17 @@ demo : -check "isint(${1=2}) && $1>=0 && $1<=2"
     n=16
     -ball[] 64,200,100,64 -n. 0,230 -s. c,-3
     -rgb2hsv.. -r.. 100%,100%,$n,3 -f.. "[z*360/d,G,B]" -hsv2rgb..
-    N={8*$n}
-    -i[0] ({'CImg3d'}) -i[1] ($N,$N) -i[2] 3,$N -i[3] 2,$N,1,1,"x?y:1" # Header, points, primitives
-    -l[4] -s z -i[0--2] (-128,{w},{h},3) 4,{$N-$n},1,1,'x==0?-128:x==1?y%$n:0' -y -a y -endl # Colors
-    -l[5] -n 0,0.25 -i[0] (-128,{w},{h},1) 4,{$N-1},1,1,-128,0,0,0 -y -a y -endl # Opacities
+    N={8*$n} P={2*$N-1}
+    -i[0] ({'CImg3d'}) -i[1] ($N,$P) -i[2] 3,$N # Header, points
+    -i[3] 2,$N,1,1,"x?y:1" -i[4] 3,{$N-1},1,1,"x==0?2:x==1?y:y+1" -y[3,4] -a[3,4] y # Primitives
+    -l[4] # Colors
+      -s z -i[0--2] (-128,{w},{h},3) 4,{$N-$n},1,1,'x==0?-128:x==1?y%$n:0' # Colors
+      3,{$P-$N},1,1,200 -y -a y
+    -endl
+    -l[5] # Opacities
+      -n 0,0.25 -i[0] (-128,{w},{h},1) 4,{$N-1},1,1,-128,0,0,0
+      1,{$P-$N},1,1,0.25 -y -a y
+    -endl
     -y -a y
   -endl
 
