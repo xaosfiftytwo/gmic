@@ -283,7 +283,7 @@ void set_logfile() {
   if (verbosity==3 || verbosity==5 || verbosity==7) {
     if (!logfile) {
       CImg<char> filename(1024);
-      cimg_snprintf(filename,filename.width(),"%sgimp_log",
+      cimg_snprintf(filename,filename.width(),"%sgui_log",
                     gmic::path_rc());
       logfile = std::fopen(filename,"a");
     }
@@ -4401,7 +4401,7 @@ void gmic_run(const gchar *name, gint nparams, const GimpParam *param,
 
       // Try updating filters automatically if necessary (every week).
       CImg<char> str(std::strlen(gmic::path_rc()) + 32);
-      cimg_snprintf(str,str.width(),"%sgimp_update.lock",
+      cimg_snprintf(str,str.width(),"%sgui_update.lock",
                     gmic::path_rc());
       bool try_network_update = true;
       gimp_get_data("gmic_lock_update",&try_network_update);
