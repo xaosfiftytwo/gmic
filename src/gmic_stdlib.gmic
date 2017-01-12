@@ -17983,8 +17983,8 @@ demo : -check "isint(${1=2}) && $1>=0 && $1<=2"
     -ball[] 64,200,100,64 -n. 0,230 -s. c,-3
     -rgb2hsv.. -r.. 100%,100%,$n,3 -f.. "[z*360/d,G,B]" -hsv2rgb..
     N={8*$n}
-    -i[0] ({'CImg3d'}) -i[1] ($N,$N) -i[2] 3,$N -i[3] 2,$N,1,1,"x?y:1"
-    -l[4] -s z -i[0--2] (-128,{w},{h},3) 4,{$N-$n},1,1,"x==0?-128:x==1?y%"$n":0" -y -a y -endl # Colors
+    -i[0] ({'CImg3d'}) -i[1] ($N,$N) -i[2] 3,$N -i[3] 2,$N,1,1,"x?y:1" # Header, points, primitives
+    -l[4] -s z -i[0--2] (-128,{w},{h},3) 4,{$N-$n},1,1,'x==0?-128:x==1?y%$n:0' -y -a y -endl # Colors
     -l[5] -n 0,0.25 -i[0] (-128,{w},{h},1) 4,{$N-1},1,1,-128,0,0,0 -y -a y -endl # Opacities
     -y -a y
   -endl
@@ -17996,10 +17996,11 @@ demo : -check "isint(${1=2}) && $1>=0 && $1<=2"
 
     # Set 3d coordinates for object.
     t={0.8*$|}
-    1,128,1,1,'(1-$alpha)*cos($cfx*y+$t)+$alpha*cos($nfx*y+$t)'
-    1,128,1,1,'(1-$alpha)*sin($cfy*y+$t)+$alpha*sin($nfy*y+$t)'
-    1,128,1,1,'(1-$alpha)*sin($cfz*y+$t)+$alpha*sin($nfz*y+$t)'
-    -a[-3--1] x -s. y,8 -a[-8--1] x -y.
+    3,$N,1,1,"const a = "$alpha"; const oma = 1 - a;
+              x==0?oma*cos("$cfx"*y+"$t") + a*cos("$nfx"*y+"$t"):
+              x==1?oma*sin("$cfy"*y+"$t") + a*sin("$nfy"*y+"$t"):
+                   oma*sin("$cfz"*y+"$t") + a*sin("$nfz"*y+"$t")"
+    -y.
     -j[6] .,0,8 -rm. -*3d[6] {0,w/2-30},{0,h/2-30},300 -+3d[6] 0,0,200
 
     # Render image.
