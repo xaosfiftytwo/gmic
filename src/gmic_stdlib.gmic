@@ -17995,11 +17995,10 @@ demo : -check "isint(${1=2}) && $1>=0 && $1<=2"
   -do
 
     # Set 3d coordinates for object.
-    t={0.8*$|}
-    3,$N,1,1,"const a = "$alpha"; const oma = 1 - a;
-              x==0?oma*cos("$cfx"*y+"$t") + a*cos("$nfx"*y+"$t"):
-              x==1?oma*sin("$cfy"*y+"$t") + a*sin("$nfy"*y+"$t"):
-                   oma*sin("$cfz"*y+"$t") + a*sin("$nfz"*y+"$t")"
+    3,$N,1,1,"const t = 0.8*"$|"; const a = "$alpha"; const oma = 1 - a;
+              x==0?oma*cos("$cfx"*y + t) + a*cos("$nfx"*y + t):
+              x==1?oma*sin("$cfy"*y + t) + a*sin("$nfy"*y + t):
+                   oma*sin("$cfz"*y + t) + a*sin("$nfz"*y + t)"
     -y.
     -j[6] .,0,8 -rm. -*3d[6] {0,w/2-30},{0,h/2-30},300 -+3d[6] 0,0,200
 
