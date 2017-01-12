@@ -21846,7 +21846,7 @@ gui_filter_sources : -skip ${1=0},${2=1}
     -i raw:$_path_rc/gimp_faves -replace_str "gimp_","fx_",uchar
     -o raw:$_path_rc/gui_faves,uchar
     -rm
-  -endl -endif
+  -onfail -rm -endl -endif
 
   # Build list of filter sources.
   ({'{/$_path_user}'}) # Include local '.gmic' (or 'user.gmic') file.
