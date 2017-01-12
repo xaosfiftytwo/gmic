@@ -346,7 +346,7 @@ CImg<char> get_locale() {
 //---------------------------------------------------
 void save_dialog_params() {
   CImg<char> filename(1024);
-  cimg_snprintf(filename,filename.width(),"%sgimp_dialog_params",
+  cimg_snprintf(filename,filename.width(),"%sgui_dialog_params",
                 gmic::path_rc());
   CImg<unsigned int> params(1,8);
   params[0] = get_input_mode(false);
@@ -367,7 +367,7 @@ void save_dialog_params() {
 
 void load_dialog_params() {
   CImg<char> filename(1024);
-  cimg_snprintf(filename,filename.width(),"%sgimp_dialog_params",
+  cimg_snprintf(filename,filename.width(),"%sgui_dialog_params",
                 gmic::path_rc());
   CImg<unsigned int> params;
   try {
