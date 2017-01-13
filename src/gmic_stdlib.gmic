@@ -3440,10 +3440,11 @@ update_film_emulation_html :
   jpeg_quality=70   # Set JPEG quality of output images.
   thumb_width=180   # Set thumbnail width.
   thumb_height=90   # Set mini thumbnail height.
-  categories=bw,instant_consumer,instant_pro,negative_color,negative_new,negative_old,picturefx,print,colorslide,various
+  categories=bw,instant_consumer,instant_pro,fujixtransii,negative_color,negative_new,negative_old,picturefx,print,colorslide,various
   category_names="Black and White",\
                  "Instant [consumer]",\
                  "Instant [pro]",\
+                 "Fuji XTrans II",\
                  "Negative [color]",\
                  "Negative [new]",\
                  "Negative [old]",\
@@ -3454,6 +3455,7 @@ update_film_emulation_html :
   category_authors="Pat David",\
                    "Pat David",\
                    "Pat David",\
+                   "Stuart Sowerby",\
                    "Pat David",\
                    "Pat David",\
                    "Pat David",\
@@ -3464,6 +3466,7 @@ update_film_emulation_html :
   category_authors_url="http://blog.patdavid.net/2013/08/film-emulation-presets-in-gmic-gimp.html",\
                        "http://blog.patdavid.net/2013/08/film-emulation-presets-in-gmic-gimp.html",\
                        "http://blog.patdavid.net/2013/08/film-emulation-presets-in-gmic-gimp.html",\
+                       "http://blog.sowerby.me/fuji-film-simulation-profiles",\
                        "http://blog.patdavid.net/2013/08/film-emulation-presets-in-gmic-gimp.html",\
                        "http://blog.patdavid.net/2013/08/film-emulation-presets-in-gmic-gimp.html",\
                        "http://www.digicrea.be/haldclut-set-style-a-la-nik-software",\
@@ -27858,6 +27861,31 @@ _fx_emulate_film_bw :
 
 fx_emulate_film_bw_preview :
   -gui_split_preview "-fx_emulate_film_bw $*",$-1
+
+#@gui Fuji XTrans : fx_emulate_film_fujixtransii, fx_emulate_film_fujixtransii_preview(1)+
+#@gui : Preset = choice{"None",
+#@gui : "Astia","Classic Chrome","Pro Neg Hi","Pro Neg Std","Provia","Velvia"}
+#@gui : sep = separator()
+#@gui : Strength (%) = float(100,0,100)
+#@gui : Brightness (%) = float(0,-100,100)
+#@gui : Contrast (%) = float(0,-100,100)
+#@gui : Gamma (%) = float(0,-100,100)
+#@gui : Hue (%) = float(0,-100,100)
+#@gui : Saturation (%) = float(0,-100,100)
+#@gui : Normalize colors = choice("None","Pre-process","Post-process","Both")
+#@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
+#@gui : sep = separator(), note = note("<small><b>Note:</b> The color LUTs used in this section have been designed by <b>Stuart Sowerby</b>. More info at:</small>")
+#@gui : link = link{"Fuji Film Simulation Profiles","http://blog.sowerby.me/fuji-film-simulation-profiles"}
+#@gui : sep = separator(), note = note("<small>Authors: <i>Stuart Sowerby</i> and <i>David Tschumperl&#233;</i>.      Latest update: <i>01/13/2017</i>.</small>")
+fx_emulate_film_fujixtransii :
+  -_fx_emulate_film $1,${-arg\ {max(1,$1)},${-_$0}},${2--1}
+
+_fx_emulate_film_fujixtransii :
+  -u fuji_xtrans_ii_astia_v2,fuji_xtrans_ii_classic_chrome_v1,fuji_xtrans_ii_pro_neg_hi_v2,fuji_xtrans_ii_pro_neg_std_v2,\
+     fuji_xtrans_ii_provia_v2,fuji_xtrans_ii_velvia_v2
+
+fx_emulate_film_fujixtransii_preview :
+  -gui_split_preview "-fx_emulate_film_fujixtransii $*",$-1
 
 #@gui Instant [consumer] : fx_emulate_film_instant_consumer, fx_emulate_film_instant_consumer_preview(1)+
 #@gui : Preset = choice{"None",
