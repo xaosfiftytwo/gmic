@@ -5320,7 +5320,7 @@ complex2polar :
 compress_clut : -check "isint(${1=2048}) && $1>=1 && ${2=17.5}>=0 && ${3=1.75}>=0"
   -e[^-1] "Compress color LUT$? as a set of colored keypoints, with $1 max points, maximum error $2 and average error $3."
   -v -
-  -repeat $! -l[$>] nm=${"-strvar "{b}}
+  -repeat $! -l[$>] -strvar {b} nm=${}
     -if {iM>255} -/ 257 -endif # Input is probably 16bits
     -if {d==1} S={cbrt(wh)} -r $S,$S,$S,3,-1 -r3dx 32 -round -endif # Input is a 2d haldclut image
     w={w} h={h} d={d} w_size=${-fitscreen" "$w,$h,$d,256,50%}
@@ -17870,6 +17870,7 @@ strvar :
    (i>=_'A' && i<=_'Z')?i - _'A' + _'a':
    _'_'"
    -if {"i>=_'0' && i<=_'9'"} -r. {w+1},1,1,1,0,0,1 -=. {_'_'} -endif
+   -y. -do h={h} -replace_str. "__","_" -while {h!=$h}
    -u {t} -rm. -v +
 
 #@cli strver : _version
