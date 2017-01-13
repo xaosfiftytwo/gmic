@@ -643,7 +643,7 @@ endif
 	mkdir -p $(DESTDIR)$(USR)/share/man/
 	mkdir -p $(DESTDIR)$(USR)/share/man/man1/
 	mkdir -p $(DESTDIR)$(USR)/share/man/fr/man1/
-	@if [ -f ../man.gmic.1.gz ]; then \
+	@if [ -f ../man/gmic.1.gz ]; then \
 	  cp -f ../man/gmic.1.gz $(DESTDIR)$(USR)/share/man/man1/gmic.1.gz; \
 	  cp -f ../man/gmic.1.gz $(DESTDIR)$(USR)/share/man/fr/man1/gmic.1.gz; \
 	fi
