@@ -10630,26 +10630,6 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
       ); kappa"
     -nm. e_curvatures
 
-    # Compute averaged normals to points.
-    -i[normals] 100%,100%,1,1,"
-      angles = I(#"$e_normals");
-      ang = -1;
-      if (max(angles)>=0,
-        U = [ 0,0 ];
-        n = 0;
-        for (k = 0, k<size(angles), ++k,
-          if (angles[k]>=0,
-            w = max(1e-8,i(#"$e_curvatures",x,y,0,k)^2);
-            ang = angles[k]*pi/180;
-            U += w*[ cos(ang),sin(ang) ];
-            n+=w;
-          );
-        );
-        U/=n;
-        ang = (atan2(U[1],U[0])*180/pi)%360;
-      ); ang"
-    -rm[e_normals]
-
     # Detect end points.
     --compose_channels[e_curvatures] max -nm. curvatures
     --ge[curvatures] {$endpoint_threshold%}
@@ -10670,7 +10650,30 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
         ); ret"
       -sh[keycoords] 100% -f. 0 -rm. # Last channel will be used to store the number of connexions for each keypoint
     -endif
-    -rm[e_curvatures,curvatures]
+    -rm[curvatures]
+
+    # Compute averaged normals to points.
+    -i[normals] [strokes],[strokes],1,1,"
+      ang = -1;
+      if (i(#"$keypoints"),
+        angles = I(#"$e_normals");
+        ang = -1;
+        if (max(angles)>=0,
+          U = [ 0,0 ];
+          n = 0;
+          for (k = 0, k<size(angles), ++k,
+            if (angles[k]>=0,
+              w = max(1e-8,i(#"$e_curvatures",x,y,0,k)^2);
+              ang = angles[k]*pi/180;
+              U += w*[ cos(ang),sin(ang) ];
+              n+=w;
+            );
+          );
+          U/=n;
+          ang = (atan2(U[1],U[0])*180/pi)%360;
+        );
+      ); ang"
+    -rm[e_normals,e_curvatures]
     -if {!0$_keep_keypoints} -rm[keypoints] -endif # Small hack used by the plug-in preview.
 
     # Detect pairs of keypoints preserving the spline constraints.
@@ -24656,7 +24659,7 @@ _fx_colorize_lineart_smartcoloring :
       -label_fg. 0 {1+iM},1,1,{colors,s+1}
       -f.. ">I[#-1,i]+=[ I(#"$colors"),1 ];I"
       -s. c,{-s+1} -/[-2,-1]
-      --l[new_strokes] -* -1 -n 0,1 -^ 5 --b 1% -b.. 1 -min -endl
+      --l[new_strokes] -* -1 -+ 1 --b 1% -b.. 1 -min -endl
       -watershed... .,0 -rm. -map.. . -rm.
 
       -if {!$7} -rm[strokes] # No color shading
