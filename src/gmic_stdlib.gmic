@@ -10835,7 +10835,6 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
               for_segment(i(#"$new_strokes",P)=0);
             , #else
               for_segment(i(#"$new_strokes",P)|=4);
-
               for_segment(
                 if (i(#"$new_strokes",P[0] + 1,P[1])==1,
                   edgels = area = 0; Q0 = Q = [ P[0] + 1,P[1],2 ];
@@ -24640,7 +24639,7 @@ _fx_colorize_lineart_smartcoloring :
       --negate[strokes] -*. 255 -to_rgb.
       ---[new_strokes] [strokes] -dilate. 2
       100%,100%,1,3,[0,128,255] -j... .,0,0,0,0,1,.. -rm[-2,-1]
-      -f[keycoords] ${-math_lib}"draw_circle(#-1,(I)[0,2],3,1,[255,0,0]);I" -rm[keycoords]
+      -if {narg($keycoords)} -f[keycoords] ${-math_lib}"draw_circle(#-1,(I)[0,2],3,1,[255,0,0]);I" -rm[keycoords] -endif
       -nm. geometry
     -endif
 
