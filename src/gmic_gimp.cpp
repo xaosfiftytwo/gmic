@@ -1234,7 +1234,7 @@ CImgList<char> update_filters(const bool try_net_update, const bool is_silent=fa
   CImgList<char> _names;
   CImg<char> command(1024);
   cimg_snprintf(command,command.width(),
-                "%s-gui_filter_sources %d",
+                "%s_host=gimp_gtk -gui_filter_sources %d",
                 get_verbosity_mode()>5?"-debug ":get_verbosity_mode()>3?"":"-v -99 ",
                 try_net_update?1:0);
   try { gmic(command,_sources,_names,gmic_additional_commands,true); } catch (...) { }
@@ -2040,6 +2040,7 @@ void *process_thread(void *arg) {
       std::fflush(cimg::output());
     }
     gmic gmic_instance(spt.env,gmic_additional_commands,true);
+    gmic_instance.set_variable("_host","gimp_gtk",0);
     gmic_instance.run(spt.command_line,spt.images,spt.images_names,&spt.progress,&spt.is_abort);
     gmic_instance.status.move_to(spt.status);
   } catch (gmic_exception &e) {
@@ -3362,7 +3363,7 @@ void process_preview() {
       spt.images_names.assign();
       original_preview.move_to(spt.images);
       CImg<char> command(1024);
-      cimg_snprintf(command,command.width(),"%s-gui_error_preview \"%s\"",
+      cimg_snprintf(command,command.width(),"%s_host=gimp_gtk -gui_error_preview \"%s\"",
                     get_verbosity_mode()>5?"-debug ":get_verbosity_mode()>3?"":"-v -99 ",
                     spt.error_message.data());
       try {
@@ -3418,7 +3419,7 @@ void process_preview() {
     if (preview_images.size()==1) preview_images[0].move_to(computed_preview);
     else if (preview_images.size()>1) try {
         CImgList<char> preview_images_names;
-        gmic("-gui_preview",preview_images,preview_images_names,gmic_additional_commands,true);
+        gmic("_host=gimp_gtk -gui_preview",preview_images,preview_images_names,gmic_additional_commands,true);
         if (preview_images.size()) preview_images[0].move_to(computed_preview);
         preview_images.assign();
         preview_images_names.assign();

@@ -14052,6 +14052,7 @@ int main(int argc, char **argv) {
 
   // Declare main G'MIC instance.
   gmic gmic_instance;
+  gmic_instance.set_variable("_host","cli",0);
   gmic_instance.add_commands("cli_start : ");
 
   // Load startup command files.
@@ -14147,7 +14148,7 @@ int main(int argc, char **argv) {
         images.assign();
         images_names.assign();
         images.insert(gmic::stdlib);
-        gmic("-v - -l -help \"\" -onfail -endl -q",images,images_names);
+        gmic("-v - _host=cli -l -help \"\" -onfail -endl -q",images,images_names);
       }
     } else { // Help for a specified command.
       CImg<char> tmp_line(1024);
