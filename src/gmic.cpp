@@ -2695,9 +2695,9 @@ gmic& gmic::debug(const char *format, ...) {
 //---------------------------------------------
 // 'operation' can be { 0 (add new variable), '=' (replace or add),'+','-','*','/','%','&','|','^','<','>' }
 // Return the variable value.
-inline const char * gmic::set_variable(const char *const name, const char *const value,
-                                       const char operation,
-                                       const unsigned int *const variables_sizes) {
+const char *gmic::set_variable(const char *const name, const char *const value,
+                               const char operation,
+                               const unsigned int *const variables_sizes) {
   if (!name || !value) return "";
   char _operation = operation, end;
   bool is_name_found = false;
