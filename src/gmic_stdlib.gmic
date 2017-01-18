@@ -22682,7 +22682,7 @@ fx_gmicky_preview :
 #@gui : Include category/command names in the search = bool(0)
 #@gui : sep = separator()
 #@gui : Matches = _text(1,"")
-#@gui : sep = separator(), note = note("<small>Authors : <i>Garagecoder</i> and <i>David Tschumperl&#233;</i>.      Latest update : <i>07/06/2015</i>.</small>")
+#@gui : sep = separator(), note = note("<small>Authors: <i>Garagecoder</i> and <i>David Tschumperl&#233;</i>.      Latest update : <i>07/06/2015</i>.</small>")
 gui_search_filters : -skip "${1=}"
   -l[]
 
@@ -27507,7 +27507,7 @@ fx_normalize_local_preview :
 #@gui : Details smoothness = int(1,0,10)
 #@gui : sep = separator(), Channel(s) = choice(11,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
-#@gui : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/08/2014</i>.</small>")
+#@gui : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>08/08/2014</i>.</small>")
 _fx_mighty_details :
   --smooth $3,0,1,0.5,0.5 --[1] [0]
   --abs. -sign.. M={iM} -^. {2-$2} -*. {$M/iM} -*[-2,-1]
@@ -27547,7 +27547,7 @@ fx_deblur_preview :
 #@gui : sep = separator(), Channel(s) = choice(11,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gui : sep = separator(), Parallel processing = choice("Auto","One thread","Two threads","Four threads","Eight threads","Sixteen threads"), Spatial overlap = int(24,0,256)
 #@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
-#@gui : sep = separator(), note = note("<small>Author : <i>J&#233;r&#244;me Boulanger</i>.      Latest update: <i>03/29/2013</i>.</small>")
+#@gui : sep = separator(), note = note("<small>Author: <i>J&#233;r&#244;me Boulanger</i>.      Latest update: <i>03/29/2013</i>.</small>")
 fx_unsharp_goldmeinel:
    -ac "-gui_parallel_overlap \"-_fx_unsharp_goldmeinel $*\",$7,$8",$6,1
 
@@ -27592,7 +27592,7 @@ fx_unsharp_octave_preview :
 #@gui : Blur = choice(1,"Exponential","Gaussian")
 #@gui : Cut = bool(true)
 #@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
-#@gui : sep = separator(), note = note("<small>Author : <i>J&#233;r&#244;me Boulanger</i>.      Latest update: <i>03/29/2013</i>.</small>")
+#@gui : sep = separator(), note = note("<small>Author: <i>J&#233;r&#244;me Boulanger</i>.      Latest update: <i>03/29/2013</i>.</small>")
 fx_unsharp_richardsonlucy :
   -deblur_richardsonlucy $*
   -if $4 -c 0,255 -else -n 0,255 -endif
@@ -30645,7 +30645,7 @@ fx_scalenx_preview :
 #@gui : Threshold = float(1.15,1,2)
 #@gui : Exponent = int(5,1,6)
 #@gui : Extend 1px = _bool(0)
-#@gui : sep = separator(), note = note("<small>Author : <i>Garagecoder</i>.      Latest update : <i>2015/11/07</i>.</small>")
+#@gui : sep = separator(), note = note("<small>Author: <i>Garagecoder</i>.      Latest update : <i>2015/11/07</i>.</small>")
 #@gui : note = note{"\n<small><b>Note: </b>
 #@gui : This filter re-implements the scaling algorithm described at :
 #@gui : </small>"}
