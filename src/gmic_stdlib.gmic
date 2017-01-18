@@ -24096,7 +24096,7 @@ fx_posterize_preview :
 #@gui : Value action = choice("None","Cut","Normalize")
 #@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gui : link = link("Click here for a video tutorial","http://www.youtube.com/watch?v=RC07VUpzwGc")
-#@gui : sep = separator(), note = note("<small>Authors: <i>Rod/GimpChat</i> and <i>David Tschumperl&#233;</i>.      Latest update: <i>03/05/2013</i>.</small>")
+#@gui : sep = separator(), note = note("<small>Authors: <i>David Tschumperl&#233;</i> and <i>Rod/GimpChat</i>.      Latest update: <i>03/05/2013</i>.</small>")
 fx_rodilius :
   -ac "-rodilius ${1-5,7} -repeat $6 -smooth 10,0,1,1,1,0.8,45 -sharpen 30 -done -c 0,255",$8,$9
 
