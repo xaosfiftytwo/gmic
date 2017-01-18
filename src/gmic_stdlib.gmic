@@ -27371,7 +27371,7 @@ fx_scanlines_preview :
 #@gui : Smoothness = float(0.5,0,5)
 #@gui : Lightness = choice(1,"Darker","Brighter")
 #@gui : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>12/29/2010</i>.</small>")
-fx_watermark_visible :
+fx_watermark_visible : -skip "${1= }"
   -watermark_visible "$1",$2,$3,$4,$6,$5
 
 #@gui Warp by intensity : fx_warp_by_intensity, fx_warp_by_intensity_preview(0)
