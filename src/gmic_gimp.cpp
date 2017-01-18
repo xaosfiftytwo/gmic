@@ -2010,6 +2010,7 @@ struct st_process_thread {
     env.assign(256);
     cimg_snprintf(env,env.width(),
                   "-v - "
+                  "_host=gimp_gtk "
                   "_input_layers=%u "
                   "_output_mode=%u "
                   "_output_messages=%u "
@@ -2040,7 +2041,6 @@ void *process_thread(void *arg) {
       std::fflush(cimg::output());
     }
     gmic gmic_instance(spt.env,gmic_additional_commands,true);
-    gmic_instance.set_variable("_host","gimp_gtk",0);
     gmic_instance.run(spt.command_line,spt.images,spt.images_names,&spt.progress,&spt.is_abort);
     gmic_instance.status.move_to(spt.status);
   } catch (gmic_exception &e) {
