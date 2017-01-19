@@ -5936,7 +5936,7 @@ ac :
 #@cli : Apply specified command on the chosen color channel(s) of each selected images.
 #@cli : (eq. to '-ac').
 #@cli : Argument 'channels' refers to a colorspace, and can be basically one of { all | rgba | rgb | lrgb | ycbcr | lab | lch | hsv | hsi | hsl | cmy | cmyk | yiq }.
-#@cli : You can also focus the processing on one particular channel of this colorspace, by setting 'channels' as 'colorspace_channel' (e.g. 'hsv_h' for the hue).
+#@cli : You can also make the processing focus on one particular channel of this colorspace, by setting 'channels' as 'colorspace_channel' (e.g. 'hsv_h' for the hue).
 #@cli : All channel values are considered to be in the [0,255] range.
 #@cli : Default value: 'value_action=0'.
 #@cli : $ image.jpg --apply_channels "-equalize -blur 2",ycbcr_cbcr
@@ -5957,7 +5957,7 @@ _apply_channels : -check "isint(${3=0}) && $3>=0 && $3<=2"
                       yiq_y,yiq_iq}
   -else mode="$2" -endif -else mode="$2" -endif
   -v + -e[^-1] "Apply command '$1' on channel '"$mode"' of image"$_gmic_s"." -v -
-  -_ac_$mode -m "_ac_precond : "$_p -m "_ac_forward : "$_f -m "_ac_backward : "$_b
+  -_ac_$mode -m _ac_precond:$_p -m _ac_forward:$_f -m _ac_backward:$_b
   -repeat $! -l[$>]
     -_ac_precond is_alpha={s==2" || "s==4}
     -if $is_alpha -s c,{1-s} -endif
@@ -5968,7 +5968,7 @@ _apply_channels : -check "isint(${3=0}) && $3>=0 && $3<=2"
     -if $is_alpha -s c,{1-s} -endif
     -_ac_backward[0] -a c
   -endl -done
-  -uncommand "_ac_precond" -uncommand "_ac_forward" -uncommand "_ac_backward"
+  -uncommand _ac_precond,_ac_forward,_ac_backward
   -v +
 
 _ac :
@@ -19798,6 +19798,121 @@ _x_mandelbrot_coords :
 _x_mandelbrot_palette :
   6,1,1,3 -rand. 20,255 -r. 32,1,1,3,3 -r. 1024,1,1,3,0,2 -=. 0,0,0,0,0 -=. 0,0,0,0,1 -=. 0,0,0,0,2
 
+#@cli x_mask_color : _colorspace={ rgb | lrgb | ycbcr | lab | lch | hsv | hsi | hsl | cmy | cmyk | yiq }, _tolerance>=0
+#@cli : Interactively select a color, and add an alpha channel containing the corresponding color mask.
+#@cli : Argument 'colorspace' refers to the color metric used to compute color similarities, and can be basically one of { rgb | lrgb | ycbcr | lab | lch | hsv | hsi | hsl | cmy | cmyk | yiq }.
+#@cli : You can also select one one particular channel of this colorspace, by setting 'colorspace' as 'colorspace_channel' (e.g. 'hsv_h' for the hue).
+#@cli : Default values: 'colorspace=rgb', 'tolerance=5'.
+x_mask_color : -check ${2=5}>=0 -skip ${1=rgb}
+  -if {!{*,u}} -error[0--3] "Command '-$0': No display available." -return -endif
+  -v - -use_vt100 g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_r -v +
+  -e[^-1] "Interactively create color mask for image$?, with color space $1 and tolerance $2."
+  -e[] "\n
+----------------------------------------------------------------------------------------------------\n
+----\n
+---- "${c}"Left mouse button"$n" add a color to the selection.\n
+---- "${c}"Right mouse button"$n" remove last added color.\n
+---- "${c}"Middle mouse button"$n" or key '"${c}"R"$n"' resets colors.\n
+---- Key '"${c}"SPACE"$n"' or '"${c}"TAB"$n"' toggles view modes (masked RGB or mask).\n
+---- Keys '"${c}"CTRL+D"$n"' increase window size.\n
+---- Keys '"${c}"CTRL+C"$n"' decrease window size.\n
+---- Keys '"${c}"CTRL+R"$n"' reset window size.\n
+---- Keys '"${c}"ESC"$n"', '"${c}"Q"$n"' or '"${c}"ENTER"$n"' exit the interactive window.\n
+----\n
+----------------------------------------------------------------------------------------------------"
+  -v - -l[] -_ac_$1 -onfail -error[0--3] "Command '-x_mask_color' : Invalid colorspace '$*'." -endl
+  -m _ac_forward:$_f
+  tolerance=$2
+  -repeat $! -l[$>] -to_rgb -slices 0 -basename {0,n} nm=${}
+    wh=${-fitscreen\ {[w,h]},1,128,1280}
+    --r $wh,1,3,2 --_ac_forward. -channels. $_s
+    -w[1] 100%,100%,0,$nm
+    colors_add=-1 colors_sub=-1 visumode=0
+    -do
+
+      # Manage user events.
+      -wait
+      x={2,round({*,x}*(w-1)/({*,w}-1))}
+      y={2,round({*,y}*(h-1)/({*,h}-1))}
+      b={*,b}
+      c={2,I($x,$y)}
+      is_add={arg(1,$colors_add)>=0}
+      is_sub={arg(1,$colors_sub)>=0}
+      is_ctrl={{*,CTRLLEFT}||{*,CTRLRIGHT}}
+      is_resized=0
+      refresh=0
+
+      -if {$b&1} # Add a color
+        -if $is_add colors_add=$colors_add,$c -else colors_add=$c -endif
+        refresh=1
+      -elif {$b&2} # Subtract a color
+        -if $is_sub colors_sub=$colors_sub,$c -else colors_sub=$c -endif
+        refresh=1
+      -elif {$b&4" || "{*,R}} # Reset colors
+        colors_add=-1 colors_sub=-1 refresh=1
+      -endif
+      -if {{*,-TAB}||{*,-SPACE}} visumode={($visumode+1)%3} refresh=1 -endif # Change visu mode
+      -if {*,r} is_resized=1
+      -elif {$is_ctrl" && "{*,-D}} -w[] {1,1.25*[w,h]} is_resized=1
+      -elif {$is_ctrl" && "{*,-C}} -w[] {1,0.8*[w,h]} is_resized=1
+      -elif {$is_ctrl" && "{*,R}} -w[] ${-fitscreen\ {0,[w,h]},1,128,1024} is_resized=1
+      -endif
+      -if $is_resized -rm[1,2] --r {*,d},{*,e},1,3,2 --_ac_forward. -channels. $_s refresh=1 -endif
+
+      # Refresh view.
+      -if $refresh
+        -_x_mask_color[2] $tolerance,{``$colors_add},{``$colors_sub}
+        -if {$visumode==0} -+. 64 -c. 0,255 --a[1,-1] c -drgba. -w. -1,-1,$nm" [half-masked]" -rm.
+        -elif {$visumode==1} --a[1,-1] c -drgba. -w. -1,-1,$nm" [masked]" -rm.
+        -else -w. -1,-1,$nm" [mask]"
+        -endif
+        -rm.
+      -endif
+
+    -while {{*}" && "!{*,ESC}" && "!{*,Q}" && "!{*,ENTER}}
+    -rm[-2,-1] --_ac_forward -channels. $_s -_x_mask_color. $tolerance,{``$colors_add},{``$colors_sub} -rm.. -a c
+
+  -endl -done
+  -uncommand _ac_forward
+  -v +
+
+_x_mask_color : # Estimate color mask image.
+  100%,100%
+  -if {"arg(1,$2)>=0 || arg(1,$3)>=0"}
+    -f. "init(
+           const den = sqrt(2)*$1;
+           colors_add = [ $2 ];
+           colors_sub = [ $3 ];
+           is_add = colors_add[0]>=0;
+           is_sub = colors_sub[0]>=0;
+           const siz = s#0;
+           const siz2 = sqr(siz);
+           tensor(op) = (
+             M_#op = vectorsiz();
+             N_#op = 0;
+             if (is_#op,
+               for (k = 0, k<size(colors_#op), k+=siz, ++N_#op; M_#op+=colors_#op[k,siz]);
+               M_#op/=N_#op;
+               T = vectorsiz2();
+               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; T+=mul(C,transp(C,1),siz));
+               T/=1e-8 + N_#op;
+               T+=eye(siz);
+               T = inv(T)/den;
+             ); T
+           );
+           T_add = tensor(add);
+           T_sub = tensor(sub);
+           N = N_add + N_sub;
+           N_add/=N;
+           N_sub/=N;
+         );
+         pot_add = is_add?(C = I#0 - M_add; exp(-dot(C,T_add*C))):1;
+         pot_sub = is_sub?(C = I#0 - M_sub; exp(-dot(C,T_sub*C))):0;
+         N_add*pot_add - N_sub*pot_sub"
+    -n. 0,255
+  -else -f. 255
+  -endif
+
 #@cli x_metaballs3d
 #@cli : Launch the 3d metaballs demo.
 x_metaballs3d :
@@ -25296,6 +25411,33 @@ fx_colormap :
 
 fx_colormap_preview :
   -gui_split_preview "-fx_colormap $*",$-1
+
+#@gui Color mask [interactive] : fx_mask_color, gui_no_preview
+#@gui : Color metric = _choice(13,"RGB [all]","RGB [red]","RGB [green]","RGB [blue]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [all]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [all]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [all]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [all]","HSI [intensity]","HSL [all]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
+#@gui : Tolerance = _float(5,0,100)
+#@gui : sep = separator()
+#@gui : Output mode = _choice(0,"Masked image","Color mask")
+#@gui : sep = separator()
+#@gui : note = note{"<small><b>Interactions:</b>\n
+#@gui : Use the following actions in the interactive window to build your color mask :\n\n
+#@gui : - <b>Left mouse button</b> make the color pointed by the mouse wanted for the mask.\n
+#@gui : - <b>Right mouse button</b> make the color pointed by the mouse unwanted for the mask.\n
+#@gui : - <b>Middle mouse button</b> or key <b>R</b> resets current color mask.\n
+#@gui : - Key <b>SPACE</b> or <b>TAB</b> toggles view modes (half/full-masked RGB or color mask).\n
+#@gui : - Keys <b>CTRL+D</b> increase window size.\n
+#@gui : - Keys <b>CTRL+C</b> decrease window size.\n
+#@gui : - Keys <b>CTRL+R</b> resets window size.\n
+#@gui : - Keys <b>ESC</b>, <b>Q</b> or <b>ENTER</b> exit the interactive window.
+#@gui : </small>"}
+#@gui : Sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>01/20/2017</i>.</small>")
+fx_mask_color :
+  cs=rgb,rgb_r,rgb_g,rgb_b,lrgb,lrgb_r,lrgb_g,lrgb_b,ycbcr_y,ycbcr_cbcr,ycbcr_cb,ycbcr_cr,ycbcr_cg,lab,lab_l,lab_ab,lab_a,lab_b,lch,lch_c,lch_h,\
+     hsv,hsv_h,hsv_s,hsv_v,hsi,hsi_i,hsl,hsl_l,cmyk_c,cmyk_m,cmyk_y,cmyk_k,yiq_y,yiq_iq
+  -repeat $! -l[$<] nm={n} -nm ${-gui_layer_name}
+    --x_mask_color ${-arg\ 1+$1,$cs},$2
+    -if {$3==1} -channels. 100% -endif
+    -nm $nm -rv
+  -endl -done
 
 #@gui Curves : fx_curves_interactive, fx_curves_interactive_preview
 #@gui : Colorspace = choice{"RGB","CMY","CMYK","HSI","HSL","HSV","Lab","Lch","YCbCr"}
