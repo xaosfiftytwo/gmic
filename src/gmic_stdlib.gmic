@@ -19886,19 +19886,21 @@ _x_mask_color : # Estimate color mask image.
            colors_sub = [ $3 ];
            is_add = colors_add[0]>=0;
            is_sub = colors_sub[0]>=0;
-           const siz = s#0;
-           const siz2 = sqr(siz);
+           const siz_add = s#0;
+           const siz_sub = s#0;
+
            tensor(op) = (
-             M_#op = vectorsiz();
+             const siz_#op#2 = sqr(siz_#op);
+             M_#op = vectorsiz_#op();
              N_#op = 0;
              if (is_#op,
-               for (k = 0, k<size(colors_#op), k+=siz, ++N_#op; M_#op+=colors_#op[k,siz]);
+               for (k = 0, k<size(colors_#op), k+=siz_#op, ++N_#op; M_#op+=colors_#op[k,siz_#op]);
                M_#op/=N_#op;
-               T = vectorsiz2();
-               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; T+=mul(C,transp(C,1),siz));
+               T = vectorsiz_#op#2();
+               for (k = 0, k<size(colors_#op), k+=siz_#op, C = colors_#op[k,siz_#op]-=M_#op; C*=den; T+=mul(C,transp(C,1),siz_#op));
                T/=1e-8 + N_#op;
-               T+=eye(siz);
-               T = inv(T)/den;
+               T+=eye(siz_#op);
+               T = inv(T);
              ); T
            );
            T_add = tensor(add);
