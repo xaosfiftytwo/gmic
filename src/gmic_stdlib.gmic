@@ -19802,8 +19802,8 @@ _x_mandelbrot_palette :
 #@cli : Interactively select a color, and add an alpha channel containing the corresponding color mask.
 #@cli : Argument 'colorspace' refers to the color metric used to compute color similarities, and can be basically one of { rgb | lrgb | ycbcr | lab | lch | hsv | hsi | hsl | cmy | cmyk | yiq }.
 #@cli : You can also select one one particular channel of this colorspace, by setting 'colorspace' as 'colorspace_channel' (e.g. 'hsv_h' for the hue).
-#@cli : Default values: 'colorspace=rgb', 'color_tolerance=5' and 'spatial_tolerance=10000'.
-x_mask_color : -check "${2=5}>=0 && ${3=10000}" -skip ${1=rgb}
+#@cli : Default values: 'colorspace=rgb', 'color_tolerance=5' and 'spatial_tolerance=5'.
+x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=rgb}
   -if {!{*,u}} -error[0--3] "Command '-$0': No display available." -return -endif
   -v - -use_vt100 g=$_gmic_g c=$_gmic_c n=$_gmic_n r=$_gmic_r -v +
   -e[^-1] "Interactively create color mask for image$?, with color space $1, color tolerance $2 and spatial tolerance $3."
@@ -19822,8 +19822,6 @@ x_mask_color : -check "${2=5}>=0 && ${3=10000}" -skip ${1=rgb}
 ----------------------------------------------------------------------------------------------------"
   -v - -l[] -_ac_$1 -onfail -error[0--3] "Command '-x_mask_color' : Invalid colorspace '$*'." -endl
   -m _ac_forward:$_f
-  tolerance=$2
-  is_spatial={!!$3}
   -repeat $! -l[$>] -to_rgb -slices 0 -basename {0,n} nm=${}
     wh=${-fitscreen\ {[w,h]},1,128,1280}
     --r $wh,1,3,2 --_ac_forward. -channels. $_s
@@ -19836,7 +19834,7 @@ x_mask_color : -check "${2=5}>=0 && ${3=10000}" -skip ${1=rgb}
       x={2,round({*,x}*(w-1)/({*,w}-1))}
       y={2,round({*,y}*(h-1)/({*,h}-1))}
       b={*,b}
-      c={2,I($x,$y)}
+      c=$x,$y,{2,I($x,$y)}
       is_add={arg(1,$colors_add)>=0}
       is_sub={arg(1,$colors_sub)>=0}
       is_ctrl={{*,CTRLLEFT}||{*,CTRLRIGHT}}
@@ -19862,7 +19860,7 @@ x_mask_color : -check "${2=5}>=0 && ${3=10000}" -skip ${1=rgb}
 
       # Refresh view.
       -if $refresh
-        -_x_mask_color[2] $tolerance,{``$colors_add},{``$colors_sub}
+        -_x_mask_color[2] {$2*w#2/w#0},$3,{``$colors_add},{``$colors_sub}
         -if {$visumode==0} -+. 64 -c. 0,255 --a[1,-1] c -drgba. -w. -1,-1,$nm" [half-masked]" -rm.
         -elif {$visumode==1} --a[1,-1] c -drgba. -w. -1,-1,$nm" [masked]" -rm.
         -else -w. -1,-1,$nm" [mask]"
@@ -19871,7 +19869,7 @@ x_mask_color : -check "${2=5}>=0 && ${3=10000}" -skip ${1=rgb}
       -endif
 
     -while {{*}" && "!{*,ESC}" && "!{*,Q}" && "!{*,ENTER}}
-    -rm[-2,-1] --_ac_forward -channels. $_s -_x_mask_color. $tolerance,{``$colors_add},{``$colors_sub} -rm.. -a c
+    -rm[-2,-1] --_ac_forward -channels. $_s -_x_mask_color. $2,$3,{``$colors_add},{``$colors_sub} -rm.. -a c
 
   -endl -done
   -uncommand _ac_forward
@@ -19879,23 +19877,26 @@ x_mask_color : -check "${2=5}>=0 && ${3=10000}" -skip ${1=rgb}
 
 _x_mask_color : # Estimate color mask image.
   100%,100%
-  -if {"arg(1,$2)>=0 || arg(1,$3)>=0"}
+  -if {"arg(1,$3)>=0 || arg(1,$4)>=0"}
     -f. "init(
-           const den = sqrt(2)*$1;
-           colors_add = [ $2 ];
-           colors_sub = [ $3 ];
+           const ss = sqrt(2)*$1;
+           const sc = sqrt(2)*$2;
+           sigma = [ ss,ss,sc,sc,sc ];
+           colors_add = [ $3 ];
+           colors_sub = [ $4 ];
            is_add = colors_add[0]>=0;
            is_sub = colors_sub[0]>=0;
-           const siz = s#0;
+           const siz = 2 + s#0;
            const siz2 = sqr(siz);
+
            tensor(op) = (
              M_#op = vectorsiz();
              N_#op = 0;
+             T = vectorsiz2();
              if (is_#op,
                for (k = 0, k<size(colors_#op), k+=siz, ++N_#op; M_#op+=colors_#op[k,siz]);
                M_#op/=N_#op;
-               T = vectorsiz2();
-               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; C*=den; T+=mul(C,transp(C,1),siz));
+               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; C*=sigma; T+=mul(C,transp(C,1),siz));
                T/=1e-8 + N_#op;
                T+=eye(siz);
                T = inv(T);
@@ -19904,14 +19905,12 @@ _x_mask_color : # Estimate color mask image.
 
            T_add = tensor(add);
            T_sub = tensor(sub);
-           N = N_add + N_sub;
-           N_add/=N;
-           N_sub/=N;
          );
-         pot_add = is_add?(C_add = I#0 - M_add; exp(-dot(C_add,T_add*C_add))):1;
-         pot_sub = is_sub?(C_sub = I#0 - M_sub; exp(-dot(C_sub,T_sub*C_sub))):0;
+         P = [ x,y,I#0 ];
+         pot_add = is_add?(C = P - M_add; exp(-dot(C,T_add*C))):1;
+         pot_sub = is_sub?(C = P - M_sub; exp(-dot(C,T_sub*C))):0;
          pot_add - pot_sub"
-    -n. 0,255
+    -n. 0,512 -c. 0,255
   -else -f. 255
   -endif
 
@@ -25416,7 +25415,8 @@ fx_colormap_preview :
 
 #@gui Color mask [interactive] : fx_mask_color, gui_no_preview
 #@gui : Color metric = _choice(13,"RGB [all]","RGB [red]","RGB [green]","RGB [blue]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [all]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [all]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [all]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [all]","HSI [intensity]","HSL [all]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
-#@gui : Tolerance = _float(5,0,100)
+#@gui : Spatial tolerance = _float(5,0,100)
+#@gui : Color tolerance = _float(5,0,100)
 #@gui : sep = separator()
 #@gui : Output mode = _choice(0,"Masked image","Color mask")
 #@gui : sep = separator()
@@ -25436,8 +25436,8 @@ fx_mask_color :
   cs=rgb,rgb_r,rgb_g,rgb_b,lrgb,lrgb_r,lrgb_g,lrgb_b,ycbcr_y,ycbcr_cbcr,ycbcr_cb,ycbcr_cr,ycbcr_cg,lab,lab_l,lab_ab,lab_a,lab_b,lch,lch_c,lch_h,\
      hsv,hsv_h,hsv_s,hsv_v,hsi,hsi_i,hsl,hsl_l,cmyk_c,cmyk_m,cmyk_y,cmyk_k,yiq_y,yiq_iq
   -repeat $! -l[$<] nm={n} -nm ${-gui_layer_name}
-    --x_mask_color ${-arg\ 1+$1,$cs},$2
-    -if {$3==1} -channels. 100% -endif
+    --x_mask_color ${-arg\ 1+$1,$cs},$2,$3
+    -if {$4==1} -channels. 100% -endif
     -nm $nm -rv
   -endl -done
 
