@@ -19886,26 +19886,24 @@ _x_mask_color : # Estimate color mask image.
            colors_sub = [ $3 ];
            is_add = colors_add[0]>=0;
            is_sub = colors_sub[0]>=0;
-           const siz_add = s#0;
-           const siz_sub = s#0;
-
+           const siz = s#0;
+           const siz2 = sqr(siz);
            tensor(op) = (
-             const siz_#op#2 = sqr(siz_#op);
-             M_#op = vectorsiz_#op();
+             M_#op = vectorsiz();
              N_#op = 0;
              if (is_#op,
-               for (k = 0, k<size(colors_#op), k+=siz_#op, ++N_#op; M_#op+=colors_#op[k,siz_#op]);
+               for (k = 0, k<size(colors_#op), k+=siz, ++N_#op; M_#op+=colors_#op[k,siz]);
                M_#op/=N_#op;
-               T_#op = vectorsiz_#op#2();
-               for (k = 0, k<size(colors_#op), k+=siz_#op, C_#op = colors_#op[k,siz_#op]-=M_#op; C_#op*=den; T_#op+=mul(C_#op,transp(C_#op,1),siz_#op));
-               T_#op/=1e-8 + N_#op;
-               T_#op+=eye(siz_#op);
-               T_#op = inv(T_#op);
-             );
+               T = vectorsiz2();
+               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; C*=den; T+=mul(C,transp(C,1),siz));
+               T/=1e-8 + N_#op;
+               T+=eye(siz);
+               T = inv(T);
+             ); T
            );
 
-           tensor(add);
-           tensor(sub);
+           T_add = tensor(add);
+           T_sub = tensor(sub);
            N = N_add + N_sub;
            N_add/=N;
            N_sub/=N;
