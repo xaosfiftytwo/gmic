@@ -22549,7 +22549,9 @@ _gui_download_all_data :
 #@gui : note = note{"\n<span foreground="purple" underline="single">Supporters:</span>"}
 #@gui : note = note{" <b>-</b> A big hug goes to these friends who supported the project:"}
 #@gui : note = note{"<i>
-#@gui : <a href=" flickr.com/photos/btraven">BTraven</a>,
+#@gui : Boris Hajdukovic,
+#@gui : <a href="https://mappish.com/pages/about-us">Jeff Combs / Mappish</a>,
+#@gui : <a href="http://flickr.com/photos/btraven">BTraven</a>,
 #@gui : <a href="https://500px.com/spodeworld">Steven Brener</a>,
 #@gui : Susanne Gabrielski,
 #@gui : Andrea Correani,
