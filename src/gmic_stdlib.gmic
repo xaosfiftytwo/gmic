@@ -19812,7 +19812,7 @@ x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=rgb}
 ----\n
 ---- "${c}"Left mouse button"$n" adds a wanted color to the selection.\n
 ---- "${c}"Right mouse button"$n" adds an unwanted colors to the selection.\n
----- Key '"${c}"R"$n"' resets all colors.\n
+---- "${c}"Middle mouse button"$n" or key '"${c}"R"$n"' resets color mask.\n
 ---- Key '"${c}"SPACE"$n"' or '"${c}"TAB"$n"' toggles view modes (masked RGB or mask).\n
 ---- Keys '"${c}"CTRL+D"$n"' increase window size.\n
 ---- Keys '"${c}"CTRL+C"$n"' decrease window size.\n
@@ -19847,7 +19847,7 @@ x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=rgb}
       -elif {$b&2} # Subtract a color
         -if $is_sub colors_sub=$colors_sub,$c -else colors_sub=$c -endif
         refresh=1
-      -elif {{*,R}} # Reset colors
+      -elif {$b&4" || "{*,R}} # Reset colors
         colors_add=-1 colors_sub=-1 refresh=1
       -endif
       -if {{*,-TAB}||{*,-SPACE}} visumode={($visumode+1)%3} refresh=1 -endif # Change visu mode
@@ -25423,11 +25423,12 @@ fx_colormap_preview :
 #@gui : sep = separator()
 #@gui : Output mode = _choice(0,"Masked image","Color mask")
 #@gui : sep = separator()
+#@gui : note = note{"<small><b>Note:</b> This filter is CPU consuming, so use it at least with 4+ cores (or reduce the size of the interactive window to speed up computation).</small>"}
 #@gui : note = note{"<small><b>Interactions:</b>\n
 #@gui : Use the following actions in the interactive window to build your color mask :\n\n
 #@gui : - <b>Left mouse button</b> make the color pointed by the mouse wanted for the mask.\n
 #@gui : - <b>Right mouse button</b> make the color pointed by the mouse unwanted for the mask.\n
-#@gui : - <b>Middle mouse button</b> or key <b>R</b> resets current color mask.\n
+#@gui : - <b>Middle mouse button</b> or key <b>R</b> resets color mask.\n
 #@gui : - Key <b>SPACE</b> or <b>TAB</b> toggles view modes (half/full-masked RGB or color mask).\n
 #@gui : - Keys <b>CTRL+D</b> increase window size.\n
 #@gui : - Keys <b>CTRL+C</b> decrease window size.\n
