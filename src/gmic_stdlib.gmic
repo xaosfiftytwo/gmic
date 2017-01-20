@@ -19896,22 +19896,23 @@ _x_mask_color : # Estimate color mask image.
              if (is_#op,
                for (k = 0, k<size(colors_#op), k+=siz_#op, ++N_#op; M_#op+=colors_#op[k,siz_#op]);
                M_#op/=N_#op;
-               T = vectorsiz_#op#2();
-               for (k = 0, k<size(colors_#op), k+=siz_#op, C = colors_#op[k,siz_#op]-=M_#op; C*=den; T+=mul(C,transp(C,1),siz_#op));
-               T/=1e-8 + N_#op;
-               T+=eye(siz_#op);
-               T = inv(T);
-             ); T
+               T_#op = vectorsiz_#op#2();
+               for (k = 0, k<size(colors_#op), k+=siz_#op, C_#op = colors_#op[k,siz_#op]-=M_#op; C_#op*=den; T_#op+=mul(C_#op,transp(C_#op,1),siz_#op));
+               T_#op/=1e-8 + N_#op;
+               T_#op+=eye(siz_#op);
+               T_#op = inv(T_#op);
+             );
            );
-           T_add = tensor(add);
-           T_sub = tensor(sub);
+
+           tensor(add);
+           tensor(sub);
            N = N_add + N_sub;
            N_add/=N;
            N_sub/=N;
          );
-         pot_add = is_add?(C = I#0 - M_add; exp(-dot(C,T_add*C))):1;
-         pot_sub = is_sub?(C = I#0 - M_sub; exp(-dot(C,T_sub*C))):0;
-         N_add*pot_add - N_sub*pot_sub"
+         pot_add = is_add?(C_add = I#0 - M_add; exp(-dot(C_add,T_add*C_add))):1;
+         pot_sub = is_sub?(C_sub = I#0 - M_sub; exp(-dot(C_sub,T_sub*C_sub))):0;
+         pot_add - pot_sub"
     -n. 0,255
   -else -f. 255
   -endif
