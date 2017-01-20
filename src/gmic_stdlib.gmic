@@ -19891,26 +19891,30 @@ x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=rgb}
 
 _x_mask_color : # Estimate color mask image.
   100%,100%
-  -if {"arg(1,$3)>=0 || arg(1,$4)>=0"}
+  is_add={arg(1,$3)>=0}
+  is_sub={arg(1,$4)>=0}
+  -if {$is_add" || "$is_sub}
+    -if $is_add ($3) -r. {2+s#0},{w/(2+s#0)},1,1,-1 N_add={h} M_add={"M = vectorw(); for (k = 0, k<w, ++k, M[k] = med(crop(k,1)));M"} -rm. -endif
+    -if $is_sub ($4) -r. {2+s#0},{w/(2+s#0)},1,1,-1 N_sub={h} M_sub={"M = vectorw(); for (k = 0, k<w, ++k, M[k] = med(crop(k,1)));M"} -rm. -endif
     -f. "init(
-           const is_add = "{arg(1,$3)>=0}";
-           const is_sub = "{arg(1,$4)>=0}";
+           const is_add = "$is_add";
+           const is_sub = "$is_sub";
            const ss = sqrt(2)*$1;
            const sc = sqrt(2)*$2;
            colors_add = [ $3 ];
            colors_sub = [ $4 ];
+           M_add = [ 0"$M_add"];
+           M_sub = [ 0"$M_sub"];
+           const N_add = 0"$N_add";
+           const N_sub = 0"$N_sub";
            const siz = 2 + s#0;
            const siz2 = sqr(siz);
            sigma = vectorsiz(sc);
            sigma[0] = sigma[1] = ss;
 
            tensor(op) = (
-             M_#op = vectorsiz();
-             N_#op = 0;
              T = vectorsiz2();
              if (is_#op,
-               for (k = 0, k<size(colors_#op), k+=siz, ++N_#op; M_#op+=colors_#op[k,siz]);
-               M_#op/=N_#op;
                for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; C*=sigma; T+=mul(C,transp(C,1),siz));
                T/=1e-8 + N_#op;
                T+=eye(siz);
