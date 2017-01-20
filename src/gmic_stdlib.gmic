@@ -19823,7 +19823,7 @@ x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=rgb}
   -v - -l[] -_ac_$1 -onfail -error[0--3] "Command '-x_mask_color' : Invalid colorspace '$*'." -endl
   -m _ac_forward:$_f
   -repeat $! -l[$>] -to_rgb -slices 0 -basename {0,n} nm=${}
-    wh=${-fitscreen\ {[w,h]},1,128,1280}
+    wh=${-fitscreen\ {[w,h]},1,128,1024}
     --r $wh,1,3,2 --_ac_forward. -channels. $_s
     -w[1] 100%,100%,0,$nm
     colors_add=-1 colors_sub=-1 visumode=0
