@@ -25424,7 +25424,7 @@ fx_colormap_preview :
 
 #@gui Color mask [interactive] : fx_mask_color, gui_no_preview
 #@gui : Color metric = _choice(13,"RGB [all]","RGB [red]","RGB [green]","RGB [blue]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [all]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [all]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [all]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [all]","HSI [intensity]","HSL [all]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
-#@gui : Spatial tolerance = _float(5,0,100)
+#@gui : Spatial tolerance = _float(20,0,100)
 #@gui : Color tolerance = _float(5,0,100)
 #@gui : sep = separator()
 #@gui : Output mode = _choice(0,"Masked image","Color mask")
