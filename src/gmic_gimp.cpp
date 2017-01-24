@@ -4495,7 +4495,7 @@ void gmic_query() {
                 gmic_version/100,
                 (gmic_version/10)%10,
                 gmic_version%10);
-  cimg_snprintf(path,path.width(),"_G'MIC - %u.%u",
+  cimg_snprintf(path,path.width(),"_G'MIC - %u.%u...",
                 gmic_version/100,
                 (gmic_version/10)%10);
   const char *const author = "David Tschumperl\303\251";
