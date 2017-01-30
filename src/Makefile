@@ -469,7 +469,7 @@ endif
 libcgmic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
 	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
-	$(CXX) -o libcgmic.o -c gmic_libc.cpp -Dgmic_gimp $(PIC) $(CFLAGS)
+	$(CXX) -o libcgmic.o -c gmic_libc.cpp -Dgmic_gui $(PIC) $(CFLAGS)
 
 libcgmic: libgmic.o libcgmic.o
 	ar rcs libcgmic.a libcgmic.o
@@ -489,7 +489,7 @@ endif
 libcgmicstatic.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
 	@if [ ! -f gmic_libc.cpp ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.cpp .; fi
 	@if [ ! -f gmic_libc.h ]; then ln -fs ../../gmic-community/libcgmic/gmic_libc.h .; fi
-	$(CXX) -o libcgmicstatic.o -c gmic_libc.cpp -Dgmic_gimp $(PIC) $(CFLAGS)
+	$(CXX) -o libcgmicstatic.o -c gmic_libc.cpp -Dgmic_gui $(PIC) $(CFLAGS)
 
 libcgmicstatic: libgmic.o libcgmicstatic.o
 	ar rcs libcgmicstatic.a libcgmicstatic.o
@@ -507,17 +507,17 @@ endif
 
 # gmic_gimp
 gmic_gimp.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
-	$(CXX) -o gmic_gimp.o -c gmic.cpp -Dgmic_gimp $(CFLAGS)
+	$(CXX) -o gmic_gimp.o -c gmic.cpp -Dgmic_gui $(CFLAGS)
 
 gmic_gimp: gmic_gimp.o gmic_gimp.cpp
 ifeq ($(OS),Darwin)
 ifeq (,$(wildcard /tmp/skl))
-	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
+	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gui `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 else
-	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` $(subst -L/opt/local,-L/tmp/skl/Gimp.app/Contents/Resources,$(shell gimptool-2.0$(EXE) --libs) $(CFLAGS) $(LIBS))
+	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gui `gimptool-2.0$(EXE) --cflags` $(subst -L/opt/local,-L/tmp/skl/Gimp.app/Contents/Resources,$(shell gimptool-2.0$(EXE) --libs) $(CFLAGS) $(LIBS))
 endif
 else
-	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gimp `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
+	$(CXX) -o gmic_gimp$(VERSION1) gmic_gimp.cpp gmic_gimp.o -Dgmic_gui `gimptool-2.0$(EXE) --cflags` `gimptool-2.0$(EXE) --libs` $(CFLAGS) $(LIBS)
 endif
 	$(STRIP) gmic_gimp$(VERSION1)$(EXE)
 
@@ -589,7 +589,7 @@ stdlib:
 #  knowledge of the CeCILL license and that you accept its terms.\n\
 #\n\
 */\n" > gmic_stdlib.h
-	@echo "#ifndef gmic_gimp" >> gmic_stdlib.h
+	@echo "#ifndef gmic_gui" >> gmic_stdlib.h
 	@\gmic gmic_stdlib.gmic raw:gmic_stdlib.gmic,char -compress_gmic_cli 1 -a y -serialize char,1,0 -o -.h,uchar | sed 's/unsigned char/const unsigned char/' | sed 's/unnamed/gmic_stdlib/' >> gmic_stdlib.h
 	@echo "#else" >> gmic_stdlib.h
 	@\gmic gmic_stdlib.gmic raw:gmic_stdlib.gmic,char -compress_gmic_gui 1 -a y -serialize char,1,0 -o -.h,uchar | sed 's/unsigned char/const unsigned char/' | sed 's/unnamed/gmic_stdlib/' >> gmic_stdlib.h
