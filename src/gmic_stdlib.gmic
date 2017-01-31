@@ -5338,6 +5338,8 @@ compress_clut : -check "isint(${1=2048}) && $1>=1 && ${2=17.5}>=0 && ${3=1.75}>=
           rgb={clut,I($x,$y,$z)} \
           -=[keypoints] 1,$x,$y,$z \
           ($X,$Y,$Z,$rgb) -a[keycoords,-1] y"
+    -add_keypoint 0,0,0    -add_keypoint $_w1,0,0    -add_keypoint $_w1,$_h1,0
+    -add_keypoint 0,0,$_d1 -add_keypoint $_w1,0,$_d1 -add_keypoint $_w1,$_h1,$_d1
     -add_keypoint {potential,xM},{potential,yM},{potential,zM}
 
     0 -nm. error
