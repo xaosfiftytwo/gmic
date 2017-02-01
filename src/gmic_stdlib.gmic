@@ -19841,11 +19841,11 @@ x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=rgb}
       is_resized=0
       refresh=0
 
-      -if {$b&1} # Add a color
+      -if {$x>=0" && "$b&1} # Add a color
         -if $is_add colors_add=$colors_add,$c -else colors_add=$c -endif
         is_clicked=1
         refresh={$|-$time>$delay}
-      -elif {$b&2} # Subtract a color
+      -elif {$x>=0" && "$b&2} # Subtract a color
         -if $is_sub colors_sub=$colors_sub,$c -else colors_sub=$c -endif
         is_clicked=1
         refresh={$|-$time>$delay}
