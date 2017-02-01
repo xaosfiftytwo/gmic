@@ -19843,8 +19843,6 @@ x_mask_color : -check "${2=5}>=0 && ${3=5}>=0" -skip ${1=all}
       is_resized=0
       refresh=0
 
-#      -v + -e $c -v -
-
       -if {$x>=0" && "$b&1} # Add a color
         -if $is_add colors_add=$colors_add,$c -else colors_add=$c -endif
         is_clicked=1
@@ -19918,7 +19916,7 @@ _x_mask_color : # Estimate color mask image.
            tensor(op) = (
              T = vectorsiz2();
              if (is_#op,
-               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; C*=sigma; T+=mul(C,transp(C,1),siz));
+               for (k = 0, k<size(colors_#op), k+=siz, C = colors_#op[k,siz]-=M_#op; C*=sigma; T+=mul(C,C,siz));
                T/=1e-8 + N_#op;
                T+=eye(siz);
                T = inv(T);
