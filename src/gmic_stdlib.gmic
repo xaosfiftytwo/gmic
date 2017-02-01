@@ -10647,14 +10647,13 @@ close_binary : -check "${1=85}>=0 && $1<=100 && ${2=2}>=0 && ${3=80}>=0 && ${4=2
             ret = 1;
           );
         ); ret"
-      -rm[keypoints]
       -channels[keycoords] 0,3 # Channels 2, 3 = number of connexions and normal angle for each keypoint.
     -endif
-    -rm[curvatures]
+    -rm[curvatures,keypoints]
 
     # Estimate point normals.
     -if {!narg($keycoords)}
-      -i[new_strokes] [strokes]
+      -rm[e_normals,e_curvatures] -i[new_strokes] [strokes]
     -else
       -f[keycoords] "
         P = (I)[0,2];
@@ -24744,7 +24743,8 @@ _fx_colorize_lineart_smartcoloring :
   -if {$1" && "$!<2} -error "A top layer with color strokes is missing, for this colorization mode." -endif
   min_color_area={$14^2}
 
-  -repeat {$1?1:$!} inds=${-arg\ 1+$1,$>,0--1} -l[$inds]
+  -repeat {$1?1:$!} inds=${-arg\ 1+$1,$<,0--1} -l[$inds]
+
     ind_lineart={$1?1:0}
     nm=${-gui_layer_name[$ind_lineart]} -nm[$ind_lineart] lineart
     -if {$!>1} -nm[0] colors -endif
