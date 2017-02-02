@@ -8188,7 +8188,7 @@ blur_z : -skip ${2=1}
 #@cli : 'boundary' can be { 0=dirichlet | 1=neumann }.
 #@cli : When specified, argument 'axes' is a sequence of { x | y | z | c }.
 #@cli : Specifying one axis multiple times apply also the blur multiple times.
-#@cli : Default values: 'order=0' and 'boundary=1'.
+#@cli : Default values: 'order=0', 'boundary=1' and 'nb_iter=1'.
 #@cli : $ image.jpg --boxfilter 5%
 #@cli : $ image.jpg --boxfilter y,3,1
 
