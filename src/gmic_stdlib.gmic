@@ -5112,12 +5112,12 @@ div_complex : -check ${3=1e-8}>=0
 #@cli : $ image.jpg --mirror x -max
 #@cli : $ image.jpg -max 'R=((x/w-0.5)^2+(y/h-0.5)^2)^0.5;255*R'
 
-#@cli // : eq. to '-mdiv'. : (+)
+#@cli m/ : eq. to '-mdiv'. : (+)
 
 #@cli mdiv : value[%] : [image] : 'formula' : (no arg) : (+)
 #@cli : Compute the matrix division of selected matrices/vectors by specified value, image or
 #@cli : mathematical expression, or compute the matrix division of selected images.
-#@cli : (eq. to '-//').
+#@cli : (eq. to '-m/').
 
 #@cli min : value[%] : [image] : 'formula' : (no arg) : (+)
 #@cli : Compute the minimum between selected images and specified value, image or
@@ -25462,7 +25462,7 @@ fx_colormap_preview :
 fx_mask_color :
   cs=rgb,rgb_r,rgb_g,rgb_b,lrgb,lrgb_r,lrgb_g,lrgb_b,ycbcr_y,ycbcr_cbcr,ycbcr_cb,ycbcr_cr,ycbcr_cg,lab,lab_l,lab_ab,lab_a,lab_b,lch,lch_c,lch_h,\
      hsv,hsv_h,hsv_s,hsv_v,hsi,hsi_i,hsl,hsl_l,cmyk_c,cmyk_m,cmyk_y,cmyk_k,yiq_y,yiq_iq
-  -repeat $! -l[$<] nm={n} -nm ${-gui_layer_name}
+  -repeat $! -l[$<] -to_rgb nm={n} -nm ${-gui_layer_name}
     --x_mask_color ${-arg\ 1+$1,$cs},$2,$3
     -if {$4==1} -channels. 100% -endif
     -nm $nm -rv
