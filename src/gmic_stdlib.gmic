@@ -8183,7 +8183,7 @@ blur_z : -skip ${2=1}
   -v - -deriche $1,0,z,$2 -v +
 
 #@cli boxfilter : size>=0[%],_order,_boundary : axes,size>=0[%],_order,_boundary : (+)
-#@cli : Blur selected images by a box filter of specified size (recursive implementation).
+#@cli : Blur selected images by a box filter of specified size (fast recursive implementation).
 #@cli : 'order' can be { 0=smooth | 1=1st-derivative | 2=2nd-derivative }.
 #@cli : 'boundary' can be { 0=dirichlet | 1=neumann } and 'kernel' can be { 0=quasi-gaussian (faster) | 1=gaussian }.
 #@cli : When specified, argument 'axes' is a sequence of { x | y | z | c }.
