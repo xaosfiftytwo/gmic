@@ -773,7 +773,7 @@ _help_usage :
 \n          (complex conjugate), '"${c}"cexp()"$n"' (complex exponential) and '"${c}"clog()"$n"' (complex logarithm).
 \n       . A "${g}"MN"$n"-dimensional vector may be seen as a "${g}"M"${n}" x "${g}"N"$n" matrix and used in those particular
 \n          functions/operators:
-\n          '"${c}"**"$n"' (matrix-vector multiplication), '"${c}"det(A)"$n"' (determinant), '"${c}"diag(V)"$n"' (diagonal matrix
+\n          '"${c}"*"$n"' (matrix-vector multiplication), '"${c}"det(A)"$n"' (determinant), '"${c}"diag(V)"$n"' (diagonal matrix
 \n          from a vector), '"${c}"eig(A)"$n"' (eigenvalues/eigenvectors), '"${c}"eye(n)"$n"' (n x n identity matrix),
 \n          '"${c}"inv(A)"$n"' (matrix inverse), '"${c}"mul(A,B,_nb_colsB)"$n"' (matrix-matrix multiplication),
 \n          '"${c}"pseudoinv(A,_nb_colsA)"$n"', '"${c}"rot(x,y,z,angle)"$n"' (3d rotation matrix), '"${c}"rot(angle)"$n"' (2d
@@ -3213,9 +3213,9 @@ shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0
      xy = [ 0,0 ];
      for (n = 0, n<"$N", ++n,
        r = u(100);
-       xy = r<=1?((f1**xy)+=g1):
-            r<=8?((f2**xy)+=g2):
-            r<=15?((f3**xy)+=g3):((f4**xy)+=g4);
+       xy = r<=1?((f1*xy)+=g1):
+            r<=8?((f2*xy)+=g2):
+            r<=15?((f3*xy)+=g3):((f4*xy)+=g4);
        I[n] = xy
     )"}
     -permute xczy
