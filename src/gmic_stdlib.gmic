@@ -3219,7 +3219,7 @@ shape_fern : -check "${1=512}>=0 && ${2=50%}>=0 && isval(${3=30}) && ${4=0.3}>=0
        I[n] = xy
     )"}
     -permute xczy
-    -i.. 2,2,1,1,{"R=rot(-$3); R[2] = -R[2]; R[3] = -R[3]; R"} -**
+    -i.. 2,2,1,1,{"R=rot(-$3); R[2] = -R[2]; R[3] = -R[3]; R"} -m*
     -repeat 2 -sh. $>,$>,0,0 --. {im} -rm. -done -n 0,{$ir-1}
     -pointcloud -$4 -r $ir,$ir,1,1,0,0,0.5,0.5
   -endl -endif
@@ -5134,12 +5134,12 @@ div_complex : -check ${3=1e-8}>=0
 #@cli : $ image.jpg --mirror x -mod
 #@cli : $ image.jpg -mod 'R=((x/w-0.5)^2+(y/h-0.5)^2)^0.5;255*R'
 
-#@cli ** : eq. to '-mmul'. : (+)
+#@cli m* : eq. to '-mmul'. : (+)
 
 #@cli mmul : value[%] : [image] : 'formula' : (no arg) : (+)
 #@cli : Compute the matrix right multiplication of selected matrices/vectors by specified value, image or
 #@cli : mathematical expression, or compute the matrix right multiplication of selected images.
-#@cli : (eq. to '-**').
+#@cli : (eq. to '-m*').
 #@cli : $ (0,1,0;0,0,1;1,0,0) (1;2;3) --mmul
 
 #@cli * : eq. to '-mul'. : (+)
@@ -5643,7 +5643,7 @@ map_clut : -check ${-is_image_arg\ $1}
 mix_channels :
   -e[^-1] "Apply matrix $1 to channels of image$?."
   -v - -repeat $! -l[$>] nm={0,n}
-    whd={w},{h},{d} -r {w*h*d},{s},1,1,-1 -i[0] ${^0} -** -r $whd,{h},-1
+    whd={w},{h},{d} -r {w*h*d},{s},1,1,-1 -i[0] ${^0} -m* -r $whd,{h},-1
   -nm $nm -endl -done -v +
 
 #@cli negate : base_value : (no arg)
@@ -9870,7 +9870,7 @@ detect_skin : -check "${1=0.5}>=0 && $1<=1" -skip ${2=-1},${3=-1},${4=-1}
     -repeat $! -l[$>]
       whd={w},{h},{d} -r {w*h*d},2,1,1,-1
       -s y --[0] $m0 --[1] $m1 -a y
-      -i[0] ($A,$B;$B,$C) --** -rm[0]
+      -i[0] ($A,$B;$B,$C) --m* -rm[0]
       -* -s y -+ -*. {$1-1} -exp.
       -r $whd,1,-1
     -endl -done
@@ -9884,9 +9884,9 @@ detect_skin : -check "${1=0.5}>=0 && $1<=1" -skip ${2=-1},${3=-1},${4=-1}
       -s[1] c
       m0={1,ia} --[1] $m0
       m1={2,ia} --[2] $m1
-      M={h} -a[1,2] x --transpose[1] -rv[1,2] -**[1,2] -/[1] $M -invert[1]
+      M={h} -a[1,2] x --transpose[1] -rv[1,2] -m*[1,2] -/[1] $M -invert[1]
       -rv whd={w},{h},{d} -r[1] {w*h*d},2,1,1,-1
-      -s[1] y --[1] $m0 --[2] $m1 -a[1,2] y --** -rm[0]
+      -s[1] y --[1] $m0 --[2] $m1 -a[1,2] y --m* -rm[0]
       -* -s y -+ -*. {$1-1} -exp.
       -r $whd,1,-1
     -endl -done
@@ -10460,7 +10460,7 @@ chessboard : -check "$1>0 && ${2=$1}>0" -skip ${3=0},${4=0},${5=0},${6=1},${7=0}
     w={w} h={h} theta={$5*pi/180}
     ($3,{$3+$w-1};$3,{$3+$w-1}^$4,$4;{$4+$h-1},{$4+$h-1}) -r. $w,$h,1,2,3
     -r. {$w*$h},2,1,1,-1
-    -i.. ({cos($theta)},{-sin($theta)};{sin($theta)},{cos($theta)}) -**[-2,-1]
+    -i.. ({cos($theta)},{-sin($theta)};{sin($theta)},{cos($theta)}) -m*[-2,-1]
     -r. $w,$h,1,2,-1
     -%. {$1+$2} ->=. $1 -s. c -xor[-2,-1] -map. [0] -r. 100%,100%,1,..
     -j.. .,0,0,0,0,$6 -rm.
@@ -11741,7 +11741,7 @@ arrow3d : -check "${7=5%}>=0 && ${8=25%}>=0 && ${9=15%}>=0"
   -a[-3--1] y
 
   # Rotate and translate the arrow at specified coordinates.
-  -s3d.. -r[-5] 3,{-5,h/3},1,1,-1 -**[-5,-1]
+  -s3d.. -r[-5] 3,{-5,h/3},1,1,-1 -m*[-5,-1]
   -y[-4] -a[-6--1] y -+3d. ${1-3} -rv3d.
   -v +
 
@@ -12563,7 +12563,7 @@ pca_patch3d : -check "isint(${1=7}) && $1>0 && isint(${2=1000}) && $2>0 && isint
     -if $4 -l. -s y -/ 'sqrt(1e-8+iv)' -a y -endl -endif
 
     # Do PCA for dimension reduction.
-    --transpose. -**[-2,-1]
+    --transpose. -m*[-2,-1]
     -eigen. -rows.. 0,2 -columns. 0,2 -transpose.
     -if $5 -sqrt.. -/.. {-2,iM} -r.. . -/. .. -endif
     -rm..
@@ -12578,7 +12578,7 @@ pca_patch3d : -check "isint(${1=7}) && $1>0 && isint(${2=1000}) && $2>0 && isint
     -done
 
     # Generate 3d representation of the projected patch set.
-    --a[2--1] x -**[1,-1] -transpose[1]                    # Vertex coordinates.
+    --a[2--1] x -m*[1,-1] -transpose[1]                    # Vertex coordinates.
     -rows[2--1] 2,100%                                     # Colors
     -if {$s!=3}
       -r[2--1] $1,$1,1,{min(3,$s)},-1
@@ -12645,7 +12645,7 @@ pose3d :
   -e[^-1] "Apply 3d pose matrix [ $1,$2,$3,$4; $5,$6,$7,$8; $9,$10,$11,$12 ] to 3d object$?."
   -v - -repeat $! -l[$>] -if ${-_is_3d}
     -s3d -r[2] 3,{2,h/3},1,1,-1 -i[3] 1,{2,h},1,1,1 -a[2,3] x
-    -i[3] ($1,$5,$9;$2,$6,$10;$3,$7,$11;$4,$8,$12) -**[2,3]
+    -i[3] ($1,$5,$9;$2,$6,$10;$3,$7,$11;$4,$8,$12) -m*[2,3]
     -r[2] 1,{2,3*h},1,1,-1 -a y
   -else -v + -error "Command '-pose3d': Image ["{$!-$>-1}"] does not represent a 3d object."
   -endif -endl -done -v +
@@ -20760,7 +20760,7 @@ x_quantize_rgb : -check "isint(${1=16}) && $1>1"
         n1={sqrt(($u1)^2+($v1)^2)}
         nu1={if($n1>135,$u1*135/$n1,$u1)} nv1={if($n1>135,$v1*135/$n1,$v1)} nw1={sqrt(max(0,18225-($nu1)^2-($nv1)^2))}
         u={$nv0*$nw1-$nw0*$nv1} v={$nw0*$nu1-$nu0*$nw1} w={$nv0*$nu1-$nu0*$nv1} n={sqrt(($u)^2+($v)^2+($w)^2)}
-        -rotation3d[] $u,$v,$w,{-asin($n/18225)*180/pi} -mv[pose3d] $! -**[-2,-1] -nm. pose3d
+        -rotation3d[] $u,$v,$w,{-asin($n/18225)*180/pi} -mv[pose3d] $! -m*[-2,-1] -nm. pose3d
         u0=$u1 v0=$v1 -rm[visu_3d]
       -endif
     -elif {!($b&1)} u0=

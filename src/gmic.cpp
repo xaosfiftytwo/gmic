@@ -4664,8 +4664,8 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
           else if (command1=='=' && command2=='=') std::strcpy(command,"-eq");
           else if (command1=='>' && command2=='=') std::strcpy(command,"-ge");
           else if (command1=='<' && command2=='=') std::strcpy(command,"-le");
-          else if (command1=='/' && command2=='/') std::strcpy(command,"-mdiv");
-          else if (command1=='*' && command2=='*') std::strcpy(command,"-mmul");
+          else if (command1=='m' && command2=='/') std::strcpy(command,"-mdiv");
+          else if (command1=='m' && command2=='*') std::strcpy(command,"-mmul");
           else if (command1=='!' && command2=='=') std::strcpy(command,"-neq");
 
         } else if (!command4 && command2=='3' && command3=='d') switch (command1) {
@@ -13742,51 +13742,30 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
                   CImg<char>::string(filename).move_to(name);
                   char *const posb = std::strchr(name,'[');
                   if (posb) *posb = 0;  // Discard selection from the command name.
-
                   static const char *native_command_names[] = {
-                    "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s",
-                    "t","u","v","w","x","y","z",
-                    "+","-","*","/","\\\\",">","<","%","^","=","sh","mv","rm","rv","<<",">>","==",">=",
-                    "<=","//","**","!=","&","|",
-                    "d3d","+3d","/3d","f3d","j3d","l3d","m3d","*3d","o3d","p3d","r3d","s3d","-3d",
-                    "t3d","db3d","md3d","rv3d","sl3d","ss3d","div3d",
-                    "append","autocrop","add","add3d","abs","and","atan2","acos","asin","atan",
-                    "axes",
-                    "blur","boxfilter","bsr","bsl","bilateral","break",
-                    "check","check3d","crop","channels","columns","command","camera","cut","cos",
-                    "convolve","correlate","color3d","col3d","cosh","continue","cumulate",
-                    "cursor",
-                    "done","do","debug","divide","distance","dilate","discard","double3d","denoise",
-                    "deriche","dijkstra","displacement","display","display3d",
-                    "endif","else","elif","endlocal","endl","echo","exec","error","endian","exp",
-                    "eq","ellipse","equalize","erode","elevation3d","eigen","eikonal",
-                    "fill","flood","files","focale3d","fft",
-                    "ge","gt","gradient","graph","guided",
-                    "histogram","hsi2rgb","hsl2rgb","hsv2rgb","hessian",
-                    "input","if","image","index","invert","isoline3d","isosurface3d","inpaint",
-                    "ifft",
-                    "keep",
-                    "local","le","lt","log","log2","log10","line","lab2rgb","label","light3d",
-                    "move","mirror","mul","mutex","mod","max","min","mmul","mode3d","moded3d",
-                    "map","median","mdiv","mse","mandelbrot","mul3d",
-                    "name","normalize","neq","noarg","noise",
-                    "output","onfail","object3d","or","opacity3d",
-                    "parallel","pass","patchmatch","permute","progress","print","pow","point","polygon",
-                    "plasma","primitives3d","plot",
-                    "quit",
-                    "remove","repeat","resize","reverse","return","rows","rotate",
-                    "round","rand","rotate3d","rgb2hsi","rgb2hsl","rgb2hsv","rgb2lab",
-                    "rgb2srgb","rol","ror","reverse3d",
-                    "status","skip","set","split","shared","shift","slices","srand","sub","sqrt",
-                    "sqr","sign","sin","sort","solve","sub3d","sharpen","smooth","split3d",
-                    "screen", "svd","sphere3d","specl3d","specs3d","sinc","sinh","srgb2rgb","streamline3d",
-                    "structuretensors","select","serialize",
-                    "threshold","tan","text","texturize3d","trisolve","tanh",
-                    "unroll","uncommand","unserialize",
-                    "vanvliet","verbose",
-                    "while","warn","window","warp","watershed","wait",
-                    "xor",0
-                  };
+                    "!=","%","&","*","*3d","+","+3d","-","-3d","/","/3d","<","<<","<=","=","==",">",">=",">>","a","abs",
+                    "acos","add","add3d","and","append","asin","atan","atan2","autocrop","axes","b","bilateral","blur",
+                    "boxfilter","break","bsl","bsr","c","camera","channels","check","check3d","col3d","color3d",
+                    "columns","command","continue","convolve","correlate","cos","cosh","crop","cumulate","cursor","cut",
+                    "d","d3d","db3d","debug","denoise","deriche","dijkstra","dilate","discard","displacement","display",
+                    "display3d","distance","div3d","divide","do","done","double3d","e","echo","eigen","eikonal",
+                    "elevation3d","elif","ellipse","else","endian","endif","endl","endlocal","eq","equalize","erode",
+                    "error","exec","exp","f","f3d","fft","files","fill","flood","focale3d","g","ge","gradient","graph",
+                    "gt","guided","h","hessian","histogram","hsi2rgb","hsl2rgb","hsv2rgb","i","if","ifft","image",
+                    "index","inpaint","input","invert","isoline3d","isosurface3d","j","j3d","k","keep","l","l3d",
+                    "lab2rgb","label","le","light3d","line","local","log","log10","log2","lt","m","m*","m/","m3d",
+                    "mandelbrot","map","max","md3d","mdiv","median","min","mirror","mmul","mod","mode3d","moded3d",
+                    "move","mse","mul","mul3d","mutex","mv","n","name","neq","noarg","noise","normalize","o","o3d",
+                    "object3d","onfail","opacity3d","or","output","p","p3d","parallel","pass","patchmatch","permute",
+                    "plasma","plot","point","polygon","pow","primitives3d","print","progress","q","quit","r","r3d",
+                    "rand","remove","repeat","resize","return","reverse","reverse3d","rgb2hsi","rgb2hsl","rgb2hsv",
+                    "rgb2lab","rgb2srgb","rm","rol","ror","rotate","rotate3d","round","rows","rv","rv3d","s","s3d",
+                    "screen","select","serialize","set","sh","shared","sharpen","shift","sign","sin","sinc","sinh",
+                    "skip","sl3d","slices","smooth","solve","sort","specl3d","specs3d","sphere3d","split","split3d",
+                    "sqr","sqrt","srand","srgb2rgb","ss3d","status","streamline3d","structuretensors","sub","sub3d",
+                    "svd","t","t3d","tan","tanh","text","texturize3d","threshold","trisolve","u","uncommand","unroll",
+                    "unserialize","v","vanvliet","verbose","w","wait","warn","warp","watershed","while","window","x",
+                    "xor","y","z","\\","^","|",0 };
 
                   const char *misspelled = 0;
                   const unsigned int foff = name[1]=='-'?2U:1U;
