@@ -5029,6 +5029,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
           float sigma = -1;
           sep = *argx = 0;
           boundary = 1;
+          value = 1;
           const char *_argument = argument;
           if (cimg_sscanf(argument,"%255[xyzc]%c",argx,&sep)==2 && sep==',') {
             _argument+=1 + std::strlen(argx);
