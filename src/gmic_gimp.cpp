@@ -64,7 +64,7 @@
 // Manage different versions of the GIMP API.
 #define _gimp_item_is_valid gimp_item_is_valid
 #define _gimp_image_get_item_position gimp_image_get_item_position
-#if GIMP_MINOR_VERSION<=7 && GIMP_MICRO_VERSION<16
+#if GIMP_MINOR_VERSION<=7 && GIMP_MICRO_VERSION<14
 #define _gimp_item_get_visible gimp_drawable_get_visible
 #else
 #define _gimp_item_get_visible gimp_item_get_visible
