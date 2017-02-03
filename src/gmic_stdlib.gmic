@@ -24054,7 +24054,7 @@ fx_highlight_bloom :
 fx_highlight_bloom_preview :
   -gui_split_preview "-fx_highlight_bloom $*",$-1
 
-#@gui Illustration Look : fx_illustration_look,fx_illustration_look_preview(0)
+#@gui Illustration look : fx_illustration_look,fx_illustration_look_preview(0)
 #@gui : Tone mapping (%) = float(100,0,100)
 #@gui : Desaturate (%) = float(0,0,100)
 #@gui : Vintage tone (%) = float(0,0,100)
@@ -32965,6 +32965,7 @@ gmicol_brushify_preview :
 #@web clone("Fractalize")
 #@web clone("Hope poster")
 #@web clone("Highlight bloom")
+#@web clone("Illustration look")
 #@web clone("Kuwahara")
 #@web clone("Lylejk's painting")
 #@web clone("Painting")
@@ -33069,6 +33070,7 @@ gmicol_rotate :
 #@web clone("B&amp;W stencil")
 #@web clone("Charcoal")
 #@web clone("Colorize lineart [auto-fill]")
+#@web clone("Colorize lineart [smart coloring]")
 #@web clone("Colorize [with colormap]")
 #@web clone("Dithering")
 #@web clone("Emboss")
