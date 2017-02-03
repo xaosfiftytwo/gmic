@@ -28076,7 +28076,7 @@ _fx_emulate_film_bw :
 fx_emulate_film_bw_preview :
   -gui_split_preview "-fx_emulate_film_bw $*",$-1
 
-#@gui Fuji XTrans : fx_emulate_film_fujixtransii, fx_emulate_film_fujixtransii_preview(1)+
+#@gui Fuji xtrans : fx_emulate_film_fujixtransii, fx_emulate_film_fujixtransii_preview(1)+
 #@gui : Preset = choice{"None",
 #@gui : "Astia","Classic Chrome","Pro Neg Hi","Pro Neg Std","Provia","Velvia"}
 #@gui : sep = separator()
@@ -33289,7 +33289,7 @@ gmicol_rotate :
 
 #@web clone("Add grain")
 #@web clone("B&amp;W films")
-#@web clone("Fuji XTrans")
+#@web clone("Fuji xtrans")
 #@web clone("Instant [consumer]")
 #@web clone("Instant [pro]")
 #@web clone("Negative [color]")
