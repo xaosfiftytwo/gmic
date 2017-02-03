@@ -5659,7 +5659,7 @@ gmic& gmic::_run(const CImgList<char>& commands_line, unsigned int& position,
             }
             if (file) {
               CImg<char> _status;
-              status.move_to(_status); // Save status because 'add_commands' can change it.
+              status.move_to(_status); // Save status because 'add_commands()' can change it.
               const int _verbosity = verbosity;
               const bool _is_debug = is_debug;
               verbosity = -1; is_debug = false;
