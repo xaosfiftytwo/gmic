@@ -27156,14 +27156,22 @@ fx_blur_angular_preview :
 #@gui : Operator = choice("Add","Max","Min")
 #@gui : Kernel = choice("Quasi-gaussian","Gaussian","Box","Triangle","Quadratic")
 #@gui : Normalize scales = bool(0)
-#@gui : Orientation = choice(2,"Horizontal","Vertical","Isotropic")
+#@gui : Anisotropy = float(0,0,1)
+#@gui : Angle = float(0,-180,180)
+#@gui : note = note("Parameter <i>Angle</i> is only active when <i>Anisotropy</i>&gt;0")
 #@gui : sep = separator(), Channel(s) = choice(7,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
 #@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
 #@gui : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>02/03/2015</i>.</small>")
 fx_blur_bloom :
   op=${"-arg 1+$4,+,max,min"}
-  axes=${"-arg 1+$7,x,y,xy"}
-  -ac "-blur_bloom ${1-3},"$op",${5-6},"$axes,$8
+  -if {!$7} -ac "-blur_bloom ${1-3},"$op",${5-6},xy",$9
+  -else
+    wh={[w,h]}
+    -rotate $8,2,1
+    -ac "-blur_bloom ${1-3},"$op",${5-6},x -blur_bloom {$1*(1-$7)},${2-3},"$op",${5-6},y",$9
+    -rotate {-$8},2,1
+    -r $wh,1,100%,0,0,0.5,0.5
+  -endif
 
 fx_blur_bloom_preview :
   -gui_split_preview "-fx_blur_bloom $*",$-1
