@@ -8100,6 +8100,29 @@ blur_angular : -skip ${2=50%},${3=50%}
   -e[^-1] "Apply angular blur on image$?, with amplitude $1 and center point ($2,$3)."
   -v - -euclidean2polar $2,$3,1.3,1 -expand_y 16,2 -blur_y $1 -shrink_y 16 -polar2euclidean $2,$3,1.3,1 -v +
 
+#@cli blur_bloom : _amplitude>=0,_ratio>=0,_nb_iter>=0,_blend_operator={ + | max | min },_kernel={ 0=quasi-gaussian (faster) | 1=gaussian | 2=box | 3=triangle | 4=quadratic },_normalize_scales={ 0 | 1 }
+#@cli : Apply a bloom filter that blend multiple blur filters of different radii,
+#@cli : resulting in a larger but sharper glare than a simple blur.
+#@cli : Reference: Masaki Kawase, “Practical Implementation of High Dynamic Range Rendering”, GDC 2004.
+#@cli : Default values: 'amplitude=1', 'ratio=2', 'nb_iter=5', 'blend_operator=+', 'kernel=0' and 'normalize_scales=0'
+blur_bloom : -check "${1=1}>=0 && ${2=2}>=0 && isint(${3=5}) && $3>=0 && isint(${5=0}) && $5>=0 && $5<=4 && isval(${6=0})" -skip ${4=+}
+  -e[^-1] "Apply bloom effect on image$?, with amplitude $1, ratio $2, $3 iterations, blend operator '$4' and "${"-arg 1+!$6,\"\",\"no \""}"scale normalization."
+  -v -
+  -m "_bloom0 : -b $""1"
+  -m "_bloom1 : -b $""1,1,1"
+  -m "_bloom2 : -boxfilter {1+2*$""1},0,1"
+  -m "_bloom3 : -boxfilter {1+2*$""1},0,1,2"
+  -m "_bloom4 : -boxfilter {1+2*$""1},0,1,3"
+  -repeat $! -l[$>] nm={n} mM={[im,iM]}
+    [0] -repeat $3 sigma={$1*($2^$>)} --_bloom$5[0] $sigma
+    -if $6 -n. $mM -endif
+    -$4[1,-1]
+    -done
+    -n. $mM -k. -nm $nm
+  -endl -done
+  -uncommand _bloom0,_bloom1,_bloom2,_bloom3,_bloom4
+  -v +
+
 #@cli blur_linear : amplitude1[%],_amplitude2[%],_angle,_boundary={ 0=dirichlet | 1=neumann }
 #@cli : Apply linear blur on selected images, with specified angle and amplitudes.
 #@cli : Default values: 'amplitude2=0', 'angle=0' and 'boundary=1'.
@@ -27123,6 +27146,23 @@ fx_blur_angular_preview :
     -circle $2%,$3%,5,0.7,0 -circle $2%,$3%,3,0.7,0,255,0
   -endif
 
+#@gui Blur [bloom] : fx_blur_bloom, fx_blur_bloom_preview(0)
+#@gui : Amplitude = float(1,0,10)
+#@gui : Ratio = float(2,0,5)
+#@gui : Iterations = int(5,0,10)
+#@gui : Operator = choice("Add","Max","Min")
+#@gui : Kernel = choice("Quasi-gaussian","Gaussian","Box","Triangle","Quadratic")
+#@gui : Normalize scales = bool(0)
+#@gui : sep = separator(), Channel(s) = choice(7,"All","RGBA [all]","RGB [all]","RGB [red]","RGB [green]","RGB [blue]","RGBA [alpha]","Linear RGB [all]","Linear RGB [red]","Linear RGB [green]","Linear RGB [blue]","YCbCr [luminance]","YCbCr [blue-red chrominances]","YCbCr [blue chrominance]","YCbCr [red chrominance]","YCbCr [green chrominance]","Lab [lightness]","Lab [ab-chrominances]","Lab [a-chrominance]","Lab [b-chrominance]","Lch [ch-chrominances]","Lch [c-chrominance]","Lch [h-chrominance]","HSV [hue]","HSV [saturation]","HSV [value]","HSI [intensity]","HSL [lightness]","CMYK [cyan]","CMYK [magenta]","CMYK [yellow]","CMYK [key]","YIQ [luma]","YIQ [chromas]")
+#@gui : sep = separator(), Preview type = choice("Full","Forward horizontal","Forward vertical","Backward horizontal","Backward vertical","Duplicate top","Duplicate left","Duplicate bottom","Duplicate right")
+#@gui : sep = separator(), note = note("<small>Author: <i>David Tschumperl&#233;</i>.      Latest update: <i>02/03/2015</i>.</small>")
+fx_blur_bloom :
+  op=${"-arg 1+$4,+,max,min"}
+  -ac "-blur_bloom ${1-3},"$op",${5-6}",$7
+
+fx_blur_bloom_preview :
+  -gui_split_preview "-fx_blur_bloom $*",$-1
+
 #@gui Blur [depth-of-field] : fx_blur_dof, fx_blur_dof_preview(1)
 #@gui : Blur amplitude = float(3,0,20)
 #@gui : Blur precision = int(16,2,64)
@@ -33181,6 +33221,7 @@ gmicol_rotate :
 #----------------------------
 
 #@web clone("Blur [angular]")
+#@web clone("Blur [bloom]")
 #@web clone("Blur [depth-of-field]")
 #@web clone("Blur [gaussian]")
 #@web clone("Blur [glow]")
