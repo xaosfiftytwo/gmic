@@ -4213,7 +4213,6 @@ update_server :
   -replace_str "#@gmic\n",""
   -replace_str "<small>samj","<small>Author: <i>Samj</i>."
   -replace_str " Update : <i>20","   Latest update: <i>20"
-#  -replace_str "<i>David Tschumperl&#233;</i>","<i><a href=\"https://goo.gl/PTcydp\">David Tschumperl&#233;</a></i>"
 
   # Remove useless comments and line breaks.
   -repeat $! -l[$>] -s -,10 -repeat $! -l[$<]
@@ -4257,6 +4256,7 @@ update_server :
 
     # Upload filter files on G'MIC server.
     -o raw:${_path_rc}update$_version.gmic,uchar
+    -replace_str "<i>David Tschumperl&#233;</i>","<i><a href=\"https://goo.gl/PTcydp\">David Tschumperl&#233;</a></i>"
     -o cimgz:/tmp/update$_version.gmic,uchar
 
     (180,200)
